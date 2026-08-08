@@ -1,0 +1,54 @@
+mode,item,v1,v2,v3,v4
+ENV,range,2026.07.06,2026.07.13,bars=1441,EURUSD
+ENV,policy,A: 1.00% risk, capped by margin,balance=$10000.00,NO P&L COMPUTED,
+ENV,candidates,1,3,5,10,15,20 pts,PRE-REGISTERED,PAD and FLOOR both reported,neither selected
+POPULATION,signals,67,same population as E-MT5-013/014,,
+PAD,X=1pts,qualifying=67,excluded=0,executable=67 (100.0%),micro<5pts=8
+PAD,X=1_stopdist,p10=4.0,median=17.0,p90=41.0,max=105.0
+PAD,X=1_lot,theo_median=5.88,theo_max=99.99,capped_median=3.80,capped_max=5.25
+PAD,X=1_risk,actual_risk_median=$81.94,actual_risk_min=$2.98,planned=$100.00,margin_median=$5690.14
+PAD,X=3pts,qualifying=67,excluded=0,executable=67 (100.0%),micro<5pts=5
+PAD,X=3_stopdist,p10=6.0,median=19.0,p90=43.0,max=107.0
+PAD,X=3_lot,theo_median=5.26,theo_max=33.33,capped_median=3.93,capped_max=5.26
+PAD,X=3_risk,actual_risk_median=$99.37,actual_risk_min=$9.39,planned=$100.00,margin_median=$5966.61
+PAD,X=5pts,qualifying=67,excluded=0,executable=67 (100.0%),micro<5pts=0
+PAD,X=5_stopdist,p10=8.0,median=21.0,p90=45.0,max=109.0
+PAD,X=5_lot,theo_median=4.76,theo_max=19.99,capped_median=3.91,capped_max=5.24
+PAD,X=5_risk,actual_risk_median=$99.75,actual_risk_min=$16.50,planned=$100.00,margin_median=$5944.52
+PAD,X=10pts,qualifying=67,excluded=0,executable=67 (100.0%),micro<5pts=0
+PAD,X=10_stopdist,p10=13.0,median=26.0,p90=50.0,max=114.0
+PAD,X=10_lot,theo_median=3.84,theo_max=10.00,capped_median=3.84,capped_max=5.23
+PAD,X=10_risk,actual_risk_median=$99.82,actual_risk_min=$38.00,planned=$100.00,margin_median=$5749.67
+PAD,X=15pts,qualifying=67,excluded=0,executable=67 (100.0%),micro<5pts=0
+PAD,X=15_stopdist,p10=18.0,median=31.0,p90=55.0,max=119.0
+PAD,X=15_lot,theo_median=3.22,theo_max=6.66,capped_median=3.22,capped_max=5.24
+PAD,X=15_risk,actual_risk_median=$99.84,actual_risk_min=$67.20,planned=$100.00,margin_median=$4367.17
+PAD,X=20pts,qualifying=67,excluded=0,executable=67 (100.0%),micro<5pts=0
+PAD,X=20_stopdist,p10=23.0,median=36.0,p90=60.0,max=124.0
+PAD,X=20_lot,theo_median=2.77,theo_max=5.00,capped_median=2.77,capped_max=5.00
+PAD,X=20_risk,actual_risk_median=$99.84,actual_risk_min=$99.18,planned=$100.00,margin_median=$3337.59
+FLOOR,X=1pts,qualifying=67,excluded=0,executable=67 (100.0%),micro<5pts=8
+FLOOR,X=1_stopdist,p10=4.0,median=17.0,p90=41.0,max=105.0
+FLOOR,X=1_lot,theo_median=5.88,theo_max=99.99,capped_median=3.80,capped_max=5.25
+FLOOR,X=1_risk,actual_risk_median=$81.94,actual_risk_min=$2.98,planned=$100.00,margin_median=$5690.14
+FLOOR,X=3pts,qualifying=62,excluded=5,executable=62 (100.0%),micro<5pts=3
+FLOOR,X=3_stopdist,p10=7.0,median=18.0,p90=42.0,max=105.0
+FLOOR,X=3_lot,theo_median=5.88,theo_max=33.33,capped_median=4.04,capped_max=5.25
+FLOOR,X=3_risk,actual_risk_median=$90.54,actual_risk_min=$9.39,planned=$100.00,margin_median=$6243.72
+FLOOR,X=5pts,qualifying=59,excluded=8,executable=59 (100.0%),micro<5pts=0
+FLOOR,X=5_stopdist,p10=9.0,median=19.0,p90=42.0,max=105.0
+FLOOR,X=5_lot,theo_median=5.26,theo_max=19.99,capped_median=4.05,capped_max=5.25
+FLOOR,X=5_risk,actual_risk_median=$99.37,actual_risk_min=$16.50,planned=$100.00,margin_median=$6248.99
+FLOOR,X=10pts,qualifying=48,excluded=19,executable=48 (100.0%),micro<5pts=0
+FLOOR,X=10_stopdist,p10=14.0,median=20.0,p90=44.0,max=105.0
+FLOOR,X=10_lot,theo_median=5.00,theo_max=8.33,capped_median=4.33,capped_max=5.25
+FLOOR,X=10_risk,actual_risk_median=$99.63,actual_risk_min=$48.48,planned=$100.00,margin_median=$6886.69
+FLOOR,X=15pts,qualifying=40,excluded=27,executable=40 (100.0%),micro<5pts=0
+FLOOR,X=15_stopdist,p10=16.0,median=23.0,p90=61.0,max=105.0
+FLOOR,X=15_lot,theo_median=4.34,theo_max=6.66,capped_median=4.34,capped_max=5.25
+FLOOR,X=15_risk,actual_risk_median=$99.75,actual_risk_min=$67.20,planned=$100.00,margin_median=$6920.02
+FLOOR,X=20pts,qualifying=23,excluded=44,executable=23 (100.0%),micro<5pts=0
+FLOOR,X=20_stopdist,p10=23.0,median=34.0,p90=74.0,max=105.0
+FLOOR,X=20_lot,theo_median=2.94,theo_max=4.76,capped_median=2.94,capped_max=4.76
+FLOOR,X=20_risk,actual_risk_median=$99.84,actual_risk_min=$99.43,planned=$100.00,margin_median=$3728.43
+NOTE,selection,NONE,stop candidate NOT chosen,P&L deliberately not computed,CHECKPOINT-002 §6

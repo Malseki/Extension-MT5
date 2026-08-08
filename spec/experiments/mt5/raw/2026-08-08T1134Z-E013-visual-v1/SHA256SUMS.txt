@@ -1,0 +1,3 @@
+b7cf00396b46fefcae71d9b95964fc2d41626d90ad6415e6cd27e15420a7db20  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-08T1134Z-E013-visual-v1/E-MT5-013-v1-events.csv
+730cfdc51bfc2ab4e6c9a0970339d8d66c48030ee068bbd9b049235de9f9a301  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-08T1134Z-E013-visual-v1/E-MT5-013-v1-report.csv
+6b16c58bc6dfb1d3730bbc58d79c1b4af0df578912e65f83d041218934c3c66a  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-08T1134Z-E013-visual-v1/E-MT5-013-v1-trades.csv

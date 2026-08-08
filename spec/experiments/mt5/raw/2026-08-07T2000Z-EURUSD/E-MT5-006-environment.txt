@@ -1,0 +1,15 @@
+E-MT5-006 environment
+terminal_build=6096
+company=MetaQuotes Ltd.
+server=MetaQuotes-Demo
+login=10012089985
+trade_mode=0
+symbol=EURUSD
+digits=5 point=0.00001000
+tick_size=0.00001000
+chart_mode=0
+server_time=2026.08.08 01:59:03
+gmt_time=2026.08.07 22:59:03
+server_minus_gmt_h_auto=3
+server_minus_gmt_h_used=3
+script_version=1.1

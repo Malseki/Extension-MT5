@@ -1,0 +1,2 @@
+565417553e6ba224a919bfc2b623cf905575158f207890c71eaa06c8e7492efc  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2045Z-EURUSD-E007/E-MT5-007-results.csv
+2eb24c59a6677e886ea7b207810a27f3a33b211eec1df76b0e8bc4c9509d30f4  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2045Z-EURUSD-E007/E-MT5-007-summary.csv

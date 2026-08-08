@@ -1,0 +1,29 @@
+category,item,result,detail1,detail2
+ENV,build,6096,MetaQuotes-Demo,EURUSD
+ENV,timeframe,PERIOD_M5,digits=5,
+GUARD,ACCOUNT_TRADE_MODE,DEMO,no trade function exists in this file,
+SCAN,bars_available,100000,scanned=40000,2026.01.26 18:15:00
+MATRIX,SW1=A any-candle,SW4=REQUIRED (GRAPHIC),R-a GRAPHIC close>=low(V2),detections=5663  refs_armed=39993  rate=14.160%
+MATRIX,SW1=A any-candle,SW4=REQUIRED (GRAPHIC),R-b close>close(V2),detections=4183  refs_armed=39993  rate=10.459%
+MATRIX,SW1=A any-candle,SW4=REQUIRED (GRAPHIC),R-c close>reference,detections=2329  refs_armed=39993  rate=5.824%
+MATRIX,SW1=A any-candle,SW4=REQUIRED (GRAPHIC),R-d close>high(V2),detections=822  refs_armed=39993  rate=2.055%
+MATRIX,SW1=A any-candle,SW4=FORBIDDEN,R-a GRAPHIC close>=low(V2),detections=8381  refs_armed=39993  rate=20.956%
+MATRIX,SW1=A any-candle,SW4=FORBIDDEN,R-b close>close(V2),detections=4799  refs_armed=39993  rate=12.000%
+MATRIX,SW1=A any-candle,SW4=FORBIDDEN,R-c close>reference,detections=7149  refs_armed=39993  rate=17.876%
+MATRIX,SW1=A any-candle,SW4=FORBIDDEN,R-d close>high(V2),detections=2697  refs_armed=39993  rate=6.744%
+MATRIX,SW1=A any-candle,SW4=EITHER,R-a GRAPHIC close>=low(V2),detections=14044  refs_armed=39993  rate=35.116%
+MATRIX,SW1=A any-candle,SW4=EITHER,R-b close>close(V2),detections=8982  refs_armed=39993  rate=22.459%
+MATRIX,SW1=A any-candle,SW4=EITHER,R-c close>reference,detections=9478  refs_armed=39993  rate=23.699%
+MATRIX,SW1=A any-candle,SW4=EITHER,R-d close>high(V2),detections=3519  refs_armed=39993  rate=8.799%
+MATRIX,SW1=B pivot k=2,SW4=REQUIRED (GRAPHIC),R-a GRAPHIC close>=low(V2),detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=REQUIRED (GRAPHIC),R-b close>close(V2),detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=REQUIRED (GRAPHIC),R-c close>reference,detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=REQUIRED (GRAPHIC),R-d close>high(V2),detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=FORBIDDEN,R-a GRAPHIC close>=low(V2),detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=FORBIDDEN,R-b close>close(V2),detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=FORBIDDEN,R-c close>reference,detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=FORBIDDEN,R-d close>high(V2),detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=EITHER,R-a GRAPHIC close>=low(V2),detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=EITHER,R-b close>close(V2),detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=EITHER,R-c close>reference,detections=0  refs_armed=5454  rate=0.000%
+MATRIX,SW1=B pivot k=2,SW4=EITHER,R-d close>high(V2),detections=0  refs_armed=5454  rate=0.000%

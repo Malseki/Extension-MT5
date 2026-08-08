@@ -1,0 +1,20 @@
+category,item,result,detail1,detail2
+ENV,build,6096,MetaQuotes-Demo,EURUSD
+ENV,timeframe,PERIOD_M5,digits=5,point=0.00001000
+ENV,tester,true,visual=true,optimization=false
+ENV,run_tag,run1,ea_version=1.0,spec_snapshot=unfrozen
+ENV,inputs,eventEveryBar=5,shotEveryBar=60,maxObjects=400
+INVARIANT,IT-1 BLOCKED renders as BLOCKED,PASS,rendered=BLOCKED,
+INVARIANT,IT-1b BLOCKED never renders BUY/SELL,PASS,rendered=BLOCKED,
+INVARIANT,IT-2 UNKNOWN not silently FAIL,PASS,rendered=UNKNOWN,
+INVARIANT,IT-3 WAITING not silently UNKNOWN,PASS,rendered=WAITING,
+INVARIANT,IT-4 Verdict() cannot emit BUY/SELL,PASS,cases=126,all_pass_returns=BLOCKED: verdict semantics undefined (D-P1/D-P3/D-M1/DEC-S-001)
+INVARIANT,IT-5 BLOCKED prerequisite blocks verdict,PASS,returned=BLOCKED,
+RENDER,screenshot_60,attempted,E-MT5-OBS-002-run1-60.png,
+RENDER,screenshot_120,attempted,E-MT5-OBS-002-run1-120.png,
+RENDER,screenshot_180,attempted,E-MT5-OBS-002-run1-180.png,
+RENDER,screenshot_240,attempted,E-MT5-OBS-002-run1-240.png,
+RESULT,bars_seen,288,events=57,screenshots=4
+RESULT,final_hash,16633771818731992620,FNV-1a over all emitted events,
+LIFECYCLE,deinit_reason,1,,
+RENDER,screenshot_final,attempted,E-MT5-OBS-002-run1-final.png,

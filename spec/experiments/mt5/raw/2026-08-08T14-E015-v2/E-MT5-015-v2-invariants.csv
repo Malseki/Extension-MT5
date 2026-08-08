@@ -1,0 +1,15 @@
+invariant,result,detail
+GUARD_not_real,PASS,trade_mode=0 (0=DEMO 1=CONTEST 2=REAL)
+SYM_bullish_detected,PASS,ref=1.10300 sweep=1.10200 rej=1.10380
+SYM_bullish_levels,PASS,
+SYM_bearish_detected_on_mirror,PASS,ref=1.10700 sweep=1.10800
+SYM_levels_are_mirrored,PASS,sigma(ref')==ref and sigma(sweep')==sweep
+SYM_no_SELL_from_bullish,PASS,
+SYM_no_BUY_from_bearish,PASS,
+SYM_stop_mirror,PASS,SL mirrors exactly
+SYM_target_mirror,PASS,TP mirrors exactly
+PROV_snapshot_immutable,PASS,trade 1 still references P1 after P2 and P3 were recorded
+SIZING_pad_locked,PASS,PAD X=5 locked by CHECKPOINT-002
+SIZING_risk_locked,PASS,Policy A 1% locked
+SAFETY_directions_gated,PASS,both directions come from the same DetectAt; no separate path exists
+LEDGER_reconciles,PASS,residual=$-0.0000 (must be 0.00)

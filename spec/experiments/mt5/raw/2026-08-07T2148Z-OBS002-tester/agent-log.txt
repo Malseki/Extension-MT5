@@ -1,0 +1,42 @@
+﻿CS	0	21:47:16.822	Startup	MetaTester 5 build 6096, 6 Aug 2026
+CS	0	21:47:16.824	Startup	Windows 11 build 22000 on Wine 11.1 Darwin 25.5.0, 8 x VirtualApple @ 2.50GHz, x64, 1 / 7 Gb memory, 36 / 228 Gb disk, GMT-3
+CS	0	21:47:16.838	Server	MetaTester 5 started on 127.0.0.1:3001
+CS	0	21:47:16.856	Startup	cloud network mode is off
+CS	0	21:47:16.857	Startup	initialization finished
+CS	0	21:47:17.218	127.0.0.1	login (build 6096)
+CS	0	21:47:18.749	Network	9148 bytes of account info loaded
+CS	0	21:47:18.749	Network	1478 bytes of tester parameters loaded
+CS	0	21:47:18.749	Network	2756 bytes of input parameters loaded
+CS	0	21:47:18.786	Network	48856 bytes of symbols list loaded (12577 symbols)
+CS	0	21:47:18.788	Tester	expert file added: Experts\trader-experiments\E-MT5-OBS-002-tester-replay.ex5. 31340 bytes loaded
+CS	0	21:47:19.104	Tester	1251 Mb available, 15 blocks set for ticks generating
+CS	0	21:47:19.105	Tester	initial deposit 10000.00 USD, leverage 1:100
+CS	0	21:47:19.110	Tester	successfully initialized
+CS	0	21:47:19.110	Network	92 Kb of total initialization data received
+CS	0	21:47:19.111	Tester	VirtualApple @ 2.50GHz, 8191 MB
+CS	0	21:47:19.149	Symbols	EURUSD: symbol to be synchronized
+CS	0	21:47:19.153	Symbols	EURUSD: symbol synchronized, 3720 bytes of symbol info received
+CS	0	21:47:19.157	History	EURUSD: history synchronization started
+CS	0	21:47:19.164	History	EURUSD: load 27 bytes of history data to synchronize in 0:00:00.004
+CS	0	21:47:19.164	History	EURUSD: history synchronized from 2025.01.02 to 2026.07.10
+CS	0	21:47:19.165	Ticks	EURUSD: ticks synchronization started
+CS	0	21:47:19.167	Ticks	EURUSD: load 34 bytes of tick data to synchronize in 0:00:00.002
+CS	0	21:47:19.167	Ticks	EURUSD: history ticks synchronized from 2026.07.09 to 2026.07.09
+CS	0	21:47:19.236	History	EURUSD,M5: history cache allocated for 112912 bars and contains 112706 bars from 2025.01.02 00:00 to 2026.07.08 23:55
+CS	0	21:47:19.236	History	EURUSD,M5: history begins from 2025.01.02 00:00
+CS	0	21:47:19.267	Tester	EURUSD,M5 (MetaQuotes-Demo): generating based on real ticks
+CS	0	21:47:19.267	Tester	EURUSD,M5: testing of Experts\trader-experiments\E-MT5-OBS-002-tester-replay.ex5 from 2026.07.09 00:00 to 2026.07.10 00:00 started with inputs:
+CS	0	21:47:19.267	Tester	  InpRunTag=run2
+CS	0	21:47:19.267	Tester	  InpEventEveryBar=5
+CS	0	21:47:19.267	Tester	  InpShotEveryBar=60
+CS	0	21:47:19.267	Tester	  InpMaxObjects=400
+CS	0	21:47:19.267	Tester	  InpDrawObjects=true
+CS	0	21:47:19.331	Ticks	EURUSD : real ticks begin from 2026.07.09 00:00:00
+CS	0	21:48:25.758	Tester	final balance 10000.00 USD
+CS	0	21:48:25.763	Tester	EURUSD,M5: 290996 ticks, 288 bars generated. Environment synchronized in 0:00:00.422. Test passed in 0:01:06.623 (including ticks preprocessing 0:00:00.022).
+CS	0	21:48:25.763	Tester	EURUSD,M5: total time from login to stop testing 0:01:07.045 (including 0:00:00.422 for history data synchronization)
+CS	0	21:48:25.764	Tester	1 Mb memory used including 6 Mb of history data, 64 Mb of tick data
+CS	0	21:48:25.764	Tester	log file "C:\Program Files\MetaTrader 5\Tester\Agent-127.0.0.1-3001\logs\20260807.log" written
+CS	0	21:48:25.765	Tester	test Experts\trader-experiments\E-MT5-OBS-002-tester-replay.ex5 on EURUSD,M5 thread finished
+CS	0	21:48:25.877	127.0.0.1	prepare for shutdown
+CS	0	21:48:25.878	127.0.0.1	shutdown finished

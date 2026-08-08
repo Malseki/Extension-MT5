@@ -1,0 +1,4 @@
+e73372247a1ff0a72e930032ed0268469e9ce81525392cdcee7a138715ce2322  E-MT5-015-smoke-events.csv
+d7f66e09c1c45d4803ea34c1ecbfa0cdddeaefb7ec6c790485cd17c3c55f1aa3  E-MT5-015-smoke-invariants.csv
+5332ba9b57033564b471ec837bb3af36b07764c271e1b914008e048d03bccc6e  E-MT5-015-smoke-trades.csv
+ea36b24a38606e543ee49713dfda3ebdc2fcf677ca58a02ff5d9d8859cec1d62  smoke.ini

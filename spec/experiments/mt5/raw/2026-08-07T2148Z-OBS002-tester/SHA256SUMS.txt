@@ -1,0 +1,9 @@
+0d0f96841448d2fc3722600a0f18e6c97e90c26f31a074be37ca40c52b6cbd15  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2148Z-OBS002-tester/E-MT5-OBS-002-run1-events.csv
+9fbd9d6c687dea048e602360c667131a38bfa87ec260341935972da510cb15a5  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2148Z-OBS002-tester/E-MT5-OBS-002-run1-report.csv
+0d0f96841448d2fc3722600a0f18e6c97e90c26f31a074be37ca40c52b6cbd15  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2148Z-OBS002-tester/E-MT5-OBS-002-run2-events.csv
+a69a089bcd06d071add142172c3648d6bc4877cc66c48d0f39b2d67127a41e2f  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2148Z-OBS002-tester/E-MT5-OBS-002-run2-report.csv
+d503881fbacef685d549374a2f8993f15a9703c5c1cf6bfb57cfa0c6c4ed6af7  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2148Z-OBS002-tester/agent-log.txt
+2a5739b7ca92665681775f1daaaba1694b10ca1a8178ced6a50ea70ebea0fabc  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2148Z-OBS002-tester/obs2_run1.set
+e06cf66245fb6ef214ee5a6643128f107742b4fcd34fecf42bdd81d7aa20019e  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2148Z-OBS002-tester/tester-log.txt
+5304bdf4fc0629b1e33cf73bdd00e378e688ad911b94bf9599a28fabc7d48837  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2148Z-OBS002-tester/tester-report-run1.htm
+4a5d79a892a99d2a348dd459411ec847769e15ee559d28765efe588851189eed  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2148Z-OBS002-tester/tester_run1.ini

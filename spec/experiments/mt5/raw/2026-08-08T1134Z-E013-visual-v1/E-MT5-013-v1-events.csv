@@ -1,0 +1,224 @@
+seq,time,event,detail
+0,2026.07.06 00:00:00,INIT,tradingEnabled=true balance=10000.00
+1,2026.07.06 01:15:00,PATTERN_DETECTED,ref=1.14356 l2=1.14343 c2=1.14355 c3=1.14358 t3=2026.07.06 01:10:00 rule=A_prime_K3_strict_left
+2,2026.07.06 01:15:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+3,2026.07.06 01:20:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+4,2026.07.06 02:15:00,PATTERN_DETECTED,ref=1.14345 l2=1.14335 c2=1.14336 c3=1.14344 t3=2026.07.06 02:10:00 rule=A_prime_K3_strict_left
+5,2026.07.06 02:15:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+6,2026.07.06 02:20:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+7,2026.07.06 04:30:00,PATTERN_DETECTED,ref=1.14342 l2=1.14316 c2=1.14329 c3=1.14317 t3=2026.07.06 04:25:00 rule=A_prime_K3_strict_left
+8,2026.07.06 04:30:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+9,2026.07.06 04:35:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+10,2026.07.06 05:05:00,PATTERN_DETECTED,ref=1.14294 l2=1.14284 c2=1.14288 c3=1.14297 t3=2026.07.06 05:00:00 rule=A_prime_K3_strict_left
+11,2026.07.06 05:05:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+12,2026.07.06 05:10:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+13,2026.07.06 06:40:00,PATTERN_DETECTED,ref=1.14291 l2=1.14280 c2=1.14286 c3=1.14298 t3=2026.07.06 06:35:00 rule=A_prime_K3_strict_left
+14,2026.07.06 06:40:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+15,2026.07.06 06:45:00,ENTRY,id=1 entry=1.14314 c3close=1.14298 gap_pts=16.0 sl=1.14279 tp=1.14384 vol=2.85 risk=99.75 tv=SYMBOL_TRADE_TICK_VALUE
+16,2026.07.06 08:15:00,PATTERN_DETECTED,ref=1.14299 l2=1.14285 c2=1.14288 c3=1.14299 t3=2026.07.06 08:10:00 rule=A_prime_K3_strict_left
+17,2026.07.06 08:15:00,SKIPPED_POSITION_OPEN,max positions=1
+18,2026.07.06 08:22:03,EXIT,id=1 reason=STOP exit=1.14276 pnl=-108.30 R=-1.086 bal=9891.70
+19,2026.07.06 11:20:00,PATTERN_DETECTED,ref=1.14211 l2=1.14158 c2=1.14192 c3=1.14176 t3=2026.07.06 11:15:00 rule=A_prime_K3_strict_left
+20,2026.07.06 11:20:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+21,2026.07.06 11:25:00,ENTRY,id=2 entry=1.14176 c3close=1.14176 gap_pts=0.0 sl=1.14157 tp=1.14214 vol=5.20 risk=98.80 tv=SYMBOL_TRADE_TICK_VALUE
+22,2026.07.06 11:46:01,EXIT,id=2 reason=STOP exit=1.14157 pnl=-98.80 R=-1.000 bal=9792.90
+23,2026.07.06 13:00:00,PATTERN_DETECTED,ref=1.14148 l2=1.14110 c2=1.14120 c3=1.14132 t3=2026.07.06 12:55:00 rule=A_prime_K3_strict_left
+24,2026.07.06 13:00:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+25,2026.07.06 13:05:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+26,2026.07.06 14:55:00,PATTERN_DETECTED,ref=1.14139 l2=1.14126 c2=1.14136 c3=1.14134 t3=2026.07.06 14:50:00 rule=A_prime_K3_strict_left
+27,2026.07.06 14:55:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+28,2026.07.06 15:00:00,ENTRY,id=3 entry=1.14153 c3close=1.14134 gap_pts=19.0 sl=1.14125 tp=1.14209 vol=3.49 risk=97.72 tv=SYMBOL_TRADE_TICK_VALUE
+29,2026.07.06 15:45:21,EXIT,id=3 reason=STOP exit=1.14125 pnl=-97.72 R=-1.000 bal=9695.18
+30,2026.07.06 15:50:00,PATTERN_DETECTED,ref=1.14145 l2=1.14127 c2=1.14137 c3=1.14139 t3=2026.07.06 15:45:00 rule=A_prime_K3_strict_left
+31,2026.07.06 15:50:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+32,2026.07.06 15:55:00,ENTRY,id=4 entry=1.14153 c3close=1.14139 gap_pts=14.0 sl=1.14126 tp=1.14207 vol=3.59 risk=96.93 tv=SYMBOL_TRADE_TICK_VALUE
+33,2026.07.06 15:57:40,EXIT,id=4 reason=STOP exit=1.14126 pnl=-96.93 R=-1.000 bal=9598.25
+34,2026.07.06 16:55:00,PATTERN_DETECTED,ref=1.14165 l2=1.14121 c2=1.14159 c3=1.14122 t3=2026.07.06 16:50:00 rule=A_prime_K3_strict_left
+35,2026.07.06 16:55:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+36,2026.07.06 17:00:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+37,2026.07.07 03:35:00,PATTERN_DETECTED,ref=1.14388 l2=1.14381 c2=1.14387 c3=1.14397 t3=2026.07.07 03:30:00 rule=A_prime_K3_strict_left
+38,2026.07.07 03:35:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+39,2026.07.07 03:40:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+40,2026.07.07 05:35:00,PATTERN_DETECTED,ref=1.14420 l2=1.14415 c2=1.14417 c3=1.14422 t3=2026.07.07 05:30:00 rule=A_prime_K3_strict_left
+41,2026.07.07 05:35:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+42,2026.07.07 05:40:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+43,2026.07.07 06:50:00,PATTERN_DETECTED,ref=1.14382 l2=1.14361 c2=1.14376 c3=1.14369 t3=2026.07.07 06:45:00 rule=A_prime_K3_strict_left
+44,2026.07.07 06:50:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+45,2026.07.07 06:55:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+46,2026.07.07 08:30:00,PATTERN_DETECTED,ref=1.14320 l2=1.14292 c2=1.14314 c3=1.14308 t3=2026.07.07 08:25:00 rule=A_prime_K3_strict_left
+47,2026.07.07 08:30:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+48,2026.07.07 08:35:00,ENTRY,id=5 entry=1.14327 c3close=1.14308 gap_pts=19.0 sl=1.14291 tp=1.14399 vol=2.66 risk=95.76 tv=SYMBOL_TRADE_TICK_VALUE
+49,2026.07.07 08:44:01,EXIT,id=5 reason=STOP exit=1.14291 pnl=-95.76 R=-1.000 bal=9502.49
+50,2026.07.07 10:35:00,PATTERN_DETECTED,ref=1.14266 l2=1.14264 c2=1.14265 c3=1.14302 t3=2026.07.07 10:30:00 rule=A_prime_K3_strict_left
+51,2026.07.07 10:35:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+52,2026.07.07 10:40:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+53,2026.07.07 11:05:00,PATTERN_DETECTED,ref=1.14259 l2=1.14248 c2=1.14251 c3=1.14271 t3=2026.07.07 11:00:00 rule=A_prime_K3_strict_left
+54,2026.07.07 11:05:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+55,2026.07.07 11:10:00,ENTRY,id=6 entry=1.14289 c3close=1.14271 gap_pts=18.0 sl=1.14247 tp=1.14373 vol=2.26 risk=94.92 tv=SYMBOL_TRADE_TICK_VALUE
+56,2026.07.07 12:00:00,PATTERN_DETECTED,ref=1.14303 l2=1.14274 c2=1.14280 c3=1.14280 t3=2026.07.07 11:55:00 rule=A_prime_K3_strict_left
+57,2026.07.07 12:00:00,SKIPPED_POSITION_OPEN,max positions=1
+58,2026.07.07 12:50:08,EXIT,id=6 reason=STOP exit=1.14247 pnl=-94.92 R=-1.000 bal=9407.57
+59,2026.07.07 15:00:00,PATTERN_DETECTED,ref=1.14315 l2=1.14253 c2=1.14270 c3=1.14326 t3=2026.07.07 14:55:00 rule=A_prime_K3_strict_left
+60,2026.07.07 15:00:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+61,2026.07.07 15:05:00,ENTRY,id=7 entry=1.14345 c3close=1.14326 gap_pts=19.0 sl=1.14252 tp=1.14531 vol=1.01 risk=93.93 tv=SYMBOL_TRADE_TICK_VALUE
+62,2026.07.07 16:10:00,PATTERN_DETECTED,ref=1.14339 l2=1.14316 c2=1.14325 c3=1.14321 t3=2026.07.07 16:05:00 rule=A_prime_K3_strict_left
+63,2026.07.07 16:10:00,SKIPPED_POSITION_OPEN,max positions=1
+64,2026.07.07 17:09:00,EXIT,id=7 reason=STOP exit=1.14252 pnl=-93.93 R=-1.000 bal=9313.64
+65,2026.07.07 17:15:00,PATTERN_DETECTED,ref=1.14276 l2=1.14249 c2=1.14256 c3=1.14267 t3=2026.07.07 17:10:00 rule=A_prime_K3_strict_left
+66,2026.07.07 17:15:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+67,2026.07.07 17:20:00,ENTRY,id=8 entry=1.14296 c3close=1.14267 gap_pts=29.0 sl=1.14248 tp=1.14392 vol=1.94 risk=93.12 tv=SYMBOL_TRADE_TICK_VALUE
+68,2026.07.07 18:25:00,PATTERN_DETECTED,ref=1.14280 l2=1.14253 c2=1.14270 c3=1.14272 t3=2026.07.07 18:20:00 rule=A_prime_K3_strict_left
+69,2026.07.07 18:25:00,SKIPPED_POSITION_OPEN,max positions=1
+70,2026.07.07 18:49:56,EXIT,id=8 reason=STOP exit=1.14248 pnl=-93.12 R=-1.000 bal=9220.52
+71,2026.07.07 19:05:00,PATTERN_DETECTED,ref=1.14238 l2=1.14221 c2=1.14230 c3=1.14236 t3=2026.07.07 19:00:00 rule=A_prime_K3_strict_left
+72,2026.07.07 19:05:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+73,2026.07.07 19:10:00,ENTRY,id=9 entry=1.14245 c3close=1.14236 gap_pts=9.0 sl=1.14220 tp=1.14295 vol=3.68 risk=92.00 tv=SYMBOL_TRADE_TICK_VALUE
+74,2026.07.07 19:12:23,EXIT,id=9 reason=STOP exit=1.14220 pnl=-92.00 R=-1.000 bal=9128.52
+75,2026.07.07 22:00:00,PATTERN_DETECTED,ref=1.14229 l2=1.14174 c2=1.14189 c3=1.14186 t3=2026.07.07 21:55:00 rule=A_prime_K3_strict_left
+76,2026.07.07 22:00:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+77,2026.07.07 22:05:00,SKIPPED_INVALID_STOP,ask<=sl
+78,2026.07.07 22:20:00,PATTERN_DETECTED,ref=1.14134 l2=1.14112 c2=1.14118 c3=1.14116 t3=2026.07.07 22:15:00 rule=A_prime_K3_strict_left
+79,2026.07.07 22:20:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+80,2026.07.07 22:25:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+81,2026.07.07 23:25:00,PATTERN_DETECTED,ref=1.14138 l2=1.14122 c2=1.14136 c3=1.14144 t3=2026.07.07 23:20:00 rule=A_prime_K3_strict_left
+82,2026.07.07 23:25:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+83,2026.07.07 23:30:00,ENTRY,id=10 entry=1.14141 c3close=1.14144 gap_pts=-3.0 sl=1.14121 tp=1.14181 vol=4.56 risk=91.20 tv=SYMBOL_TRADE_TICK_VALUE
+84,2026.07.07 23:30:54,EXIT,id=10 reason=STOP exit=1.14120 pnl=-95.76 R=-1.050 bal=9032.76
+85,2026.07.07 23:45:00,PATTERN_DETECTED,ref=1.14119 l2=1.14109 c2=1.14115 c3=1.14120 t3=2026.07.07 23:40:00 rule=A_prime_K3_strict_left
+86,2026.07.07 23:45:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+87,2026.07.07 23:50:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+88,2026.07.08 01:45:00,PATTERN_DETECTED,ref=1.14047 l2=1.14030 c2=1.14045 c3=1.14049 t3=2026.07.08 01:40:00 rule=A_prime_K3_strict_left
+89,2026.07.08 01:45:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+90,2026.07.08 01:50:00,ENTRY,id=11 entry=1.14050 c3close=1.14049 gap_pts=1.0 sl=1.14029 tp=1.14092 vol=4.30 risk=90.30 tv=SYMBOL_TRADE_TICK_VALUE
+91,2026.07.08 02:48:36,EXIT,id=11 reason=STOP exit=1.14028 pnl=-94.60 R=-1.048 bal=8938.16
+92,2026.07.08 04:05:00,PATTERN_DETECTED,ref=1.14085 l2=1.14071 c2=1.14080 c3=1.14079 t3=2026.07.08 04:00:00 rule=A_prime_K3_strict_left
+93,2026.07.08 04:05:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+94,2026.07.08 04:10:00,SKIPPED_INVALID_STOP,ask<=sl
+95,2026.07.08 04:50:00,PATTERN_DETECTED,ref=1.14007 l2=1.13985 c2=1.13998 c3=1.14045 t3=2026.07.08 04:45:00 rule=A_prime_K3_strict_left
+96,2026.07.08 04:50:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+97,2026.07.08 04:55:00,ENTRY,id=12 entry=1.14037 c3close=1.14045 gap_pts=-8.0 sl=1.13984 tp=1.14143 vol=1.68 risk=89.04 tv=SYMBOL_TRADE_TICK_VALUE
+98,2026.07.08 06:01:56,EXIT,id=12 reason=TARGET exit=1.14143 pnl=178.08 R=2.000 bal=9116.24
+99,2026.07.08 11:25:00,PATTERN_DETECTED,ref=1.14224 l2=1.14007 c2=1.14076 c3=1.14073 t3=2026.07.08 11:20:00 rule=A_prime_K3_strict_left
+100,2026.07.08 11:25:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+101,2026.07.08 11:30:00,ENTRY,id=13 entry=1.14142 c3close=1.14073 gap_pts=69.0 sl=1.14006 tp=1.14414 vol=0.67 risk=91.12 tv=SYMBOL_TRADE_TICK_VALUE
+102,2026.07.08 12:10:40,EXIT,id=13 reason=STOP exit=1.14006 pnl=-91.12 R=-1.000 bal=9025.12
+103,2026.07.08 12:20:00,PATTERN_DETECTED,ref=1.14014 l2=1.13960 c2=1.13965 c3=1.14052 t3=2026.07.08 12:15:00 rule=A_prime_K3_strict_left
+104,2026.07.08 12:20:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+105,2026.07.08 12:25:00,ENTRY,id=14 entry=1.14041 c3close=1.14052 gap_pts=-11.0 sl=1.13959 tp=1.14205 vol=1.10 risk=90.20 tv=SYMBOL_TRADE_TICK_VALUE
+106,2026.07.08 14:10:00,PATTERN_DETECTED,ref=1.14081 l2=1.14048 c2=1.14061 c3=1.14070 t3=2026.07.08 14:05:00 rule=A_prime_K3_strict_left
+107,2026.07.08 14:10:00,SKIPPED_POSITION_OPEN,max positions=1
+108,2026.07.08 14:38:09,EXIT,id=14 reason=STOP exit=1.13958 pnl=-91.30 R=-1.012 bal=8933.82
+109,2026.07.08 14:45:00,PATTERN_DETECTED,ref=1.14028 l2=1.13940 c2=1.13946 c3=1.14044 t3=2026.07.08 14:40:00 rule=A_prime_K3_strict_left
+110,2026.07.08 14:45:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+111,2026.07.08 14:50:00,ENTRY,id=15 entry=1.14006 c3close=1.14044 gap_pts=-38.0 sl=1.13939 tp=1.14140 vol=1.33 risk=89.11 tv=SYMBOL_TRADE_TICK_VALUE
+112,2026.07.08 16:48:33,EXIT,id=15 reason=TARGET exit=1.14140 pnl=178.22 R=2.000 bal=9112.04
+113,2026.07.08 17:20:00,PATTERN_DETECTED,ref=1.14071 l2=1.14058 c2=1.14063 c3=1.14087 t3=2026.07.08 17:15:00 rule=A_prime_K3_strict_left
+114,2026.07.08 17:20:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+115,2026.07.08 17:25:00,ENTRY,id=16 entry=1.14106 c3close=1.14087 gap_pts=19.0 sl=1.14057 tp=1.14204 vol=1.85 risk=90.65 tv=SYMBOL_TRADE_TICK_VALUE
+116,2026.07.08 17:31:37,EXIT,id=16 reason=STOP exit=1.14057 pnl=-90.65 R=-1.000 bal=9021.39
+117,2026.07.08 18:25:00,PATTERN_DETECTED,ref=1.14027 l2=1.13991 c2=1.14011 c3=1.14016 t3=2026.07.08 18:20:00 rule=A_prime_K3_strict_left
+118,2026.07.08 18:25:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+119,2026.07.08 18:30:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+120,2026.07.08 18:50:00,PATTERN_DETECTED,ref=1.13934 l2=1.13912 c2=1.13928 c3=1.13929 t3=2026.07.08 18:45:00 rule=A_prime_K3_strict_left
+121,2026.07.08 18:50:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+122,2026.07.08 18:55:00,ENTRY,id=17 entry=1.13956 c3close=1.13929 gap_pts=27.0 sl=1.13911 tp=1.14046 vol=2.00 risk=90.00 tv=SYMBOL_TRADE_TICK_VALUE
+123,2026.07.08 19:31:51,EXIT,id=17 reason=TARGET exit=1.14047 pnl=182.00 R=2.022 bal=9203.39
+124,2026.07.08 21:05:00,PATTERN_DETECTED,ref=1.14200 l2=1.14177 c2=1.14191 c3=1.14215 t3=2026.07.08 21:00:00 rule=A_prime_K3_strict_left
+125,2026.07.08 21:05:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+126,2026.07.08 21:10:00,ENTRY,id=18 entry=1.14240 c3close=1.14215 gap_pts=25.0 sl=1.14176 tp=1.14368 vol=1.43 risk=91.52 tv=SYMBOL_TRADE_TICK_VALUE
+127,2026.07.08 22:55:00,PATTERN_DETECTED,ref=1.14268 l2=1.14226 c2=1.14235 c3=1.14267 t3=2026.07.08 22:50:00 rule=A_prime_K3_strict_left
+128,2026.07.08 22:55:00,SKIPPED_POSITION_OPEN,max positions=1
+129,2026.07.08 23:35:45,EXIT,id=18 reason=STOP exit=1.14176 pnl=-91.52 R=-1.000 bal=9111.87
+130,2026.07.08 23:45:00,PATTERN_DETECTED,ref=1.14188 l2=1.14152 c2=1.14161 c3=1.14165 t3=2026.07.08 23:40:00 rule=A_prime_K3_strict_left
+131,2026.07.08 23:45:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+132,2026.07.08 23:50:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+133,2026.07.09 00:45:00,PATTERN_DETECTED,ref=1.14165 l2=1.14147 c2=1.14163 c3=1.14167 t3=2026.07.09 00:40:00 rule=A_prime_K3_strict_left
+134,2026.07.09 00:45:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+135,2026.07.09 00:50:00,ENTRY,id=19 entry=1.14180 c3close=1.14167 gap_pts=13.0 sl=1.14146 tp=1.14248 vol=2.67 risk=90.78 tv=SYMBOL_TRADE_TICK_VALUE
+136,2026.07.09 00:51:30,EXIT,id=19 reason=STOP exit=1.14146 pnl=-90.78 R=-1.000 bal=9021.09
+137,2026.07.09 05:40:01,PATTERN_DETECTED,ref=1.14257 l2=1.14246 c2=1.14247 c3=1.14248 t3=2026.07.09 05:35:00 rule=A_prime_K3_strict_left
+138,2026.07.09 05:40:01,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+139,2026.07.09 05:45:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+140,2026.07.09 10:15:00,PATTERN_DETECTED,ref=1.14384 l2=1.14350 c2=1.14378 c3=1.14369 t3=2026.07.09 10:10:00 rule=A_prime_K3_strict_left
+141,2026.07.09 10:15:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+142,2026.07.09 10:20:00,ENTRY,id=20 entry=1.14378 c3close=1.14369 gap_pts=9.0 sl=1.14349 tp=1.14436 vol=3.11 risk=90.19 tv=SYMBOL_TRADE_TICK_VALUE
+143,2026.07.09 10:35:30,EXIT,id=20 reason=STOP exit=1.14349 pnl=-90.19 R=-1.000 bal=8930.90
+144,2026.07.09 10:55:00,PATTERN_DETECTED,ref=1.14346 l2=1.14324 c2=1.14344 c3=1.14342 t3=2026.07.09 10:50:00 rule=A_prime_K3_strict_left
+145,2026.07.09 10:55:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+146,2026.07.09 11:00:00,ENTRY,id=21 entry=1.14356 c3close=1.14342 gap_pts=14.0 sl=1.14323 tp=1.14422 vol=2.70 risk=89.10 tv=SYMBOL_TRADE_TICK_VALUE
+147,2026.07.09 11:40:19,EXIT,id=21 reason=STOP exit=1.14323 pnl=-89.10 R=-1.000 bal=8841.80
+148,2026.07.09 11:55:00,PATTERN_DETECTED,ref=1.14311 l2=1.14290 c2=1.14293 c3=1.14303 t3=2026.07.09 11:50:00 rule=A_prime_K3_strict_left
+149,2026.07.09 11:55:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+150,2026.07.09 12:00:00,SKIPPED_INVALID_STOP,ask<=sl
+151,2026.07.09 12:05:00,PATTERN_DETECTED,ref=1.14282 l2=1.14250 c2=1.14266 c3=1.14277 t3=2026.07.09 12:00:00 rule=A_prime_K3_strict_left
+152,2026.07.09 12:05:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+153,2026.07.09 12:10:00,SKIPPED_INVALID_STOP,ask<=sl
+154,2026.07.09 15:50:00,PATTERN_DETECTED,ref=1.14297 l2=1.14268 c2=1.14284 c3=1.14268 t3=2026.07.09 15:45:00 rule=A_prime_K3_strict_left
+155,2026.07.09 15:50:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+156,2026.07.09 15:55:00,SKIPPED_INVALID_STOP,ask<=sl
+157,2026.07.09 18:00:00,PATTERN_DETECTED,ref=1.14349 l2=1.14329 c2=1.14334 c3=1.14329 t3=2026.07.09 17:55:00 rule=A_prime_K3_strict_left
+158,2026.07.09 18:00:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+159,2026.07.09 18:05:00,SKIPPED_INVALID_STOP,ask<=sl
+160,2026.07.09 19:30:00,PATTERN_DETECTED,ref=1.14373 l2=1.14358 c2=1.14364 c3=1.14371 t3=2026.07.09 19:25:00 rule=A_prime_K3_strict_left
+161,2026.07.09 19:30:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+162,2026.07.09 19:35:00,SKIPPED_INVALID_STOP,ask<=sl
+163,2026.07.09 21:30:00,PATTERN_DETECTED,ref=1.14339 l2=1.14319 c2=1.14330 c3=1.14320 t3=2026.07.09 21:25:00 rule=A_prime_K3_strict_left
+164,2026.07.09 21:30:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+165,2026.07.09 21:35:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+166,2026.07.09 22:15:00,PATTERN_DETECTED,ref=1.14320 l2=1.14312 c2=1.14316 c3=1.14315 t3=2026.07.09 22:10:00 rule=A_prime_K3_strict_left
+167,2026.07.09 22:15:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+168,2026.07.09 22:20:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+169,2026.07.09 22:40:00,PATTERN_DETECTED,ref=1.14287 l2=1.14264 c2=1.14271 c3=1.14286 t3=2026.07.09 22:35:00 rule=A_prime_K3_strict_left
+170,2026.07.09 22:40:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+171,2026.07.09 22:45:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+172,2026.07.10 06:20:00,PATTERN_DETECTED,ref=1.14569 l2=1.14544 c2=1.14561 c3=1.14558 t3=2026.07.10 06:15:00 rule=A_prime_K3_strict_left
+173,2026.07.10 06:20:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+174,2026.07.10 06:25:00,SKIPPED_INVALID_STOP,ask<=sl
+175,2026.07.10 07:05:00,PATTERN_DETECTED,ref=1.14502 l2=1.14473 c2=1.14495 c3=1.14484 t3=2026.07.10 07:00:00 rule=A_prime_K3_strict_left
+176,2026.07.10 07:05:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+177,2026.07.10 07:10:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+178,2026.07.10 08:00:00,PATTERN_DETECTED,ref=1.14403 l2=1.14396 c2=1.14401 c3=1.14429 t3=2026.07.10 07:55:00 rule=A_prime_K3_strict_left
+179,2026.07.10 08:00:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+180,2026.07.10 08:05:00,ENTRY,id=22 entry=1.14434 c3close=1.14429 gap_pts=5.0 sl=1.14395 tp=1.14512 vol=2.26 risk=88.14 tv=SYMBOL_TRADE_TICK_VALUE
+181,2026.07.10 08:17:46,EXIT,id=22 reason=STOP exit=1.14395 pnl=-88.14 R=-1.000 bal=8753.66
+182,2026.07.10 08:30:00,PATTERN_DETECTED,ref=1.14394 l2=1.14374 c2=1.14383 c3=1.14380 t3=2026.07.10 08:25:00 rule=A_prime_K3_strict_left
+183,2026.07.10 08:30:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+184,2026.07.10 08:35:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+185,2026.07.10 09:55:00,PATTERN_DETECTED,ref=1.14400 l2=1.14389 c2=1.14394 c3=1.14408 t3=2026.07.10 09:50:00 rule=A_prime_K3_strict_left
+186,2026.07.10 09:55:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+187,2026.07.10 10:00:00,ENTRY,id=23 entry=1.14420 c3close=1.14408 gap_pts=12.0 sl=1.14388 tp=1.14484 vol=2.73 risk=87.36 tv=SYMBOL_TRADE_TICK_VALUE
+188,2026.07.10 10:02:25,EXIT,id=23 reason=STOP exit=1.14388 pnl=-87.36 R=-1.000 bal=8666.30
+189,2026.07.10 11:30:00,PATTERN_DETECTED,ref=1.14350 l2=1.14331 c2=1.14332 c3=1.14340 t3=2026.07.10 11:25:00 rule=A_prime_K3_strict_left
+190,2026.07.10 11:30:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+191,2026.07.10 11:35:00,ENTRY,id=24 entry=1.14349 c3close=1.14340 gap_pts=9.0 sl=1.14330 tp=1.14387 vol=4.56 risk=86.64 tv=SYMBOL_TRADE_TICK_VALUE
+192,2026.07.10 11:37:36,EXIT,id=24 reason=STOP exit=1.14330 pnl=-86.64 R=-1.000 bal=8579.66
+193,2026.07.10 12:05:00,PATTERN_DETECTED,ref=1.14305 l2=1.14300 c2=1.14304 c3=1.14341 t3=2026.07.10 12:00:00 rule=A_prime_K3_strict_left
+194,2026.07.10 12:05:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+195,2026.07.10 12:10:00,ENTRY,id=25 entry=1.14321 c3close=1.14341 gap_pts=-20.0 sl=1.14299 tp=1.14365 vol=3.89 risk=85.58 tv=SYMBOL_TRADE_TICK_VALUE
+196,2026.07.10 12:36:26,EXIT,id=25 reason=STOP exit=1.14298 pnl=-89.47 R=-1.045 bal=8490.19
+197,2026.07.10 12:55:00,PATTERN_DETECTED,ref=1.14294 l2=1.14280 c2=1.14290 c3=1.14283 t3=2026.07.10 12:50:00 rule=A_prime_K3_strict_left
+198,2026.07.10 12:55:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+199,2026.07.10 13:00:00,SKIPPED_INVALID_STOP,ask<=sl
+200,2026.07.10 14:20:00,PATTERN_DETECTED,ref=1.14309 l2=1.14304 c2=1.14305 c3=1.14306 t3=2026.07.10 14:15:00 rule=A_prime_K3_strict_left
+201,2026.07.10 14:20:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+202,2026.07.10 14:25:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+203,2026.07.10 15:40:00,PATTERN_DETECTED,ref=1.14287 l2=1.14254 c2=1.14258 c3=1.14294 t3=2026.07.10 15:35:00 rule=A_prime_K3_strict_left
+204,2026.07.10 15:40:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+205,2026.07.10 15:45:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+206,2026.07.10 16:15:00,PATTERN_DETECTED,ref=1.14224 l2=1.14197 c2=1.14220 c3=1.14221 t3=2026.07.10 16:10:00 rule=A_prime_K3_strict_left
+207,2026.07.10 16:15:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+208,2026.07.10 16:20:00,ENTRY,id=26 entry=1.14221 c3close=1.14221 gap_pts=0.0 sl=1.14196 tp=1.14271 vol=3.39 risk=84.75 tv=SYMBOL_TRADE_TICK_VALUE
+209,2026.07.10 16:27:53,EXIT,id=26 reason=STOP exit=1.14196 pnl=-84.75 R=-1.000 bal=8405.44
+210,2026.07.10 17:10:00,PATTERN_DETECTED,ref=1.14187 l2=1.14166 c2=1.14185 c3=1.14201 t3=2026.07.10 17:05:00 rule=A_prime_K3_strict_left
+211,2026.07.10 17:10:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+212,2026.07.10 17:15:00,ENTRY,id=27 entry=1.14236 c3close=1.14201 gap_pts=35.0 sl=1.14165 tp=1.14378 vol=1.18 risk=83.78 tv=SYMBOL_TRADE_TICK_VALUE
+213,2026.07.10 17:33:06,EXIT,id=27 reason=STOP exit=1.14160 pnl=-89.68 R=-1.070 bal=8315.76
+214,2026.07.10 20:15:00,PATTERN_DETECTED,ref=1.14268 l2=1.14260 c2=1.14263 c3=1.14273 t3=2026.07.10 20:10:00 rule=A_prime_K3_strict_left
+215,2026.07.10 20:15:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+216,2026.07.10 20:20:00,SKIPPED_INVALID_STOP,ask<=sl
+217,2026.07.10 20:30:00,PATTERN_DETECTED,ref=1.14240 l2=1.14221 c2=1.14229 c3=1.14250 t3=2026.07.10 20:25:00 rule=A_prime_K3_strict_left
+218,2026.07.10 20:30:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+219,2026.07.10 20:35:00,ORDER_FAILED,OrderSend=false retcode=10019 err=4756
+220,2026.07.10 23:45:00,PATTERN_DETECTED,ref=1.14129 l2=1.14114 c2=1.14121 c3=1.14129 t3=2026.07.10 23:40:00 rule=A_prime_K3_strict_left
+221,2026.07.10 23:45:00,SIGNAL,direction=BUY_CANDIDATE pending execution at first tick of candle 4
+222,2026.07.10 23:50:00,ENTRY,id=28 entry=1.14134 c3close=1.14129 gap_pts=5.0 sl=1.14113 tp=1.14176 vol=3.95 risk=82.95 tv=SYMBOL_TRADE_TICK_VALUE

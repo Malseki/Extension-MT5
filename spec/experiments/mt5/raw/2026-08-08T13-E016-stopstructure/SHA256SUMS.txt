@@ -1,0 +1,3 @@
+d3cc0583df59fc09015d4e0322772c00d300f90a52857ef61d90ca0551bc7bdc  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-08T13-E016-stopstructure/E-MT5-014-f1-report.csv
+34395f5247b098555b2d67e0580cd80369a86ec3184472700fd69b773442c57f  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-08T13-E016-stopstructure/E-MT5-014-f1-signals.csv
+b379f832f950931c87b4aef0bb7b211845779bdeeed0812c762e08652e8bd8a8  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-08T13-E016-stopstructure/E-MT5-016-s1-stopstructure.csv

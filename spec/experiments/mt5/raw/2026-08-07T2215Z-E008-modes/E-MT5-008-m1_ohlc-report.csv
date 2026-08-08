@@ -1,0 +1,10 @@
+category,item,result,detail1,detail2
+ENV,build,6096,MetaQuotes-Demo,EURUSD
+ENV,run_tag,m1_ohlc,PERIOD_M5,
+ENV,tester,true,visual=false,
+GUARD,ACCOUNT_TRADE_MODE,DEMO,raw=0,REAL=2 must be refused by any future guard
+GUARD,account,10012089985,MetaQuotes-Demo,MetaQuotes Ltd.
+GUARD,trade_allowed_terminal,true,expert=true,observability EA never trades regardless
+RESULT,bars,288,ticks=5757,
+RESULT,order_counts,hi_first=142,lo_first=146,undetermined=0
+RESULT,final_hash,710620364845699507,FNV-1a over per-bar intrabar order,

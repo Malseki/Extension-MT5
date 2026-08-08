@@ -1,0 +1,9 @@
+InpRefK=3
+InpStopPadPts=5
+InpTargetR=2.0
+InpRiskPct=1.0
+InpMaxPositions=1
+InpAllowBuy=true
+InpAllowSell=true
+InpDraw=true
+InpRunTag=hist3

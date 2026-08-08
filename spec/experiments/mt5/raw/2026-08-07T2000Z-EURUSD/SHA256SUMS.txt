@@ -1,0 +1,2 @@
+8fd4eba8d8c14cb73135e1e64ef0731003681b3a93242bc6941bebd775b8d8f8  /Users/nachogm/Library/Application Support/net.metaquotes.wine.metatrader5/drive_c/users/nachogm/AppData/Roaming/MetaQuotes/Terminal/Common/Files/E-MT5-006-results.csv
+e07e9246e230a6f9b321cc372574dc4be6a3fe56a05c3dc8b3ce97ac3fc09bb4  /Users/nachogm/Library/Application Support/net.metaquotes.wine.metatrader5/drive_c/users/nachogm/AppData/Roaming/MetaQuotes/Terminal/Common/Files/E-MT5-006-summary.csv

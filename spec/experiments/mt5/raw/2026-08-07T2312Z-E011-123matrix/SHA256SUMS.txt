@@ -1,0 +1,2 @@
+878b2ca93bff4ee3f5cd950d829b0eaca823ff43bfd329ec2b8955c4582787a1  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2312Z-E011-123matrix/E-MT5-011-graphic-matrix.csv
+99f110aefed131c3787d52bafb2bdeacb80b0c1f235622b82bbd001b2fab7de9  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2312Z-E011-123matrix/reference-graphic.jpg

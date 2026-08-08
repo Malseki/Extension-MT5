@@ -1,0 +1,36 @@
+﻿LL	0	21:42:36.107	Tester	Cloud servers switched off
+LP	0	21:42:40.641	Tester	"trader-experiments\E-MT5-OBS-002-tester-replay.ex5" X64
+HM	0	21:42:40.684	Tester	EURUSD: history data begins from 1999.03.10 00:00
+CJ	0	21:42:40.990	Tester	EURUSD: preliminary downloading of history ticks started, it may take quite a long time
+HG	0	21:42:40.990	Tester	EURUSD: preliminary downloading of history ticks completed
+FO	0	21:42:40.991	Tester	EURUSD: ticks data begins from 2011.12.19 00:00
+FH	0	21:42:42.246	Tester	EURUSD: history data begins from 1999.03.10 00:00
+OR	0	21:42:42.246	Tester	EURUSD: ticks data begins from 2011.12.19 00:00
+EJ	0	21:42:43.746	Core 1	agent process started on 127.0.0.1:3000
+CM	0	21:42:43.747	Core 1	connecting to 127.0.0.1:3000
+RJ	0	21:42:45.650	Core 1	connected
+RR	0	21:42:45.664	Core 1	authorized (agent build 6096)
+JH	0	21:42:45.666	Tester	EURUSD,M5 (MetaQuotes-Demo): visual testing of Experts\trader-experiments\E-MT5-OBS-002-tester-replay.ex5 from 2026.07.09 00:00 to 2026.07.10 00:00
+NE	0	21:42:48.300	Core 1	common synchronization completed
+QL	0	21:42:48.485	Core 1	EURUSD: history for 2025 year synchronized
+QD	0	21:42:48.550	Core 1	EURUSD: history for 2026 year synchronized
+EG	0	21:42:48.550	Core 1	EURUSD: history synchronization completed [2664 Kb]
+JQ	0	21:42:48.551	Core 1	EURUSD: 2.60 Mb of history processed in 0:00:00.203
+HH	0	21:42:48.565	Core 1	EURUSD: ticks synchronization completed [920 Kb]
+OL	0	21:43:55.340	Core 1	connection closed
+CF	0	21:47:07.620	Tester	Cloud servers switched off
+FO	0	21:47:11.972	Tester	"trader-experiments\E-MT5-OBS-002-tester-replay.ex5" X64
+KG	0	21:47:12.018	Tester	EURUSD: history data begins from 1999.03.10 00:00
+RM	0	21:47:12.331	Tester	EURUSD: preliminary downloading of history ticks started, it may take quite a long time
+EL	0	21:47:12.331	Tester	EURUSD: preliminary downloading of history ticks completed
+PJ	0	21:47:12.331	Tester	EURUSD: ticks data begins from 2011.12.19 00:00
+PS	0	21:47:13.586	Tester	EURUSD: history data begins from 1999.03.10 00:00
+EM	0	21:47:13.586	Tester	EURUSD: ticks data begins from 2011.12.19 00:00
+KG	0	21:47:15.037	Core 1	agent process started on 127.0.0.1:3001
+OP	0	21:47:15.038	Core 1	connecting to 127.0.0.1:3001
+KE	0	21:47:17.208	Core 1	connected
+GD	0	21:47:17.221	Core 1	authorized (agent build 6096)
+MN	0	21:47:17.225	Tester	EURUSD,M5 (MetaQuotes-Demo): visual testing of Experts\trader-experiments\E-MT5-OBS-002-tester-replay.ex5 from 2026.07.09 00:00 to 2026.07.10 00:00
+RH	0	21:47:19.112	Core 1	common synchronization completed
+LO	0	21:47:19.167	Core 1	EURUSD: ticks synchronized already [43 bytes]
+LJ	0	21:48:25.877	Core 1	connection closed

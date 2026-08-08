@@ -1,0 +1,30 @@
+category,item,result,detail1,detail2
+GUARD,ACCOUNT_TRADE_MODE,DEMO,raw=0,REAL is refused
+ENV,build,6104,MetaQuotes-Demo,EURUSD
+ENV,account,10012089985,USD,leverage=100
+ENV,timeframe,PERIOD_M5,tester=true,visual=true
+ENV,initial_balance,10000.00,,
+CONFIG,REF_RULE,A_prime_K3_strict_left,K=3,SW-1 A-prime LOCKED
+CONFIG,SW-4,C(2)<REF REQUIRED,SW-5=R-a C(3)>=L(2),SW-6=strict adjacency
+CONFIG,TARGET_R,2.00,STATUS=PROVISIONAL / ENGINEERING VALIDATION,NOT an optimised rule
+CONFIG,RISK,1.00% per trade,stop=L(2)-1pt,no spread padding
+CONFIG,SESSION_FILTER,DISABLED,STATUS=OPEN DEC-S-001,not resolved by this run
+CONFIG,BID_ASK,pattern=BID (SYMBOL_CHART_MODE=0),D-M4=OPEN,execution: BUY fills at Ask, closes at Bid
+BLOCKED,stages,CONFIRMATION MSS FVG RETRACEMENT HTF_CONTEXT SESSION ACCUMULATION DPMO,unimplemented — no approved rule exists,never silently satisfied
+SCOPE,label,ENGINEERING VALIDATION BACKTEST,NOT A PROFITABILITY CLAIM,1-2-3 PATTERN + MINIMUM ECONOMIC WRAPPER
+LABEL,scope,ENGINEERING VALIDATION BACKTEST,NOT A PROFITABILITY CLAIM,
+RESULT,bars,1440,patterns=67,signals=61 skipped=6
+MONEY,initial_balance,10000.00,USD,
+MONEY,final_balance,8339.46,USD,
+MONEY,net_profit,-1660.54,USD,-16.61%
+MONEY,gross_profit,538.30,gross_loss=2222.54,
+MONEY,profit_factor,0.242,,
+TRADES,total,27,wins=3,losses=24
+TRADES,win_rate,11.11%,,
+TRADES,avg_win,179.43,avg_loss=92.61,
+TRADES,largest_win,182.00,largest_loss=-108.30,
+RISK,max_drawdown,1684.24,16.84%,peak=10000.00
+R,total_R,-18.289,avg_R=-0.677,
+SPLIT,BUY,27,wins=3,pnl=-1684.24
+SPLIT,SELL,0,wins=0,pnl=0.00 (bearish mirror NOT implemented this run)
+HASH,event_log,14820117959951301250,FNV-1a over all events,

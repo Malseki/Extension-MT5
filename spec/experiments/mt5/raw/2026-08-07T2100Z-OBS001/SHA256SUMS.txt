@@ -1,0 +1,2 @@
+256d363f120f9dea8b5b3b119e1b39ac5a738cd90ff2990b4007065c4f379a5f  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2100Z-OBS001/E-MT5-OBS-001-capabilities.csv
+49071f7283d6e7904a40402dcc2faaecff8edd106b64ba79ba093502b43ce872  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2100Z-OBS001/E-MT5-OBS-001-chart.png

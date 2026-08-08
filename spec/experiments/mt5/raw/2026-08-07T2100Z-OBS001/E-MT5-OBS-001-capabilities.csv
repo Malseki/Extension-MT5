@@ -1,0 +1,43 @@
+category,item,result,detail,note
+ENV,build,6096,MetaQuotes-Demo,EURUSD
+ENV,timeframe,PERIOD_M5,,
+ENV,max_bars_setting,100000,,
+ENV,memory_used_mb,989,avail=15393,
+ENV,is_tester,false,visual=false,
+ENV,chart_bars,100000,,
+OBJECT,OBJ_HLINE,OK,err=0 found=true,liquidity level (synthetic)
+OBJECT_RW,OBJ_HLINE,READBACK_OK,color=16748574,
+OBJECT,OBJ_RECTANGLE,OK,err=0 found=true,FVG box (synthetic)
+OBJECT_RW,OBJ_RECTANGLE,READBACK_OK,color=16748574,
+OBJECT,OBJ_TREND,OK,err=0 found=true,MSS break level (synthetic)
+OBJECT_RW,OBJ_TREND,READBACK_OK,color=16748574,
+OBJECT,OBJ_VLINE,OK,err=0 found=true,event time marker
+OBJECT_RW,OBJ_VLINE,READBACK_OK,color=16748574,
+OBJECT,OBJ_ARROW,OK,err=0 found=true,sweep marker
+OBJECT_RW,OBJ_ARROW,READBACK_OK,color=16748574,
+OBJECT,OBJ_TEXT,OK,err=0 found=true,anchored text
+OBJECT_RW,OBJ_TEXT,READBACK_OK,color=16748574,
+OBJECT,OBJ_ARROWED_LINE,OK,err=0 found=true,impulse arrow
+OBJECT_RW,OBJ_ARROWED_LINE,READBACK_OK,color=16748574,
+OBJECT,OBJ_CHANNEL,OK,err=0 found=true,retracement band
+OBJECT_RW,OBJ_CHANNEL,READBACK_OK,color=16748574,
+OBJECT,OBJ_FIBO,OK,err=0 found=true,50/70.5 retracement
+OBJECT_RW,OBJ_FIBO,READBACK_OK,color=16748574,
+OBJECT,OBJ_RECTANGLE_LABEL,OK,err=0 found=true,panel background (pixel-anchored)
+OBJECT_RW,OBJ_RECTANGLE_LABEL,READBACK_OK,color=16748574,
+OBJECT,OBJ_LABEL,OK,err=0 found=true,pixel-anchored label
+OBJECT_RW,OBJ_LABEL,READBACK_OK,color=16748574,
+OBJECT,OBJ_BUTTON,OK,err=0 found=true,interactive control
+OBJECT_RW,OBJ_BUTTON,READBACK_OK,color=16748574,
+OBJECT,OBJ_EDIT,OK,err=0 found=true,text input (labeling UI?)
+OBJECT_RW,OBJ_EDIT,READBACK_OK,color=16748574,
+PANEL,pipeline_9_stages,OK,PASS/FAIL/WAITING/UNKNOWN rendered,synthetic values only
+SIGNAL,Print_journal,OK,always available,carries full explanation text
+SIGNAL,SendNotification,FAIL,err=4517,needs MetaQuotes ID in terminal settings
+SIGNAL,SendMail,FAIL,err=4510,needs SMTP configured
+SIGNAL,Alert_modal,SKIPPED,Alert() opens a MODAL dialog,deliberately not fired by default
+SIGNAL,PlaySound,OK,err=0,
+STRESS,objects_created,500,requested=500,ms=1
+STRESS,total_on_chart,534,,
+STRESS,after_cleanup,34,,
+RENDER,ChartScreenShot,OK,err=0,MQL5/Files/E-MT5-OBS-001-chart.png

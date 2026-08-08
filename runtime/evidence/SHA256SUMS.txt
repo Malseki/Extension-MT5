@@ -1,0 +1,1 @@
+bd8a72de9c0944accaa0a8db00375124e7582a60a99cf895c379528e844eeb66  E-MT5-012-symbol-specs.csv

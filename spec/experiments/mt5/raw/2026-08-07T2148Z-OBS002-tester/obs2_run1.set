@@ -1,0 +1,5 @@
+InpRunTag=run1
+InpEventEveryBar=5
+InpShotEveryBar=60
+InpMaxObjects=400
+InpDrawObjects=true

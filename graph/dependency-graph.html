@@ -1,0 +1,807 @@
+<title>PROJECT TRADER — Dependency Graph</title>
+
+<script type="application/json" id="graph-data">
+{
+  "meta": {
+    "source": "DEP-001 §1.2 edges · DEP-001 §4 classification · REDTEAM-001 §1 severity and status",
+    "authority": "The Markdown documents are authoritative. This block is the data of record for the visualisation only."
+  },
+  "lanes": [
+    ["K",  "KERNEL",             "primitives · forced additions"],
+    ["S0", "Σ0 SEMANTICS",       "what a predicate means"],
+    ["S1", "Σ1 SUBSTRATE",       "what an instant is"],
+    ["S2", "Σ2 MEASUREMENT",     "aggregates · baselines"],
+    ["S3", "Σ3 GEOMETRY",        "pivot · level · cluster"],
+    ["S4", "Σ4 INTERPRETATION",  "pool · sweep · displacement · imbalance"],
+    ["S5", "Σ5 COMPOSITION",     "identity · lifecycle"],
+    ["DL", "DECISION LAYER",     "policy · selection — not engine semantics"],
+    ["S6", "Σ6 OUTPUT",          "verdict · alert"],
+    ["C",  "CONCEPTS",           "the methodology's named ideas"]
+  ],
+  "classes": { "1":"Constitutional","2":"Foundational","3":"Structural","4":"Behavioral","5":"Parametric","0":"Not a decision" },
+  "nodes": [
+    ["K-SERIES","Series (with ⊥)","kernel","K","1","survives","","The only input. ⊥ is forced independently by DEC-006, by the exogenous clock and by three-valued semantics — three unrelated derivations of one requirement."],
+    ["K-LIFT","Lift · pointwise","kernel","K","1","survives","","All arithmetic, comparison and logic. And = Lift(∧); Compare = Lift(>)."],
+    ["K-DELAY","Delay","kernel","K","1","survives","","The only source of memory. Crossing = Lift(>) + Delay."],
+    ["K-REC","Recursion · guarded","kernel","K","1","survives","","Running aggregates, timers, latches, the entire lifecycle."],
+    ["K-POP","Population · value domain","kernel","K","1","required","HIGH","RT-01, NARROWED by REDTEAM-002 §1.5. Only Class I entities (pools, structural levels) are unbounded. Class II — FVGs in an impulse, pullbacks, setups — is window-bounded by the methodology's own timeouts and expressible today by static unrolling."],
+    ["K-STACK","Monotone stack","kernel","K","1","required","HIGH","REDTEAM-002 §1.4. The Class I population is provably a stack, not a set: push on pivot, pop-prefix on penetration. Three operations, no excess power. Gives intrinsic order, a checkpoint format, O(1) MIN/MAX/COUNT and exact σ."],
+    ["K-ID","Identity","kernel","K","0","eliminated","","RT-11 REFUTED by REDTEAM-002 §2.2. At most one entity of a kind is born per series per instant, so (kind, series, birth_instant) is a key. Identity is derived from the data, not generated — and derived identity is a precondition for σ over populations."],
+    ["K-EVID","Evidence","kernel","K","1","required","HIGH","RT-10. Evaluation must return value × evidence, or explanation can diverge from logic."],
+    ["K-SNAP","Snapshot time","kernel","K","1","required","HIGH","RT-07. The third time coordinate. Without it, reproducing a past run is ambiguous."],
+    ["K-LAG","Availability-lag typing","kernel","K","1","required","","MF-5. Makes multi-timeframe causality a static property rather than a tested one."],
+    ["K-CLOCK","Exogenous clock","kernel","K","1","required","HIGH","RT-12. The base clock must not be derived from any symbol's own activity."],
+    ["K-LEVEL","Level","kernel","K","0","eliminated","","RT-05. A constant Series, or a Series. Not primitive either way."],
+    ["K-WINDOW","Window","kernel","K","0","eliminated","","RT-06. Bars(n) is n applications of Delay."],
+    ["K-CROSS","Crossing","kernel","K","0","eliminated","","RT-06. The rising edge of a lifted comparison."],
+    ["K-AGG","Aggregate","kernel","K","0","eliminated","","RT-06. Bounded case is a fold; unbounded case is recursion."],
+    ["K-THEN","Then-within","kernel","K","0","eliminated","","RT-06. Guarded recursion with a counter."],
+    ["K-AND","And","kernel","K","0","eliminated","","RT-06. Lift(∧)."],
+
+    ["DEC-050","value domain (+051)","decision","S0","1","open","CRITICAL","Highest fanout in the system. Filed Tier C in Phase 1. RT-02 makes it blocking for the output contract."],
+    ["DEC-012","UNKNOWN in aggregates","decision","S0","1","open","","Instance of H-02. Promoted from Tier C by DEP-001."],
+    ["H-01","predicate value type","hidden","S0","1","open","CRITICAL","The formal form of DEC-050: Boolean, Kleene three-valued, or an ordered lattice."],
+    ["H-02","UNKNOWN propagation","hidden","S0","1","open","","Absorbing, ignoring, or support-thresholded aggregation. Only the third is both honest and usable."],
+    ["H-08","negation semantics","hidden","S0","1","open","HIGH","RT-15. Negation-as-failure turns absent data into satisfied conditions — the doctrine inverted."],
+    ["H-09","window typing","hidden","S0","1","open","","Bars(n) | Elapsed(d), decided once as a type rather than at eight separate sites."],
+    ["H-17","rounding discipline","hidden","S0","5","open","LOW","Belongs to the value representation, not to semantics — misfiled in Σ0."],
+    ["H-20","directional duality σ","hidden","S0","1","open","HIGH","RT-18 refuted the spread exception; RT-22 demotes σ from axiom to checkable per-term property."],
+
+    ["DEC-001","base timeframe","decision","S1","2","open","",""],
+    ["DEC-002","evaluation clock","decision","S1","1","open","","Defines what an instant is. Out-degree 10 — the widest in Σ1."],
+    ["DEC-003","timeframe set + sharing","decision","S1","2","open","",""],
+    ["DEC-004","HTF anchor","decision","S1","2","open","","Wide but shallow: parameterises Window, does not define it."],
+    ["DEC-005","timezone / DST","decision","S1","2","open","",""],
+    ["DEC-006","missing-bar policy","decision","S1","2","open","HIGH","RT-12. This is where the per-symbol clock is already baked in — H-04 was never open."],
+    ["DEC-007","session / weekend spanning","decision","S1","5","open","",""],
+    ["DEC-008","spread model","decision","S1","3","open","","Option S3 changes the engine's input type — an architectural flag, not a parameter."],
+    ["DEC-009","instrument scope","decision","S1","1","open","","The domain of quantification: decides which concepts exist at all."],
+    ["H-04","multi-symbol clock","hidden","S1","1","made","HIGH","RT-12 / FA-10. Not an open question — the assumption is already made, inside DEC-006."],
+    ["H-05","data revision policy","hidden","S1","3","open","HIGH","RT-07. A fact derived from later-revised data has no representable status."],
+    ["H-06","parameter mutability","hidden","S1","2","open","","Do live setups keep their birth parameters or adopt retuned ones?"],
+    ["H-13","timeframe lattice","hidden","S1","2","open","","Labels, or a refinement order? Decides whether MTF inference is principled or ad hoc."],
+    ["H-18","warm-up boundary","hidden","S1","3","open","CRITICAL","RT-03. No warm-up length is provably sufficient — the state horizon is unbounded."],
+    ["H-19","symbol metadata drift","hidden","S1","3","open","","Tick size and contract specs change over decades."],
+
+    ["DEC-010","volatility estimator","decision","S2","2","open","HIGH","RT-13. Regime-adaptive normalisation makes the detector invariant to the frequency of what it detects."],
+    ["DEC-011","equality tolerance ε","decision","S2","3","open","",""],
+    ["DEC-016","efficiency variant","decision","S2","3","open","",""],
+    ["H-03","baseline causality","hidden","S2","2","open","HIGH","Cycle C7. RT-13 shows the causal-baseline fix is necessary but not sufficient."],
+
+    ["DEC-013","pool = confirmed pivot","decision","S3","0","derived","","A theorem, not a decision. Follows from A-1 plus DEC-002."],
+    ["DEC-014","pivot tie rule","decision","S3","3","open","","Ties are the liquidity signature itself — not an academic choice."],
+    ["DEC-015","pivot widths (k,m)","decision","S3","3","open","MEDIUM","RT-19. k=0 collapses the concept; needs a declared non-degenerate admissible range."],
+    ["DEC-017","cluster representative","decision","S3","3","open","",""],
+    ["DEC-034","intrabar-order exclusion","decision","S3","0","derived","","A corollary of DEC-002 = E1, not a choice."],
+
+    ["DEC-018","pool death","decision","S4","3","open","CRITICAL","RT-03. No maximum lifetime → unbounded state horizon → replay is start-dependent."],
+    ["DEC-019","multi-TF duplicate pools","decision","DL","4","open","","MOVED to the decision layer by REDTEAM-002 §12.3. Not an identity question — identity is settled. One physical phenomenon legitimately yields one entity per timeframe; what to show is policy."],
+    ["DEC-020","pool significance","decision","S4","2","open","","Under a graded value domain its type changes — hence downstream of DEC-050."],
+    ["DEC-021","penetration threshold δ","decision","S4","5","open","HIGH","A parametric leaf despite its Tier A filing. RT-13 applies to its baseline."],
+    ["DEC-022","sweep resolution TF","decision","S4","3","open","",""],
+    ["DEC-023","sweep window / acceptance","decision","S4","3","open","","Cycle C4 with DEC-018 — mutual definition."],
+    ["DEC-024","FVG middle bar","decision","S4","3","open","",""],
+    ["DEC-025","displacement ⇄ FVG","decision","S4","2","open","","Cuts cycle C1. One direction must be deleted — not both."],
+    ["DEC-026","displacement model","decision","S4","3","open","HIGH","RT-13 baseline contamination."],
+    ["DEC-027","bias conflict","decision","DL","4","open","","MOVED to the decision layer by REDTEAM-002 §15."],
+    ["DEC-028","cascade sweeps","decision","S4","4","open","",""],
+    ["DEC-029","structural reference","decision","S4","2","open","HIGH","RT-17. Option R3 is a counterfactual and must be struck — which removes cycle C2 entirely, free."],
+    ["DEC-030","0.705 vs √0.5","decision","S4","5","open","","Absolute leaf: out-degree 0. The lowest-ranked node in the graph."],
+    ["DEC-031","zone-entry basis","decision","S4","4","open","",""],
+    ["DEC-032","MSS timeframe","decision","S4","3","open","",""],
+    ["DEC-033","running-extreme policy","decision","S4","3","open","",""],
+    ["DEC-035","max sweep→MSS latency","decision","S4","5","open","",""],
+    ["DEC-036","FVG minimum size","decision","S4","3","open","HIGH","RT-13 baseline contamination."],
+    ["DEC-037","FVG containment","decision","S4","4","open","",""],
+    ["DEC-038","mitigation policy","decision","S4","3","open","","A selector, not a threshold — RT-16. Changing it makes results incomparable."],
+    ["DEC-039","overlapping FVGs","decision","S4","4","open","CRITICAL","RT-01. The question presupposes a population the kernel cannot express."],
+    ["DEC-040","impulse anchor + freeze","decision","S4","2","open","","Cuts cycle C3. Without the freeze, the whole pullback subsystem is retrospective."],
+    ["DEC-041","FVG-in-zone MUST/SHOULD","decision","S4","4","open","",""],
+    ["DEC-042","partial overlap","decision","S4","5","open","",""],
+    ["DEC-043","pullback counting θ","decision","S4","5","open","HIGH","RT-13 baseline contamination."],
+    ["DEC-044","reaction vs confirmation","decision","S4","4","open","MEDIUM","RT-27. Currently duplication-by-ambiguity. Architecturally near-weightless — a terminal gate."],
+    ["DEC-045","confirmation timeout","decision","S4","5","open","",""],
+    ["DEC-046","accumulation window","decision","S4","3","open","HIGH","RT-14 and cycle C6. Decides whether accumulation is independent of displacement or a duplicate of it."],
+    ["DEC-047","accumulation combination","decision","S4","4","open","HIGH","RT-14. The containment metric measures shape, not compression — a veto measuring the wrong quantity."],
+    ["DEC-048","bias lifetime","decision","S4","5","open","",""],
+    ["DEC-049","HTF context role","decision","S4","4","open","",""],
+    ["DEC-052","target boundary","decision","S4","4","open","",""],
+    ["DEC-053","DPMO","decision","S4","4","open","","Pendant node: in-degree 0, out-degree 1. Unanswerable and blocking nothing."],
+    ["H-07","open / closed ontology","hidden","S4","1","open","","Is the methodology written in the language, or as the language?"],
+    ["H-12","significance time-varying","hidden","S4","4","open","CRITICAL","RT-04. If significance decays it must be retracted — axiom A-2 violated."],
+
+    ["DEC-054","invalidation + timeouts","decision","S5","3","open","HIGH","RT-15. Every state needs a provably enabled exit or the machine stalls on UNKNOWN."],
+    ["DEC-055","setup identity","decision","S5","2","open","HIGH","RT-11. Downstream of the identity primitive — not the same question."],
+    ["DEC-056","concurrency limit","decision","DL","4","open","MEDIUM","RT-02 DOWNGRADED by REDTEAM-002 §15. The engine layer was never ternary; the ternary contract is correct at the presentation layer. This is now a versioned, trader-owned selection policy with several valid answers, not a semantic contradiction with none."],
+    ["H-11","aggregate root","hidden","S5","2","open","HIGH","Does a setup belong to a pool, a sweep, or a symbol? Determines the whole state model."],
+    ["H-14","concept extension","hidden","S5","2","open","","States added to the machine, or gates over the stream? Decides whether the 20-year vision is reachable."],
+    ["H-16","corpus versioned","hidden","S5","3","open","","If parameters are fitted from labels, the corpus is part of the system's definition."],
+
+    ["DEC-057","alert repetition","decision","DL","4","open","","MOVED to the decision layer by REDTEAM-002 §15."],
+    ["DEC-058","revocation","decision","S6","4","open","MEDIUM","RT-25. A revocation is non-monotone output. A-2 governs facts, not recommendations."],
+    ["H-10","output timestamping","hidden","S6","3","open","HIGH","RT-08. t_occurred or t_known — every downstream consumer inherits the choice."],
+    ["H-15","explanation first-class","hidden","S6","3","open","HIGH","RT-10. Retrofitting evidence touches every term in the language."],
+
+    ["D-P1","semantic unboundedness","decision","S0","1","open","CRITICAL","REDTEAM-002 §4. Unbounded semantics with declared operational bounds, or bounded semantics? If bounded, the meaning of the strategy depends on a resource limit and it stops being a mathematical object."],
+    ["D-P2","population monotonicity","decision","S0","1","open","CRITICAL","REFORMULATED by REDTEAM-003 §2. The original blanket restriction was REFUTED — DEC-036 (FVG min size) and DEC-020 (significance) are not order-contiguous. Repaired by stratifying predicates: arbitrary at birth, order-contiguous at query time. Sufficiency for future concepts is a CONJECTURE, not a theorem."],
+    ["D-P3","Pop_known vs Pop_occurred","decision","S0","1","open","CRITICAL","MORE SEVERE than recorded. REDTEAM-003 §3 WITHDRAWS REDTEAM-002's claim that Pop_known ⊆ Pop_occurred: containment holds only if deaths are instantly decidable. MT5 gives every HTF death an unbounded delay, so the populations are INCOMPARABLE — a rule can be satisfied by an entity already destroyed. Both options are unsafe in different directions."],
+    ["OPEN-6.4","identity key: nominal vs determinable","decision","S5","1","open","HIGH","REDTEAM-003 §6.4. MqlRates.time (nominal bar open) is more REPRODUCIBLE; the determinability instant is more CAUSAL. In MT5 they differ by an unbounded amount. A genuine conflict between two properties the project holds at once — invisible until MT5 became a semantic target."],
+    ["D-P4","cross-series order","decision","S5","3","open","","REDTEAM-002 §8.2. Intra-series order is a theorem; across timeframe, side and symbol it is a decision. All that remains of MF-7."],
+    ["D-P5","hard or amortised work bound","decision","S1","3","open","HIGH","REDTEAM-002 §9.3. A sweep pops an unbounded prefix — unbounded work in one instant. Amortised O(1), but that is not a real-time guarantee."],
+    ["D-P6","report bound binding","decision","S6","3","open","HIGH","REDTEAM-002 §4.2. An approximation whose binding rate is unobservable is indistinguishable from a bug."],
+    ["D-P7","identity includes parameter version","decision","S5","3","open","","REDTEAM-002 §2.4. Birth instant depends on confirmation delays, which depend on parameters. Ids are names within a run, not global names."],
+    ["D-P8","K semantic or architectural","decision","S1","3","open","HIGH","REDTEAM-002 §7.2. Architectural where a structural non-binding proof exists (Class II), semantic everywhere else (Class I). The same symbol has different status per class."],
+    ["D-P9","decidable multi-stack fragment","decision","K","1","open","CRITICAL","REDTEAM-002 §17.4, refined in REDTEAM-003 §5. One stack over a finite alphabet is a pushdown system — decidable. Two independent stacks are Turing-complete. Predicate stratification improves the odds (O(1) elements touched per instant) but does NOT close it: the bounded-context result is global, not per-step. Still OPEN, possibly needing an outside proof."],
+
+    ["D-M1","HTF context: closed or forming","decision","S1","1","open","CRITICAL","MT5-CAP-001 §2.3. Closed-bar context is causal and A-2-safe but up to 4 HOURS stale; forming-bar context is fresh but non-final (a repaint hazard, i.e. A-2 not A-1). Never stated as a decision. Cheap to state, changes detector latency by hours."],
+    ["D-M2","market closed vs silent vs not loaded","decision","S0","1","open","CRITICAL","MT5-CAP-001 §5. MT5 exposes 4 of 5 missing-data distinctions; NOT-APPLICABLE is the gap. A minute with no ticks is indistinguishable from one never loaded without a session AND holiday calendar, which MT5 does not provide."],
+    ["D-M3","execution host","decision","S1","3","open","HIGH","MT5-CAP-001 §7. Services fit the semantics best (chart-independent, multi-symbol) but DO NOT RUN IN THE STRATEGY TESTER. The host choice and the replay requirement are in direct conflict."],
+    ["D-M4","ask-based penetration","decision","S1","3","open","HIGH","MT5-CAP-001 §4.2. Stops trigger at the ask, so the ask reading is what the strategy actually means — and it is the one MT5 makes hardest to obtain historically. Committing to it commits to tick history and a shorter corpus."],
+    ["D-M5","valid tester modes","decision","S1","3","open","HIGH","MT5-CAP-001 §6. Intrabar tick order is FABRICATED in generated modes. If any rule depends on within-bar order — a same-bar sweep does — only real-ticks mode is semantically valid. A mode is a semantic commitment, not a speed setting."],
+    ["D-M6","broker timezone / DST model","decision","S1","1","open","CRITICAL","ESCALATED to Constitutional by DEC-S-001 §2.2. MT5 exposes no broker timezone or DST schedule. Previously this only affected HTF bar alignment; now the ENTRY GATE ITSELF is defined in New York time, so a mis-converted hour admits or rejects a setup outright. A-6 is unachievable as written."],
+    ["DEC-S-001","session window gate","decision","S4","1","open","CRITICAL","New domain input 2026-08-07: liquidity must be taken inside NY 03:00-04:00 and 09:30-10:50, else the result is invalid. The methodology's FIRST HARD TIME GATE. Six unresolved ambiguities (one/two windows; fixed UTC-4 vs America/New_York; sweep-only vs whole chain; which instrument; holidays; inclusive bounds). Cuts the tradeable day by ~90%, which re-costs D-M4/D-M5 by an order of magnitude."],
+
+    ["C-LIQ","Liquidity","concept","C","0","","","A point concept here (resting stops). RT-24: the microstructure sense is not expressible in this kernel."],
+    ["C-SWING","Swing","concept","C","0","","","Observable with bounded delay."],
+    ["C-STRUCT","Structure","concept","C","0","","",""],
+    ["C-MSS","MSS","concept","C","0","","","Immediately observable at the breaking close."],
+    ["C-IMP","Impulse","concept","C","0","","","RT-27: mathematically identical to displacement. Merge."],
+    ["C-FVG","FVG","concept","C","0","","","Observable with one bar of delay. A population — RT-01."],
+    ["C-PB","Pullback","concept","C","0","","","Only retrospectively observable unless the anchor is frozen."],
+    ["C-REACT","Reaction","concept","C","0","","","RT-27: currently duplication-by-ambiguity with Confirmation."],
+    ["C-CONF","Confirmation","concept","C","0","","","P-6: identical in form to MSS at a smaller scale. The corpus's strongest formal result."],
+    ["C-ACC","Accumulation","concept","C","0","","","RT-14: the metric does not measure what its name claims."],
+    ["C-HTF","HTF context","concept","C","0","","","P-8: timeframe belongs to Series, not to Window, Event or Context."],
+    ["C-BIAS","Bias","concept","C","0","","","Immediately observable."],
+    ["C-INV","Invalidation","concept","C","0","","",""],
+    ["C-LIFE","Setup lifecycle","concept","C","0","","","RT-15: totality of the transition relation is unproven."]
+  ],
+  "edges": [
+    ["DEC-009","DEC-004"],["DEC-009","DEC-005"],["DEC-009","DEC-007"],["DEC-009","DEC-008"],["DEC-009","DEC-010"],["DEC-009","DEC-052"],
+    ["DEC-002","DEC-001"],["DEC-002","DEC-006"],["DEC-002","DEC-008"],["DEC-002","DEC-013"],["DEC-002","DEC-022"],["DEC-002","DEC-023"],["DEC-002","DEC-031"],["DEC-002","DEC-034"],["DEC-002","DEC-045"],["DEC-002","DEC-054"],
+    ["DEC-001","DEC-003"],["DEC-001","DEC-006"],["DEC-001","DEC-010"],["DEC-001","DEC-015"],
+    ["DEC-005","DEC-004"],
+    ["DEC-004","DEC-003"],["DEC-004","DEC-007"],["DEC-004","DEC-020"],["DEC-004","DEC-023"],
+    ["DEC-003","DEC-015"],["DEC-003","DEC-019"],["DEC-003","DEC-022"],["DEC-003","DEC-032"],["DEC-003","DEC-037"],["DEC-003","DEC-049"],
+    ["DEC-006","DEC-010"],["DEC-006","DEC-016"],["DEC-006","DEC-035"],["DEC-006","DEC-043"],["DEC-006","DEC-046"],["DEC-006","DEC-054"],["DEC-006","H-04"],
+    ["DEC-008","DEC-021"],["DEC-008","DEC-036"],
+    ["DEC-010","DEC-011"],["DEC-010","DEC-020"],["DEC-010","DEC-021"],["DEC-010","DEC-023"],["DEC-010","DEC-026"],["DEC-010","DEC-036"],["DEC-010","DEC-043"],["DEC-010","DEC-046"],
+    ["DEC-016","DEC-026"],["DEC-016","DEC-047"],
+    ["DEC-011","DEC-014"],["DEC-011","DEC-017"],["DEC-011","DEC-020"],
+    ["DEC-014","DEC-017"],["DEC-014","DEC-020"],["DEC-014","DEC-029"],
+    ["DEC-015","DEC-020"],["DEC-015","DEC-029"],["DEC-015","DEC-043"],
+    ["DEC-017","DEC-019"],["DEC-017","DEC-020"],
+    ["DEC-020","DEC-013"],["DEC-020","DEC-018"],["DEC-020","DEC-019"],["DEC-020","DEC-022"],["DEC-020","DEC-028"],["DEC-020","DEC-055"],
+    ["DEC-018","DEC-023"],["DEC-018","DEC-028"],["DEC-018","DEC-054"],["DEC-018","H-18"],
+    ["DEC-019","DEC-028"],["DEC-019","DEC-055"],
+    ["DEC-021","DEC-023"],
+    ["DEC-022","DEC-023"],["DEC-022","DEC-027"],["DEC-022","DEC-032"],["DEC-022","DEC-035"],
+    ["DEC-023","DEC-018"],["DEC-023","DEC-027"],["DEC-023","DEC-035"],["DEC-023","DEC-054"],
+    ["DEC-024","DEC-025"],["DEC-024","DEC-037"],
+    ["DEC-025","DEC-026"],["DEC-025","DEC-036"],["DEC-025","DEC-037"],["DEC-025","DEC-041"],
+    ["DEC-026","DEC-029"],["DEC-026","DEC-046"],["DEC-026","DEC-047"],
+    ["DEC-029","DEC-032"],["DEC-029","DEC-033"],["DEC-029","DEC-035"],["DEC-029","DEC-040"],
+    ["DEC-032","DEC-033"],["DEC-032","DEC-035"],["DEC-032","DEC-044"],["DEC-032","DEC-054"],
+    ["DEC-033","DEC-040"],["DEC-033","DEC-054"],
+    ["DEC-036","DEC-037"],["DEC-036","DEC-038"],["DEC-036","DEC-039"],["DEC-036","DEC-042"],
+    ["DEC-037","DEC-039"],["DEC-037","DEC-041"],["DEC-037","DEC-042"],
+    ["DEC-038","DEC-039"],["DEC-038","DEC-042"],["DEC-038","DEC-045"],["DEC-038","DEC-054"],
+    ["DEC-039","DEC-042"],["DEC-039","DEC-055"],
+    ["DEC-040","DEC-030"],["DEC-040","DEC-031"],["DEC-040","DEC-041"],["DEC-040","DEC-042"],["DEC-040","DEC-043"],["DEC-040","DEC-045"],["DEC-040","DEC-054"],["DEC-040","DEC-055"],
+    ["DEC-031","DEC-042"],["DEC-031","DEC-045"],["DEC-031","DEC-054"],
+    ["DEC-041","DEC-042"],["DEC-043","DEC-054"],
+    ["DEC-044","DEC-045"],["DEC-044","DEC-054"],["DEC-044","DEC-057"],["DEC-044","DEC-058"],
+    ["DEC-045","DEC-054"],["DEC-046","DEC-047"],["DEC-047","DEC-054"],["DEC-048","DEC-054"],
+    ["DEC-027","DEC-048"],["DEC-027","DEC-056"],["DEC-028","DEC-055"],["DEC-028","DEC-056"],
+    ["DEC-052","DEC-049"],["DEC-053","DEC-054"],
+    ["DEC-054","DEC-056"],["DEC-054","DEC-057"],["DEC-054","DEC-058"],
+    ["DEC-055","DEC-019"],["DEC-055","DEC-028"],["DEC-055","DEC-056"],["DEC-055","DEC-057"],
+    ["DEC-056","DEC-057"],["DEC-057","DEC-058"],
+    ["DEC-034","DEC-031"],["DEC-034","DEC-038"],["DEC-034","DEC-044"],
+    ["DEC-050","DEC-012"],["DEC-050","DEC-020"],["DEC-050","DEC-026"],["DEC-050","DEC-041"],["DEC-050","DEC-042"],["DEC-050","DEC-043"],["DEC-050","DEC-047"],["DEC-050","DEC-049"],["DEC-050","DEC-055"],["DEC-050","DEC-056"],["DEC-050","DEC-057"],["DEC-050","DEC-058"],
+    ["H-01","DEC-050"],
+    ["H-02","DEC-012"],["H-02","DEC-016"],["H-02","DEC-026"],["H-02","DEC-047"],
+    ["DEC-012","DEC-016"],["DEC-012","DEC-026"],["DEC-012","DEC-046"],["DEC-012","DEC-047"],
+    ["H-08","DEC-023"],["H-08","DEC-033"],["H-08","DEC-037"],["H-08","DEC-041"],["H-08","DEC-047"],["H-08","DEC-054"],
+    ["H-09","DEC-006"],["H-09","DEC-035"],["H-09","DEC-043"],["H-09","DEC-045"],["H-09","DEC-046"],
+    ["H-17","DEC-030"],["H-17","DEC-031"],["H-17","DEC-042"],
+    ["H-20","C-MSS"],["H-20","C-LIQ"],["H-20","C-FVG"],["H-20","DEC-029"],
+    ["H-03","DEC-010"],["H-03","DEC-026"],["H-03","DEC-046"],
+    ["H-04","K-CLOCK"],["H-05","K-SNAP"],["H-06","K-SNAP"],["H-16","K-SNAP"],["H-15","K-EVID"],
+    ["H-07","H-14"],["H-13","DEC-003"],["H-11","DEC-055"],["H-12","DEC-020"],["H-14","DEC-054"],
+    ["H-18","K-POP"],["H-19","DEC-009"],["H-10","DEC-057"],
+    ["K-SERIES","K-LIFT"],["K-SERIES","K-LEVEL"],
+    ["K-LIFT","K-CROSS"],["K-LIFT","K-AND"],
+    ["K-DELAY","K-CROSS"],["K-DELAY","K-WINDOW"],["K-DELAY","K-AGG"],["K-DELAY","K-THEN"],
+    ["K-REC","K-AGG"],["K-REC","K-THEN"],["K-WINDOW","K-AGG"],
+    ["K-POP","C-LIFE"],["K-POP","DEC-039"],["K-POP","DEC-056"],["K-POP","K-STACK"],
+    ["K-STACK","C-LIQ"],["K-STACK","C-FVG"],["K-STACK","C-LIFE"],["K-STACK","D-P9"],
+    ["K-CLOCK","DEC-002"],["K-LAG","C-HTF"],["K-EVID","C-LIFE"],
+    ["D-P1","K-POP"],["D-P1","K-STACK"],["D-P1","D-P8"],["D-P1","D-P6"],
+    ["D-P2","K-STACK"],["D-P2","D-P5"],["D-P2","D-P9"],
+    ["D-P3","DEC-018"],["D-P3","DEC-038"],["D-P3","DEC-054"],
+    ["H-10","D-P3"],["H-04","D-P4"],
+    ["D-P4","DEC-019"],["D-P7","DEC-055"],
+    ["D-P8","DEC-035"],["D-P8","DEC-045"],["D-P8","DEC-054"],
+    ["DEC-035","K-POP"],["DEC-045","K-POP"],["DEC-054","K-POP"],
+    ["OPEN-6.4","DEC-055"],["OPEN-6.4","D-P7"],["H-10","OPEN-6.4"],
+    ["D-M1","DEC-049"],["D-M1","DEC-003"],["D-M1","C-HTF"],["D-M1","D-P3"],
+    ["D-M2","DEC-012"],["D-M2","DEC-006"],["D-M2","H-02"],["D-M2","DEC-007"],
+    ["D-M3","K-SNAP"],["D-M3","H-18"],
+    ["D-M4","DEC-008"],["D-M4","DEC-021"],["D-M4","H-20"],
+    ["D-M5","DEC-034"],["D-M5","DEC-022"],["D-M5","D-M4"],
+    ["D-M6","DEC-004"],["D-M6","DEC-005"],["D-M6","DEC-007"],
+    ["DEC-002","D-M5"],["DEC-009","D-M6"],["H-05","D-M3"],
+    ["D-M6","DEC-S-001"],["DEC-007","DEC-S-001"],["DEC-009","DEC-S-001"],
+    ["DEC-S-001","C-LIQ"],["DEC-S-001","DEC-020"],["DEC-S-001","DEC-023"],
+    ["DEC-S-001","D-M4"],["DEC-S-001","D-M5"],["DEC-S-001","D-P1"],["DEC-S-001","DEC-048"],
+    ["DEC-020","C-LIQ"],["DEC-018","C-LIQ"],["DEC-011","C-LIQ"],["DEC-019","C-LIQ"],
+    ["DEC-014","C-SWING"],["DEC-015","C-SWING"],
+    ["DEC-029","C-STRUCT"],["DEC-015","C-STRUCT"],
+    ["DEC-029","C-MSS"],["DEC-032","C-MSS"],["DEC-033","C-MSS"],
+    ["DEC-025","C-IMP"],["DEC-026","C-IMP"],["DEC-016","C-IMP"],
+    ["DEC-024","C-FVG"],["DEC-036","C-FVG"],["DEC-037","C-FVG"],["DEC-038","C-FVG"],["DEC-039","C-FVG"],
+    ["DEC-040","C-PB"],["DEC-030","C-PB"],["DEC-031","C-PB"],["DEC-043","C-PB"],
+    ["DEC-044","C-REACT"],["DEC-044","C-CONF"],["DEC-045","C-CONF"],
+    ["DEC-046","C-ACC"],["DEC-047","C-ACC"],
+    ["DEC-049","C-HTF"],["DEC-052","C-HTF"],["DEC-027","C-BIAS"],["DEC-048","C-BIAS"],
+    ["DEC-054","C-INV"],["DEC-038","C-INV"],["DEC-055","C-LIFE"],["DEC-056","C-LIFE"]
+  ],
+  "cycles": [
+    ["C1","displacement ⇄ FVG",["DEC-024","DEC-025","DEC-026","DEC-036"],"live"],
+    ["C2","structure ⇄ displacement",["DEC-026","DEC-029","DEC-032"],"eliminated by RT-17"],
+    ["C3","pullback ⇄ impulse",["DEC-040","DEC-031","DEC-043"],"live"],
+    ["C4","pool death ⇄ acceptance",["DEC-018","DEC-023"],"live"],
+    ["C5","identity tangle",["DEC-050","DEC-020","DEC-028","DEC-055"],"live"],
+    ["C6","accumulation ⇄ displacement",["DEC-046","DEC-047","DEC-026"],"live"],
+    ["C7","estimator contamination",["DEC-010","DEC-021","DEC-026","DEC-036","DEC-043","DEC-046"],"live"]
+  ],
+  "criticalPath": [
+    ["1","value domain",["H-01","DEC-050"]],
+    ["2","logic semantics",["H-08","H-02","DEC-012","H-09"]],
+    ["3","duality",["H-20"]],
+    ["4","domain and instant",["DEC-009","DEC-002"]],
+    ["5","evolution locks",["H-04","H-07","H-14"]],
+    ["6","substrate closure",["DEC-001","DEC-004","DEC-005","DEC-003","DEC-006"]],
+    ["7","measurement",["DEC-010","H-03"]],
+    ["8","cycle cuts",["DEC-025","DEC-029","DEC-040"]],
+    ["9","identity",["DEC-020","DEC-055","H-11"]],
+    ["R","red-team preconditions",["K-POP","K-STACK","K-EVID","K-SNAP","K-CLOCK","DEC-018","DEC-039","H-18","H-12","DEC-054"]],
+    ["P","population semantics",["D-P1","D-P2","D-P3","D-P9"]],
+    ["M","MT5 semantic boundary",["D-M1","D-M2","D-M3","D-M4","D-M5","D-M6","OPEN-6.4"]],
+    ["S","session gate",["DEC-S-001","D-M6"]]
+  ],
+  "blockers": ["K-POP","K-STACK","K-EVID","K-SNAP","K-CLOCK","DEC-050","DEC-018","H-18","DEC-039","H-12","DEC-054","DEC-006","H-05","H-10","H-15","D-P1","D-P2","D-P3","D-P9","D-M1","D-M2","D-M3","D-M4","D-M5","D-M6","OPEN-6.4","DEC-S-001"]
+}
+</script>
+
+<style>
+:root{
+  --bg:#E7EAEF; --panel:#F6F7FA; --sunken:#DDE1E8; --line:#C3CAD5; --line-soft:#D5DAE3;
+  --text:#131820; --muted:#596375; --faint:#8A93A4;
+  --accent:#4F44CE; --accent-ghost:rgba(79,68,206,.12);
+  --decision:#4E5FDD; --hidden:#A8458F; --kernel:#12836F; --concept:#6E7889;
+  --critical:#C92B33; --high:#C96A1C; --medium:#9E7D0E; --low:#8A93A4;
+  --path:#B2560B; --path-ghost:rgba(178,86,11,.14);
+  --cycle:#B03A6E;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#080B10; --panel:#111721; --sunken:#0C1119; --line:#232B39; --line-soft:#1A212C;
+    --text:#E1E6EE; --muted:#8A94A7; --faint:#5C6675;
+    --accent:#8E82F5; --accent-ghost:rgba(142,130,245,.16);
+    --decision:#7987F2; --hidden:#D06BB6; --kernel:#2FB39C; --concept:#798395;
+    --critical:#F0575E; --high:#EE9145; --medium:#D9B93C; --low:#798395;
+    --path:#E29244; --path-ghost:rgba(226,146,68,.16);
+    --cycle:#E272A6;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#E7EAEF; --panel:#F6F7FA; --sunken:#DDE1E8; --line:#C3CAD5; --line-soft:#D5DAE3;
+  --text:#131820; --muted:#596375; --faint:#8A93A4;
+  --accent:#4F44CE; --accent-ghost:rgba(79,68,206,.12);
+  --decision:#4E5FDD; --hidden:#A8458F; --kernel:#12836F; --concept:#6E7889;
+  --critical:#C92B33; --high:#C96A1C; --medium:#9E7D0E; --low:#8A93A4;
+  --path:#B2560B; --path-ghost:rgba(178,86,11,.14); --cycle:#B03A6E;
+}
+:root[data-theme="dark"]{
+  --bg:#080B10; --panel:#111721; --sunken:#0C1119; --line:#232B39; --line-soft:#1A212C;
+  --text:#E1E6EE; --muted:#8A94A7; --faint:#5C6675;
+  --accent:#8E82F5; --accent-ghost:rgba(142,130,245,.16);
+  --decision:#7987F2; --hidden:#D06BB6; --kernel:#2FB39C; --concept:#798395;
+  --critical:#F0575E; --high:#EE9145; --medium:#D9B93C; --low:#798395;
+  --path:#E29244; --path-ghost:rgba(226,146,68,.16); --cycle:#E272A6;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+.shell{display:grid;grid-template-columns:270px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);
+  height:100vh;height:100dvh}
+
+/* ---- masthead ---- */
+.masthead{grid-column:1/-1;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;
+  padding:12px 18px;background:var(--panel);border-bottom:1px solid var(--line)}
+.masthead h1{margin:0;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase}
+.masthead .sub{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.masthead .spacer{flex:1}
+.counts{display:flex;gap:14px;font-family:var(--mono);font-size:11px;color:var(--muted);
+  font-variant-numeric:tabular-nums}
+.counts b{color:var(--text);font-weight:600}
+
+/* ---- rail ---- */
+.rail{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:14px 14px 40px}
+.rail section{margin-bottom:20px}
+.rail h2{margin:0 0 8px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint)}
+.search{width:100%;padding:7px 9px;background:var(--sunken);border:1px solid var(--line);border-radius:3px;
+  color:var(--text);font-family:var(--mono);font-size:12px}
+.search:focus{outline:2px solid var(--accent);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border:1px solid var(--line);
+  border-radius:3px;background:var(--sunken);color:var(--muted);font-family:var(--mono);font-size:11px;
+  cursor:pointer;user-select:none}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.chip[aria-pressed="true"]{background:var(--accent-ghost);border-color:var(--accent);color:var(--text)}
+.chip .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.chip .bar{width:3px;height:11px;border-radius:1px;flex:none}
+.rowlabel{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);
+  font-size:11px;color:var(--muted);margin-bottom:6px}
+.rowlabel b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.btn{width:100%;padding:7px;background:var(--sunken);border:1px solid var(--line);border-radius:3px;
+  color:var(--text);font-family:var(--mono);font-size:11px;letter-spacing:.05em;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.legend{display:grid;gap:5px;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.legend div{display:flex;align-items:center;gap:7px}
+.swatch{width:20px;height:0;border-top-width:2px;border-top-style:solid;flex:none}
+
+/* ---- canvas ---- */
+.stage{position:relative;overflow:hidden;background:var(--bg);cursor:grab}
+.stage.dragging{cursor:grabbing}
+svg{display:block;width:100%;height:100%;touch-action:none}
+.laneband rect{fill:var(--panel);opacity:.55}
+.laneband rect.alt{opacity:.25}
+.laneband text.lname{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;
+  fill:var(--muted)}
+.laneband text.ldesc{font-family:var(--mono);font-size:9.5px;fill:var(--faint)}
+.laneband line{stroke:var(--line-soft);stroke-width:1}
+
+.edge{fill:none;stroke:var(--line);stroke-width:1;opacity:.5}
+.edge.hi{stroke:var(--accent);stroke-width:1.8;opacity:1}
+.edge.hi-up{stroke:var(--hidden);stroke-width:1.8;opacity:1}
+.edge.cyc{stroke:var(--cycle);stroke-width:1.8;opacity:.95;stroke-dasharray:5 3}
+.edge.dim{opacity:.07}
+
+.node{cursor:pointer}
+.node rect.box{fill:var(--panel);stroke-width:1.4;rx:3}
+.node text.nid{font-family:var(--mono);font-size:10.5px;font-weight:600;fill:var(--text)}
+.node text.nlab{font-family:var(--mono);font-size:9px;fill:var(--muted)}
+.node rect.sev{rx:1.5}
+.node.sel rect.box{stroke-width:2.6}
+.node.dim{opacity:.13}
+.node.onpath rect.box{stroke-dasharray:none;filter:none}
+.node .pathring{fill:none;stroke:var(--path);stroke-width:2;rx:5;opacity:0}
+.node.onpath .pathring{opacity:1}
+.node .cycring{fill:none;stroke:var(--cycle);stroke-width:1.6;stroke-dasharray:3 2;rx:6;opacity:0}
+.node.incyc .cycring{opacity:1}
+.node text.badge{font-family:var(--mono);font-size:8px;font-weight:700;fill:var(--panel)}
+.node circle.badgebg{stroke:none}
+.node:focus{outline:none}
+.node:focus-visible rect.box{stroke:var(--accent);stroke-width:2.6}
+
+/* ---- detail ---- */
+.detail{position:absolute;top:12px;right:12px;width:330px;max-height:calc(100% - 24px);
+  overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:4px;
+  padding:14px 15px;box-shadow:0 8px 28px rgba(0,0,0,.16);display:none}
+.detail.open{display:block}
+.detail .did{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.02em}
+.detail .dlab{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:2px}
+.detail .meta{display:flex;flex-wrap:wrap;gap:5px;margin:11px 0}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 6px;border:1px solid var(--line);border-radius:2px;color:var(--muted)}
+.tag.sev{color:var(--panel);border:none;font-weight:700}
+.detail p.note{margin:10px 0 0;font-size:12.5px;line-height:1.55;color:var(--text)}
+.detail h3{margin:15px 0 6px;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--faint)}
+.reflist{display:flex;flex-wrap:wrap;gap:4px}
+.ref{font-family:var(--mono);font-size:10.5px;padding:2px 6px;border-radius:2px;border:1px solid var(--line);
+  background:var(--sunken);color:var(--muted);cursor:pointer}
+.ref:hover{border-color:var(--accent);color:var(--text)}
+.ref:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.detail .close{position:absolute;top:10px;right:11px;background:none;border:none;color:var(--faint);
+  font-size:17px;line-height:1;cursor:pointer;padding:2px 5px;border-radius:2px}
+.detail .close:hover{color:var(--text)}
+.empty{font-size:12px;color:var(--faint);font-style:italic}
+
+.zoombar{position:absolute;left:12px;bottom:12px;display:flex;gap:5px}
+.zoombar button{width:30px;height:30px;background:var(--panel);border:1px solid var(--line);
+  border-radius:3px;color:var(--text);font-family:var(--mono);font-size:13px;cursor:pointer}
+.zoombar button:hover{border-color:var(--accent)}
+.zoombar button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+@media (prefers-reduced-motion:no-preference){
+  .node rect.box,.edge{transition:opacity .16s ease,stroke .16s ease}
+}
+@media (max-width:820px){
+  .shell{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr)}
+  .rail{border-right:none;border-bottom:1px solid var(--line);max-height:230px}
+  .detail{width:auto;left:12px;right:12px}
+}
+</style>
+
+<div class="shell">
+  <header class="masthead">
+    <h1>Project Trader · Dependency Graph</h1>
+    <span class="sub">DEP-001 + REDTEAM-001 · layout computed from the embedded edge set</span>
+    <span class="spacer"></span>
+    <div class="counts">
+      <span><b id="c-nodes">0</b> nodes</span>
+      <span><b id="c-edges">0</b> edges</span>
+      <span><b id="c-vis">0</b> shown</span>
+    </div>
+  </header>
+
+  <aside class="rail">
+    <section>
+      <h2>Search</h2>
+      <input class="search" id="q" type="search" placeholder="id or label…" aria-label="Search nodes">
+    </section>
+
+    <section>
+      <h2>Kind</h2>
+      <div class="chips" id="f-kind"></div>
+    </section>
+
+    <section>
+      <h2>Stratum</h2>
+      <div class="chips" id="f-lane"></div>
+    </section>
+
+    <section>
+      <h2>Classification</h2>
+      <div class="chips" id="f-class"></div>
+    </section>
+
+    <section>
+      <h2>Severity</h2>
+      <div class="chips" id="f-sev"></div>
+    </section>
+
+    <section>
+      <h2>Status</h2>
+      <div class="chips" id="f-status"></div>
+    </section>
+
+    <section>
+      <h2>Overlays</h2>
+      <div class="chips" id="f-overlay">
+        <button class="chip" id="t-path" aria-pressed="false"><span class="bar" style="background:var(--path)"></span>critical path</button>
+        <button class="chip" id="t-cyc" aria-pressed="false"><span class="bar" style="background:var(--cycle)"></span>cycles</button>
+        <button class="chip" id="t-block" aria-pressed="false">blockers only</button>
+      </div>
+    </section>
+
+    <section>
+      <div class="rowlabel"><span>Dependency depth</span><b id="depth-val">all</b></div>
+      <input type="range" id="depth" min="1" max="7" value="7" aria-label="Dependency depth from selected node">
+      <p style="margin:6px 0 0;font-family:var(--mono);font-size:10px;color:var(--faint)">Applies once a node is selected.</p>
+    </section>
+
+    <section>
+      <button class="btn" id="reset">RESET VIEW</button>
+    </section>
+
+    <section>
+      <h2>Legend</h2>
+      <div class="legend">
+        <div><span class="dot" style="width:9px;height:9px;border-radius:50%;background:var(--decision)"></span>open decision</div>
+        <div><span class="dot" style="width:9px;height:9px;border-radius:50%;background:var(--hidden)"></span>hidden decision</div>
+        <div><span class="dot" style="width:9px;height:9px;border-radius:50%;background:var(--kernel)"></span>kernel operator</div>
+        <div><span class="dot" style="width:9px;height:9px;border-radius:50%;background:var(--concept)"></span>methodology concept</div>
+        <div><span class="swatch" style="border-top-color:var(--accent)"></span>depends on selection</div>
+        <div><span class="swatch" style="border-top-color:var(--hidden)"></span>selection depends on</div>
+        <div><span class="swatch" style="border-top-color:var(--cycle);border-top-style:dashed"></span>cycle member</div>
+        <div style="margin-top:4px">badge <b style="font-family:var(--mono)">E</b> eliminated · <b style="font-family:var(--mono)">T</b> theorem · <b style="font-family:var(--mono)">A</b> already assumed · <b style="font-family:var(--mono)">R</b> required · <b style="font-family:var(--mono)">S</b> survives</div>
+      </div>
+    </section>
+  </aside>
+
+  <div class="stage" id="stage">
+    <svg id="svg" role="img" aria-label="Dependency graph of the specification's open decisions, hidden decisions, kernel operators and methodology concepts">
+      <g id="viewport">
+        <g id="lanes"></g>
+        <g id="edges"></g>
+        <g id="nodes"></g>
+      </g>
+    </svg>
+
+    <div class="zoombar">
+      <button id="z-in" title="Zoom in" aria-label="Zoom in">+</button>
+      <button id="z-out" title="Zoom out" aria-label="Zoom out">−</button>
+      <button id="z-fit" title="Fit" aria-label="Fit to view">⤢</button>
+    </div>
+
+    <div class="detail" id="detail" role="region" aria-live="polite">
+      <button class="close" id="d-close" aria-label="Close detail">×</button>
+      <div class="did" id="d-id"></div>
+      <div class="dlab" id="d-lab"></div>
+      <div class="meta" id="d-meta"></div>
+      <p class="note" id="d-note"></p>
+      <h3>Depends on</h3><div class="reflist" id="d-up"></div>
+      <h3>Depended on by</h3><div class="reflist" id="d-down"></div>
+      <h3>Cycles</h3><div class="reflist" id="d-cyc"></div>
+      <h3>Critical path</h3><div class="reflist" id="d-path"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const D = JSON.parse(document.getElementById("graph-data").textContent);
+
+/* ---------- model ---------- */
+const N = new Map();
+D.nodes.forEach((a,i)=>N.set(a[0],{
+  id:a[0], label:a[1], kind:a[2], lane:a[3], cls:a[4], status:a[5]||"", sev:a[6]||"", note:a[7]||"",
+  seq:i, up:[], down:[], cycles:[], step:null
+}));
+const EDGES = D.edges.filter(e=>N.has(e[0])&&N.has(e[1]));
+EDGES.forEach(([s,t])=>{ N.get(t).up.push(s); N.get(s).down.push(t); });
+D.cycles.forEach(([cid,name,members])=>members.forEach(m=>{ if(N.has(m)) N.get(m).cycles.push(cid+" "+name); }));
+const PATH = new Map();
+D.criticalPath.forEach(([step,name,ids])=>ids.forEach(id=>{ if(N.has(id)){ N.get(id).step = step+" · "+name; PATH.set(id,step);} }));
+const BLOCK = new Set(D.blockers);
+const CYCSET = new Set(); D.cycles.forEach(([,,m])=>m.forEach(x=>CYCSET.add(x)));
+const cycEdgeKey = new Set();
+D.cycles.forEach(([,,m])=>{ for(const a of m) for(const b of m) cycEdgeKey.add(a+"→"+b); });
+
+/* ---------- layout: lanes + deterministic barycentre ordering ---------- */
+const NW=150, NH=40, GX=12, GY=34, LPAD=176, TOP=30;
+const laneIds = D.lanes.map(l=>l[0]);
+const byLane = new Map(laneIds.map(l=>[l,[]]));
+[...N.values()].sort((a,b)=>a.seq-b.seq).forEach(n=>{ if(byLane.has(n.lane)) byLane.get(n.lane).push(n.id); });
+const pos = new Map();
+byLane.forEach(arr=>arr.forEach((id,i)=>pos.set(id,i)));
+const nbrs = new Map([...N.keys()].map(k=>[k,[...N.get(k).up,...N.get(k).down]]));
+for(let s=0;s<12;s++){
+  laneIds.forEach(l=>{
+    const arr = byLane.get(l);
+    const bc = new Map();
+    arr.forEach(id=>{
+      const xs = nbrs.get(id).map(m=>pos.get(m)).filter(v=>v!==undefined);
+      bc.set(id, xs.length ? xs.reduce((a,b)=>a+b,0)/xs.length : pos.get(id));
+    });
+    arr.sort((a,b)=> (bc.get(a)-bc.get(b)) || N.get(a).seq-N.get(b).seq );
+    arr.forEach((id,i)=>pos.set(id,i));
+  });
+}
+const laneY = new Map(); let y = TOP;
+laneIds.forEach(l=>{ laneY.set(l,y); y += NH + GY; });
+const CANVAS_H = y + 20;
+let maxCols = 0;
+byLane.forEach(a=>{ maxCols = Math.max(maxCols,a.length); });
+const CANVAS_W = LPAD + maxCols*(NW+GX) + 40;
+const XY = new Map();
+byLane.forEach((arr,l)=>arr.forEach((id,i)=>XY.set(id,{x:LPAD+i*(NW+GX), y:laneY.get(l)})));
+
+/* ---------- render ---------- */
+const SVGNS="http://www.w3.org/2000/svg";
+const el=(t,at)=>{const e=document.createElementNS(SVGNS,t);for(const k in at)e.setAttribute(k,at[k]);return e;};
+const gLanes=document.getElementById("lanes"), gEdges=document.getElementById("edges"), gNodes=document.getElementById("nodes");
+
+D.lanes.forEach(([id,name,desc],i)=>{
+  const yy=laneY.get(id)-11, g=el("g",{class:"laneband"});
+  const r=el("rect",{x:0,y:yy,width:CANVAS_W,height:NH+22,rx:4}); if(i%2) r.setAttribute("class","alt");
+  g.appendChild(r);
+  g.appendChild(el("line",{x1:0,y1:yy,x2:CANVAS_W,y2:yy}));
+  const t1=el("text",{class:"lname",x:14,y:yy+22}); t1.textContent=name; g.appendChild(t1);
+  const t2=el("text",{class:"ldesc",x:14,y:yy+36}); t2.textContent=desc; g.appendChild(t2);
+  gLanes.appendChild(g);
+});
+
+const edgeEls=[];
+EDGES.forEach(([s,t])=>{
+  const a=XY.get(s), b=XY.get(t);
+  const x1=a.x+NW/2, y1=a.y+NH/2, x2=b.x+NW/2, y2=b.y+NH/2;
+  const dy=y2-y1, c=Math.max(34,Math.abs(dy)*0.42);
+  const d = (Math.abs(dy)<2)
+    ? `M${x1},${y1} C${x1},${y1-52} ${x2},${y2-52} ${x2},${y2}`
+    : `M${x1},${y1} C${x1},${y1+Math.sign(dy)*c} ${x2},${y2-Math.sign(dy)*c} ${x2},${y2}`;
+  const p=el("path",{class:"edge",d:d}); p.dataset.s=s; p.dataset.t=t;
+  if(cycEdgeKey.has(s+"→"+t)) p.dataset.cyc="1";
+  gEdges.appendChild(p); edgeEls.push(p);
+});
+
+const KCOL={decision:"var(--decision)",hidden:"var(--hidden)",kernel:"var(--kernel)",concept:"var(--concept)"};
+const SCOL={CRITICAL:"var(--critical)",HIGH:"var(--high)",MEDIUM:"var(--medium)",LOW:"var(--low)"};
+const BADGE={eliminated:"E",derived:"T",made:"A",required:"R",survives:"S"};
+const nodeEls=new Map();
+[...N.values()].forEach(n=>{
+  const p=XY.get(n.id);
+  const g=el("g",{class:"node",transform:`translate(${p.x},${p.y})`,tabindex:"0",role:"button"});
+  g.setAttribute("aria-label", n.id+" "+n.label);
+  g.appendChild(el("rect",{class:"cycring",x:-5,y:-5,width:NW+10,height:NH+10}));
+  g.appendChild(el("rect",{class:"pathring",x:-3,y:-3,width:NW+6,height:NH+6}));
+  const box=el("rect",{class:"box",x:0,y:0,width:NW,height:NH,stroke:KCOL[n.kind]||"var(--line)"});
+  if(n.status==="eliminated"){ box.setAttribute("stroke-dasharray","4 3"); g.setAttribute("opacity",".55"); }
+  if(n.status==="derived"){ box.setAttribute("stroke-dasharray","1.5 2.5"); }
+  g.appendChild(box);
+  if(n.sev) g.appendChild(el("rect",{class:"sev",x:0,y:0,width:4,height:NH,fill:SCOL[n.sev]}));
+  const t1=el("text",{class:"nid",x:11,y:16}); t1.textContent=n.id; g.appendChild(t1);
+  const t2=el("text",{class:"nlab",x:11,y:29});
+  t2.textContent = n.label.length>23 ? n.label.slice(0,22)+"…" : n.label;
+  g.appendChild(t2);
+  if(BADGE[n.status]){
+    g.appendChild(el("circle",{class:"badgebg",cx:NW-11,cy:11,r:7,fill:KCOL[n.kind]||"var(--muted)"}));
+    const b=el("text",{class:"badge",x:NW-11,y:14,"text-anchor":"middle"}); b.textContent=BADGE[n.status]; g.appendChild(b);
+  }
+  gNodes.appendChild(g); nodeEls.set(n.id,g);
+  g.addEventListener("click",e=>{e.stopPropagation();select(n.id);});
+  g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();select(n.id);} });
+});
+
+document.getElementById("c-nodes").textContent=N.size;
+document.getElementById("c-edges").textContent=EDGES.length;
+
+/* ---------- pan / zoom ---------- */
+const stage=document.getElementById("stage"), svg=document.getElementById("svg"), vp=document.getElementById("viewport");
+let k=1,tx=0,ty=0;
+const apply=()=>vp.setAttribute("transform",`translate(${tx},${ty}) scale(${k})`);
+function fit(){
+  const r=stage.getBoundingClientRect();
+  k=Math.min((r.width-24)/CANVAS_W,(r.height-24)/CANVAS_H,1.4);
+  tx=(r.width-CANVAS_W*k)/2; ty=12; apply();
+}
+let drag=null;
+stage.addEventListener("pointerdown",e=>{ if(e.target.closest(".detail")||e.target.closest(".zoombar"))return;
+  drag={x:e.clientX,y:e.clientY,tx,ty}; stage.classList.add("dragging"); stage.setPointerCapture(e.pointerId); });
+stage.addEventListener("pointermove",e=>{ if(!drag)return; tx=drag.tx+(e.clientX-drag.x); ty=drag.ty+(e.clientY-drag.y); apply(); });
+stage.addEventListener("pointerup",()=>{drag=null;stage.classList.remove("dragging");});
+stage.addEventListener("pointercancel",()=>{drag=null;stage.classList.remove("dragging");});
+stage.addEventListener("wheel",e=>{ e.preventDefault();
+  const r=stage.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+  const nk=Math.min(3,Math.max(.15,k*(e.deltaY<0?1.12:1/1.12)));
+  tx=mx-(mx-tx)*(nk/k); ty=my-(my-ty)*(nk/k); k=nk; apply(); },{passive:false});
+const zoomBy=f=>{ const r=stage.getBoundingClientRect(), mx=r.width/2, my=r.height/2;
+  const nk=Math.min(3,Math.max(.15,k*f)); tx=mx-(mx-tx)*(nk/k); ty=my-(my-ty)*(nk/k); k=nk; apply(); };
+document.getElementById("z-in").onclick=()=>zoomBy(1.2);
+document.getElementById("z-out").onclick=()=>zoomBy(1/1.2);
+document.getElementById("z-fit").onclick=fit;
+stage.addEventListener("click",e=>{ if(e.target===stage||e.target===svg||e.target.closest("#lanes")) select(null); });
+
+/* ---------- filters ---------- */
+const F={kind:new Set(),lane:new Set(),cls:new Set(),sev:new Set(),status:new Set()};
+function mkChips(host,items,setKey,deco){
+  items.forEach(([val,label])=>{
+    const b=document.createElement("button");
+    b.className="chip"; b.type="button"; b.setAttribute("aria-pressed","false");
+    if(deco) b.innerHTML=deco(val);
+    b.appendChild(document.createTextNode(label));
+    b.onclick=()=>{ const on=b.getAttribute("aria-pressed")==="true";
+      b.setAttribute("aria-pressed",String(!on));
+      if(on)F[setKey].delete(val); else F[setKey].add(val); update(); };
+    host.appendChild(b);
+  });
+}
+mkChips(document.getElementById("f-kind"),
+  [["decision","decision"],["hidden","hidden"],["kernel","kernel"],["concept","concept"]],
+  "kind", v=>`<span class="dot" style="background:var(--${v==="decision"?"decision":v==="hidden"?"hidden":v==="kernel"?"kernel":"concept"})"></span>`);
+mkChips(document.getElementById("f-lane"), D.lanes.map(l=>[l[0],l[0]]), "lane");
+mkChips(document.getElementById("f-class"),
+  [["1","constitutional"],["2","foundational"],["3","structural"],["4","behavioral"],["5","parametric"]],"cls");
+mkChips(document.getElementById("f-sev"),
+  [["CRITICAL","critical"],["HIGH","high"],["MEDIUM","medium"],["LOW","low"]],"sev",
+  v=>`<span class="bar" style="background:${SCOL[v]}"></span>`);
+mkChips(document.getElementById("f-status"),
+  [["open","open"],["derived","theorem"],["made","already assumed"],["required","required"],["eliminated","eliminated"],["survives","survives"]],"status");
+
+const q=document.getElementById("q");
+const tPath=document.getElementById("t-path"), tCyc=document.getElementById("t-cyc"), tBlock=document.getElementById("t-block");
+[tPath,tCyc,tBlock].forEach(b=>b.onclick=()=>{ b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed")!=="true")); update(); });
+q.addEventListener("input",update);
+const depth=document.getElementById("depth"), depthVal=document.getElementById("depth-val");
+depth.addEventListener("input",()=>{ depthVal.textContent = depth.value==="7" ? "all" : depth.value; update(); });
+document.getElementById("reset").onclick=()=>{
+  document.querySelectorAll(".chip[aria-pressed='true']").forEach(c=>c.setAttribute("aria-pressed","false"));
+  Object.keys(F).forEach(kk=>F[kk].clear()); q.value=""; depth.value="7"; depthVal.textContent="all";
+  select(null); fit();
+};
+
+/* ---------- selection + reachability ---------- */
+let sel=null;
+function reach(id,dir,maxD){
+  const seen=new Map([[id,0]]); const qq=[id];
+  while(qq.length){ const cur=qq.shift(); const d=seen.get(cur); if(d>=maxD)continue;
+    for(const nx of N.get(cur)[dir]) if(!seen.has(nx)){ seen.set(nx,d+1); qq.push(nx); } }
+  return seen;
+}
+function select(id){ sel=id; update(); renderDetail(id); }
+
+function passes(n){
+  if(F.kind.size&&!F.kind.has(n.kind))return false;
+  if(F.lane.size&&!F.lane.has(n.lane))return false;
+  if(F.cls.size&&!F.cls.has(n.cls))return false;
+  if(F.sev.size&&!F.sev.has(n.sev))return false;
+  if(F.status.size&&!F.status.has(n.status))return false;
+  if(tBlock.getAttribute("aria-pressed")==="true"&&!BLOCK.has(n.id))return false;
+  const s=q.value.trim().toLowerCase();
+  if(s&&!(n.id.toLowerCase().includes(s)||n.label.toLowerCase().includes(s)))return false;
+  return true;
+}
+function update(){
+  const showPath=tPath.getAttribute("aria-pressed")==="true";
+  const showCyc=tCyc.getAttribute("aria-pressed")==="true";
+  const maxD = depth.value==="7" ? 99 : +depth.value;
+  let up=null,down=null;
+  if(sel){ up=reach(sel,"up",maxD); down=reach(sel,"down",maxD); }
+  let vis=0;
+  N.forEach(n=>{
+    const g=nodeEls.get(n.id);
+    let ok=passes(n);
+    if(ok&&sel) ok = up.has(n.id)||down.has(n.id);
+    g.classList.toggle("dim",!ok);
+    g.classList.toggle("sel",n.id===sel);
+    g.classList.toggle("onpath",showPath&&PATH.has(n.id)&&ok);
+    g.classList.toggle("incyc",showCyc&&CYCSET.has(n.id)&&ok);
+    if(ok)vis++;
+  });
+  edgeEls.forEach(p=>{
+    const s=p.dataset.s,t=p.dataset.t;
+    const sOk=!nodeEls.get(s).classList.contains("dim"), tOk=!nodeEls.get(t).classList.contains("dim");
+    p.classList.remove("hi","hi-up","cyc","dim");
+    if(!sOk||!tOk){ p.classList.add("dim"); return; }
+    if(showCyc&&p.dataset.cyc){ p.classList.add("cyc"); return; }
+    if(sel){ if(s===sel||down&&down.has(s)&&down.has(t)) p.classList.add("hi");
+             else if(t===sel||up&&up.has(s)&&up.has(t)) p.classList.add("hi-up"); }
+  });
+  document.getElementById("c-vis").textContent=vis;
+}
+
+/* ---------- detail panel ---------- */
+const dEl=document.getElementById("detail");
+function chipList(host,ids){
+  host.innerHTML="";
+  if(!ids.length){ host.innerHTML='<span class="empty">none</span>'; return; }
+  ids.slice().sort().forEach(id=>{
+    const b=document.createElement("button"); b.className="ref"; b.type="button"; b.textContent=id;
+    b.onclick=()=>select(id); host.appendChild(b);
+  });
+}
+function renderDetail(id){
+  if(!id){ dEl.classList.remove("open"); return; }
+  const n=N.get(id);
+  document.getElementById("d-id").textContent=n.id;
+  document.getElementById("d-lab").textContent=n.label;
+  const meta=document.getElementById("d-meta"); meta.innerHTML="";
+  const add=(txt,cls,style)=>{ const s=document.createElement("span"); s.className="tag"+(cls?" "+cls:"");
+    if(style)s.setAttribute("style",style); s.textContent=txt; meta.appendChild(s); };
+  add(n.kind); add(n.lane);
+  if(n.cls!=="0") add(D.classes[n.cls]);
+  if(n.status) add(n.status);
+  if(n.sev) add(n.sev,"sev","background:"+SCOL[n.sev]);
+  if(BLOCK.has(n.id)) add("blocks future work","sev","background:var(--accent)");
+  document.getElementById("d-note").textContent = n.note || "No red-team finding recorded against this node.";
+  chipList(document.getElementById("d-up"),n.up);
+  chipList(document.getElementById("d-down"),n.down);
+  const cy=document.getElementById("d-cyc");
+  cy.innerHTML = n.cycles.length ? "" : '<span class="empty">none</span>';
+  n.cycles.forEach(c=>{ const s=document.createElement("span"); s.className="ref"; s.style.cursor="default"; s.textContent=c; cy.appendChild(s); });
+  const pa=document.getElementById("d-path");
+  pa.innerHTML = n.step ? "" : '<span class="empty">not on the critical path</span>';
+  if(n.step){ const s=document.createElement("span"); s.className="ref"; s.style.cursor="default"; s.textContent="step "+n.step; pa.appendChild(s); }
+  dEl.classList.add("open");
+}
+document.getElementById("d-close").onclick=()=>select(null);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") select(null); });
+
+fit(); update();
+window.addEventListener("resize",()=>{ if(!sel) fit(); });
+})();
+</script>

@@ -1,0 +1,21 @@
+category,item,result,detail1,detail2
+ENV,symbol,EURUSD,PERIOD_M5,bars=1441
+ENV,range,2026.07.06,2026.07.13,balance_ref=10000.00
+METHOD,margin_reference,FIXED $10000,no open position,OPTIMISTIC bound: live balance declined
+METHOD,entry_price,OPEN of candle 4 (Bid bar series),PROXY for the locked first-tick ASK rule,sub-pip difference; does not affect lot/margin conclusions
+SYMBOL,vmin/vstep,0.01,0.01,tickVal=1.00000
+POPULATION,patterns,67,signals_analysed=67,valid_stop=67
+CENSOR,invalid_stop,0,0.0%,price already below stop at entry
+CENSOR,margin_fail_1pct,41,61.2%,lot needs more margin than balance
+CENSOR,executable_1pct,26,38.8%,
+CENSOR,lot_below_min_1pct,0,,
+DIST,stop_points_min,1.0,p10=4.0,median=17.0
+DIST,stop_points_p90,41.0,max=105.0,
+DIST,lot_1pct_min,0.95,median=5.88,p90=24.99
+DIST,lot_1pct_max,99.99,,
+DIST,margin_1pct_min,1083.42,median=12179.63,p90=77652.48
+DIST,margin_1pct_max,334952.70,balance_ref=10000.00,
+POLICY,A_1pct_capped,67,100.0% coverage,cap volume to available margin; risk becomes VARIABLE (<1%)
+POLICY,B_025pct,59,88.1% coverage,constant risk; a NEW parameter chosen after seeing a result
+POLICY,C_010pct,65,97.0% coverage,constant risk; smallest; more signals fall below min lot
+POLICY,NOTE,no policy is selected here,coverage reported, P&L deliberately NOT computed,checkpoint §4

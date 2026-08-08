@@ -1,0 +1,26 @@
+key,value,note
+symbol,EURUSD,
+digits,5,
+point,0.00001000,
+tick_size,0.00001000,
+tick_value,0.00000,per 1.0 lot
+contract_size,100000.00,
+volume_min,0.0100,
+volume_max,500.00,
+volume_step,0.0100,
+stops_level_points,0,min SL/TP distance
+freeze_level_points,0,
+spread_current_points,2,
+spread_float,1,
+swap_long,-0.7000,
+swap_short,-1.0000,
+margin_initial,0.00,
+filling_mode,1,
+account_currency,USD,
+account_leverage,100,
+account_balance,0.00,
+trade_mode,0,0=DEMO 1=CONTEST 2=REAL
+m5_bars_sampled,5000,
+spread_mean_points,0.031,MqlRates.spread
+spread_min_points,0,
+spread_max_points,12,

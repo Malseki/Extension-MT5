@@ -1,0 +1,8 @@
+d50fc8bcfe1a4c49100c9a47e082ad0291901d87d9fe75e9c0fb50b08d4ff6e8  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2215Z-E008-modes/E-MT5-008-M1tf_m4-bars.csv
+4b2aa381fbfedd372b8f87b41a762d5af4589fc2a13fa9b84bde62bfb7b8308c  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2215Z-E008-modes/E-MT5-008-M1tf_m4-report.csv
+030ff661a4211fd80abb3b4f9c09443d59be96585718a6b1c456e02180476c1e  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2215Z-E008-modes/E-MT5-008-m0_everytick-bars.csv
+172b55bbd3ab4f1986206b20b0c748dfb9db42dda878d1d0efded015f138fd03  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2215Z-E008-modes/E-MT5-008-m0_everytick-report.csv
+224a121fb23f28d07cdb16d8bda1b2055b5ffafa41b2034ea5d4250b458dfa5f  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2215Z-E008-modes/E-MT5-008-m1_ohlc-bars.csv
+8bbdea3ea9f08cc4edf22d0260f20d7516f37e6bbcc5fff7875fc9ebf52551fb  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2215Z-E008-modes/E-MT5-008-m1_ohlc-report.csv
+6dea33842ff824a7babc4b0539e87dc9be80b98556d98901690369fdde5aa5a8  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2215Z-E008-modes/E-MT5-008-m4_realticks-bars.csv
+e22bf771709ec7c06a9b8eedc7d21862fad81a9994f9f1132bee15f506723578  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-08-07T2215Z-E008-modes/E-MT5-008-m4_realticks-report.csv

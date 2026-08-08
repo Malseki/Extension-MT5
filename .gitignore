@@ -1,0 +1,6 @@
+.DS_Store
+*.ex5
+*.log
+*.dat
+*.tkc
+**/Temp/
