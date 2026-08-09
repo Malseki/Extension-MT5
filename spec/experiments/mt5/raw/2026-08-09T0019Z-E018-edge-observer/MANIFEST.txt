@@ -1,0 +1,28 @@
+E-MT5-018 — EDGE OBSERVER
+run_id            E-MT5-018-20260809T001843
+experiment        DISCOVERY / REPLICATION  (NOT out-of-sample validation)
+purpose           measure barrier outcome per signal, independent of the account
+
+git HEAD          8fbb8fa2ef7067633b79339f82f3fa508dc1f0ef
+source sha256     9071bfe6da2297051023ec43293ca57492aed126e72b0d9d8269877d69ae8bd8
+binary sha256     a3db674ff7d992c62621c31de3374ccbece73747b9c875bb2a04b575ec059478
+preset sha256     141d6b263baec7f0516c412c63153ca557064f32e66f331f25ecd53f4444307a
+ini    sha256     05a0945aefa1c689606d106338a480ab486f31845f3be4c589543e6b94de741f
+
+symbol/timeframe  EURUSD / M5
+model             4 — every tick based on real ticks
+feed / account    MetaQuotes-Demo 10012089985, trade_mode=0 (DEMO)
+terminal build    6104 (x64, Wine 11.1 / Darwin 25.5.0)
+range             2024.01.01 -> 2026.08.08
+ticks / bars      68,389,585 / 194,013
+data warning      real ticks absent for 599 of 967,961 minute bars
+
+started           2026.08.09 00:19:11
+finished          2026.08.09 00:19:35   "successfully finished" in 0:00:13.332
+agent             Agent-127.0.0.1-3000, healthy, single agent
+
+signals           18,416
+gap-skipped       78    (locked 1->2->3->4 time contiguity)
+invalid-stop      145   (slots across all six observed X, entry already past stop)
+orders sent       0     — the EA links no trade function
+positions opened  0
