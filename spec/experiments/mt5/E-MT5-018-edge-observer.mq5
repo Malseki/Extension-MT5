@@ -63,6 +63,17 @@ datetime gLastBar = 0;
 int   fh = INVALID_HANDLE;
 long  gInvalidStop = 0, gGapSkip = 0;
 
+//--- BUG-001 fix, purely computational. gS grew with ArrayResize(gS,gN+1) and
+//--- no reserve, so MQL5 reallocated and copied the whole array on every
+//--- signal: ~18,400 signals x a ~200-byte struct is tens of GB of memcpy.
+//--- The reserve makes growth amortised O(1). Array CONTENTS, ORDER and SIZE
+//--- are byte-for-byte what they were; only the allocation strategy changes.
+#define SIG_RESERVE 8192
+//--- gBars was a local `Bar bars[]` resized on every single bar. Hoisted to
+//--- file scope and sized once in OnInit. Every element is overwritten each
+//--- bar before use, so no value can survive from a previous iteration.
+Bar   gBars[];
+
 //====================================================================
 double Ext(const Bar &b, const int d) { return(d > 0 ? b.l : b.h); }
 
@@ -97,6 +108,8 @@ int OnInit()
    fh = FileOpen("E-MT5-018-" + InpRunTag + "-signals.csv",
                  FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
    if(fh == INVALID_HANDLE) return(INIT_FAILED);
+   ArrayResize(gS, 0, SIG_RESERVE);          // BUG-001: pre-reserve, no semantic effect
+   ArrayResize(gBars, InpRefK + 4);          // BUG-001: size the bar window once
    FileWrite(fh, "signal_time", "entry_time", "dir", "ref", "sweep", "rej", "entry",
              "depth", "displace", "rejwick", "body3", "range3", "prior_rng",
              "expansion", "reclaim", "dist_entry",
@@ -141,13 +154,12 @@ void OnTick()
      }
 
    int need = InpRefK + 4;
-   Bar bars[]; ArrayResize(bars, need);
-   for(int i = 0; i < need; i++)
+   for(int i = 0; i < need; i++)                // every element overwritten each bar
      {
       int sh = need - 1 - i;
-      bars[i].t = iTime(_Symbol, _Period, sh); bars[i].o = iOpen(_Symbol, _Period, sh);
-      bars[i].h = iHigh(_Symbol, _Period, sh); bars[i].l = iLow(_Symbol, _Period, sh);
-      bars[i].c = iClose(_Symbol, _Period, sh);
+      gBars[i].t = iTime(_Symbol, _Period, sh); gBars[i].o = iOpen(_Symbol, _Period, sh);
+      gBars[i].h = iHigh(_Symbol, _Period, sh); gBars[i].l = iLow(_Symbol, _Period, sh);
+      gBars[i].c = iClose(_Symbol, _Period, sh);
      }
    int i3 = need - 2;
    int ps = PeriodSeconds();
@@ -155,9 +167,9 @@ void OnTick()
    for(int d = 1; d >= -1; d -= 2)
      {
       double ref, sw, rj;
-      if(!DetectAt(bars, i3, InpRefK, d, ref, sw, rj)) continue;
-      if(!Contiguous(bars, i3, bt, ps)) { gGapSkip++; break; }
-      Register(d, bars, i3, ref, sw, rj, tk);
+      if(!DetectAt(gBars, i3, InpRefK, d, ref, sw, rj)) continue;
+      if(!Contiguous(gBars, i3, bt, ps)) { gGapSkip++; break; }
+      Register(d, gBars, i3, ref, sw, rj, tk);
       break;                                    // geometry is mutually exclusive
      }
   }
@@ -173,7 +185,7 @@ void Register(const int d, const Bar &bars[], const int i3,
    for(int k = 1; k <= i3 - 2; k++) { hi = MathMax(hi, bars[k].h); lo = MathMin(lo, bars[k].l); }
    double prior = hi - lo;
 
-   ArrayResize(gS, gN + 1);
+   ArrayResize(gS, gN + 1, SIG_RESERVE);     // BUG-001: amortised growth
    gS[gN].t3 = c3.t; gS[gN].t4 = bars[i3].t + PeriodSeconds(); gS[gN].dir = d;
    gS[gN].ref = ref; gS[gN].sweep = sw; gS[gN].rej = rj; gS[gN].entry = entry;
    gS[gN].depth     = MathAbs(sw - ref) / _Point;
