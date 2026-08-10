@@ -1,0 +1,10 @@
+InpGridPips=10
+InpUPips=4
+InpStopPips=20
+InpTargetR=2.0
+InpRiskPct=1.0
+InpFixedRisk=100.0
+InpMaxPos=1
+InpMode=0
+InpExpireSec=3600
+InpRunTag=e27fix

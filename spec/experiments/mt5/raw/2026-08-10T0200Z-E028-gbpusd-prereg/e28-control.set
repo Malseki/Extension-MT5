@@ -1,0 +1,8 @@
+InpStopPips=20
+InpTargetR=2.0
+InpRiskPct=1.0
+InpMaxPos=1
+InpOneIn=20000
+InpExpireSec=3600
+InpSeed=20260809
+InpRunTag=e28ctrl
