@@ -1,0 +1,4 @@
+1ca7abb1a5d41501deec261afaf6f9dd2ae4deb36ab9e8e5c41406149fa1bbde  E-MT5-033-e33maker-trades.csv
+19c1469eae659a7b36f0aecd13fe1ab0af0c11878d0fb333a4a5fa0aabd8746b  E-MT5-033-e33taker-trades.csv
+33882ef6ac0d8e8c60cadd81870a939f5a0d1595760b3699698765eee693734a  E-MT5-033-maker-reversion.mq5
+3e6b68909076425628c0acd76b293d5cf366ef141dd65d8b78592b09a11e82f7  MANIFEST.txt

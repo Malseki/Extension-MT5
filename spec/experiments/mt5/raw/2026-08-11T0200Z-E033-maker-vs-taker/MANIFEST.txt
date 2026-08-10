@@ -1,0 +1,49 @@
+E-MT5-033 — MAKER vs TAKER, A/B ON THE SAME SIGNAL
+
+experiment  ECONOMIC A/B. Same EA, same signal, same period, same sizing.
+            One input switches market entry for limit entry. Any difference
+            is attributable to that alone.
+range       EURUSD 2024-2026, M5, model 4, fixed $100 risk, 1 position max
+prediction  RECORDED BEFORE MEASURING:
+              taker EV = -0.276 pips/trade
+              maker EV = +0.167 pips/trade   <- first positive prediction
+            REFUTED. The maker came out WORSE than the taker.
+
+RESULT
+  mode     placed  filled  fill%   win%      PF   balance   totalR
+  MAKER      2270    2186  96.3%  46.61%  0.8935     9.92   -329.5
+  TAKER      2550    2550 100.0%  48.00%  0.9181    10.67   -121.5
+
+TWO THINGS THE TEST MEASURED THAT THE THEORY MISSED
+
+  1. ADVERSE SELECTION, now quantified: 48.00 - 46.61 = 1.39 pp.
+     Fill rate was 96.3%, so almost nothing was lost to non-execution.
+     The limits fill, and they fill preferentially on the bad ones: when
+     price was about to revert for real, the order sat unfilled.
+
+  2. EXECUTION COST IS LARGER THAN ESTIMATED.
+       pure observer (E-MT5-031, no costs)   52.81%
+       taker, real execution                 48.00%   -4.81 pp
+       maker, real execution                 46.61%   -6.20 pp
+     The available margin was 0.81 pp. The real drop is 5.9x that for the
+     taker and 7.7x for the maker.
+
+     Source of the gap: the observer resolved every race against the bid.
+     In real execution a short closes against the ASK. That bid/ask asymmetry
+     at each barrier is a cost the observer could not see and the tester does
+     apply.
+
+VERDICT
+  The maker route -- the last configuration the evidence pointed at -- also
+  loses, and loses harder. There is no fourth arrangement: taking liquidity,
+  providing it, small stop, large stop, fractional sizing, fixed sizing, two
+  instruments, fourteen years.
+
+  The gap between what the inefficiency is worth (0.562 pips) and what it
+  costs to collect (4.81 pp of win rate) cannot be closed with execution
+  engineering.
+
+NOTE ON THE PREDICTION BEING WRONG
+  The prediction was wrong in the optimistic direction, which is exactly the
+  direction that costs money. It was recorded before measuring, so the error
+  is visible instead of hidden. That is the point of preregistration.
