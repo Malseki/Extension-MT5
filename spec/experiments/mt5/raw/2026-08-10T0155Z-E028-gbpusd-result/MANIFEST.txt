@@ -1,0 +1,34 @@
+E-MT5-028 — FOCAL SIGNAL ON VIRGIN GBPUSD
+
+experiment      REPLICATION on virgin data. Preregistered at commit 9ab36b3,
+                sealed BEFORE any GBPUSD tick was downloaded.
+range           2024.01.01 -> 2026.08.08   GBPUSD M5, model 4, real ticks
+ticks           68,179,847 ticks, 193,838 M5 bars
+
+RUN A  random-entry control (E-MT5-025)
+       n=1270  winrate=31.81%  PF=0.8941  balance=$4,276  R=-73.9  maxDD=74.8%
+       avgSpread=0.6986 pips
+       -> empirical economic null for GBPUSD.
+          Formula 1/3 - s/(3D) predicts 32.17%; measured 31.81%. Error 0.36pp.
+
+RUN B  focal signal, mode 0 (E-MT5-027)
+       n=872   winrate=28.90%  PF=0.8313  balance=$12.23  R=-123.7  maxDD=99.9%
+
+PRIMARY ENDPOINT   delta = winrate(B) - winrate(A) = -2.91 pp,  z = -1.44
+                   signal vs break-even 33.33%:  z = -2.78  (SIGNIFICANT)
+
+PREREGISTERED PREDICTION
+   "The focal signal will NOT exceed the random control by a statistically
+    significant margin."                                        -> HELD.
+   It did not merely fail to exceed it: it fell BELOW it.
+
+SIGN REVERSAL BETWEEN SAMPLES
+   EURUSD (contaminated, exploratory)  delta = +1.06 pp   z=+0.58
+   GBPUSD (virgin, preregistered)      delta = -2.91 pp   z=-1.44
+
+VERDICT (D): the EURUSD result was noise. The reserved GBPUSD 2011-2023 sample
+is NOT spent. H-FOCAL loses its last support.
+
+NOTE: this is the SECOND time an in-sample positive failed to replicate on
+virgin data. The 1-2-3 H4 cell went from z=-0.92 in-sample to z=-6.98 OOS.
+Same pattern, same outcome, same protocol catching it before further spend.
