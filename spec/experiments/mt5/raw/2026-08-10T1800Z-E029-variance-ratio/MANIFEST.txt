@@ -1,0 +1,59 @@
+E-MT5-029 — VARIANCE RATIO / STRUCTURE OBSERVER
+
+experiment   EXPLORATORY on EURUSD (contaminated sample, already examined).
+             Pure observer: no orders, no account, no costs.
+question     Is there ANY exploitable linear structure in the returns, at any
+             intraday scale? This is the general test that subsumes the three
+             refuted directional hypotheses.
+method       Lo-MacKinlay variance ratio, heteroskedasticity-robust z.
+             VR = Var(r_q)/(q*Var(r_1)).  VR<1 reversion, VR>1 momentum.
+range        2024.01.01 -> 2026.08.08, EURUSD
+
+ESTIMATOR VALIDATION
+  Two bugs were found and fixed before any conclusion was drawn:
+    (1) overlap normalisation used (1 - 1/q) instead of (1 - q/n),
+        which inflated VR to ~2 at q=2.
+    (2) delta_j denominator used [sum]^2/n instead of [sum]^2,
+        which inflated theta by n and crushed z by sqrt(n).
+  After the fix the estimator was validated on a synthetic pure random walk:
+    q=2  VR=0.99824 z=-0.78 | q=4 VR=0.99338 z=-1.58
+    q=8  VR=0.98987 z=-1.53 | q=16 VR=0.98645 z=-1.38   -> all non-significant.
+
+RESULT — structure EXISTS
+  base M1, n=371,354 returns:
+    ALL       VR 0.986 -> 0.897   z -2.797 -> -3.962   REVERSION at every scale
+    VOL_BAJA  VR 0.966 -> 0.832   z -7.810 -> -9.937   strongest
+    VOL_ALTA  VR 0.992 -> 0.926   z -1.382 -> -2.692   weakest
+
+  This is the first statistically solid finding of the project.
+
+WHY IT IS NOT EXPLOITABLE — two independent reasons
+
+  (a) It dissolves under aggregation, the signature of microstructure:
+        base M1   reversion at all scales
+        base M5   reversion up to q=16 (80 min), gone beyond
+        base M15  reversion only at q=2 (30 min), gone beyond
+      And it is STRONGER in LOW volatility (z=-9.9) than high (z=-1.4),
+      the opposite of what the short-term-reversal literature predicts,
+      but exactly how price discretisation behaves when the market is quiet.
+
+  (b) It is smaller than the spread. With sigma = 3.0954 pips per M5 bar
+      (measured) and spread = 0.4614 pips (measured in E-MT5-024):
+
+        q=2   10 min  VR 0.97770  capturable 0.049 pips  0.11x spread
+        q=4   20 min  VR 0.95341  capturable 0.146 pips  0.32x spread
+        q=8   40 min  VR 0.93346  capturable 0.296 pips  0.64x spread
+        q=16  80 min  VR 0.92721  capturable 0.459 pips  1.00x spread
+
+      At best it exactly equals the spread. Equalling the spread means
+      working for free, before commission and slippage.
+
+VERDICT: REAL BUT NOT EXPLOITABLE.
+
+The execution-tax law discovered in E-MT5-024/025, s/(3D), is what kills it.
+That law is not a defect of our implementation: it is the barrier that makes
+small FX inefficiencies unprofitable for anyone without institutional costs.
+
+HYPOTHESIS BUDGET: exhausted. 1-2-3 refuted at -7 sigma; tick order flow null
+(50.20%); H-FOCAL refuted on virgin GBPUSD (-2.91 pp); this general test found
+real structure below the economic threshold.
