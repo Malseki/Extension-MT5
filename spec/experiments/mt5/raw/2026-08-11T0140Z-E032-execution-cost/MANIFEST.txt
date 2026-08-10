@@ -1,0 +1,51 @@
+E-MT5-032 — EXECUTION COST AT THE MOMENT OF SIGNAL
+
+experiment  OBSERVER. No orders, no account. Measures what every previous EV
+            calculation in this project assumed rather than measured.
+prediction  RECORDED BEFORE MEASURING: the spread at the signal instant will be
+            LARGER than the period average.                        -> CONFIRMED.
+
+RESULT
+
+  instrument         avg spread   at signal   ratio   slip 1 tick   TOTAL COST
+  EURUSD 2024-2026     0.4273p     0.8360p    1.96x     0.0020p       0.8380p
+  GBPUSD 2012-2023     1.3506p     1.7601p    1.30x     0.2389p       1.9990p
+
+  n = 22,522 signals (EURUSD) and 253,286 (GBPUSD), over 460 million ticks.
+
+THE MECHANISM
+
+  The spread at the instant of a signal is 1.3x to 2.0x the average. This is
+  not bad luck: the signal fires when price moves 5 pips in 5 minutes, and that
+  is exactly when market makers widen their quotes to protect inventory.
+
+  The signal and its cost are CORRELATED BY CONSTRUCTION. Averaging the spread
+  over all ticks -- including the millions where nothing happens -- systematically
+  understates what any strategy triggered by movement will actually pay.
+
+CONSEQUENCE — every prior EV in this project was optimistic
+
+  edge of the reversion effect (E-MT5-031, clean) = 0.562 pips per trade
+
+  instrument   cost assumed    EV assumed    cost REAL    EV REAL
+  EURUSD          0.4614p       +0.101p       0.8380p     -0.276p
+  GBPUSD          0.6986p       -0.137p       1.9990p     -1.437p
+
+  Real cost is 1.49x (EURUSD) and 3.56x (GBPUSD) the maximum tolerable.
+  To be profitable in EURUSD the effect would need p = 54.19%. Measured: 52.81%.
+
+VERDICT
+
+  The reversion effect is REAL and CONFIRMED (z = +18.50, n = 108,678, virgin
+  data). It is NOT exploitable, and not marginally so: the true execution cost
+  is 1.5 to 3.6 times the entire edge.
+
+  This closes the economic question. The apparent near-miss in E-MT5-031 was an
+  artefact of using the average spread instead of the spread that would actually
+  be paid.
+
+WHY RETAIL CANNOT TRADE THIS
+
+  Not because the inefficiency is absent -- it is measurably there. Because the
+  cost of accessing it rises precisely when it appears. The market maker's
+  widening is the mechanism that transfers the edge from the taker to the maker.
