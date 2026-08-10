@@ -33,10 +33,12 @@ input double InpImpPips   = 5.0;     // pips de movimiento para considerarlo imp
 input int    InpImpMin    = 5;       // en cuantos minutos
 input int    InpImpCoolS  = 300;     // no repetir el aviso antes de N segundos
 
-#define STAT_SIGNAL   28.90
-#define STAT_SIGNAL_N 872
-#define STAT_NULL     31.81
-#define STAT_BE       33.33
+// FINDINGS-001: hallazgos consolidados, no la senal focal refutada
+#define REV_P      52.81    // P(reversion) medida, GBPUSD virgen n=108,678
+#define REV_N      108678
+#define EDGE_PIPS  0.562    // ventaja del efecto por operacion, carrera 10p
+#define COST_REAL  0.838    // costo REAL en el instante de la senal (E-MT5-032)
+#define COST_AVG   0.427    // spread promedio, el que enganaba antes
 
 #define W_BASE 232
 #define H_BASE 380
@@ -255,14 +257,14 @@ void Draw()
        (t.bid - lvlDn) / (gPip * _Point), (armDn ? "ARMADO" : "esperando")),
        (armDn ? C'90,200,255' : C'110,120,140'), FS(8), "Arial");                        y += SP(12);
 
-   Txt("f0", x, y, "LA ALERTA PREDICE  (va EN CONTRA)", C'110,120,140', FS(7), "Arial");        y += SP(15);
-   Txt("f1", x, y, StringFormat("senal focal   %.2f %%   n=%d", STAT_SIGNAL, STAT_SIGNAL_N),
-       C'240,110,110', FS(8), "Arial");                                                   y += SP(16);
-   Txt("f2", x, y, StringFormat("entrada azar  %.2f %%   <- nulo real", STAT_NULL),
+   Txt("f0", x, y, "LO QUE SABEMOS (medido)", C'110,120,140', FS(7), "Arial");             y += SP(15);
+   Txt("f1", x, y, StringFormat("reversion  %.2f %%  n=%d", REV_P, REV_N),
+       C'110,220,140', FS(8), "Arial");                                                   y += SP(16);
+   Txt("f2", x, y, StringFormat("ventaja    %.3f pips/op", EDGE_PIPS),
        C'150,160,180', FS(8), "Arial");                                                   y += SP(16);
-   Txt("f3", x, y, StringFormat("break-even    %.2f %%", STAT_BE),
-       C'150,160,180', FS(8), "Arial");                                                   y += SP(12);
-   Txt("f4", x, y, "POR DEBAJO DEL AZAR - NO OPERABLE", C'255,70,70', FS(8), "Arial");y += SP(12);
+   Txt("f3", x, y, StringFormat("costo real %.3f p = %.1fx", COST_REAL, COST_REAL/EDGE_PIPS),
+       C'240,110,110', FS(8), "Arial");                                                   y += SP(12);
+   Txt("f4", x, y, "EL COSTO SUPERA LA VENTAJA", C'255,70,70', FS(8), "Arial");y += SP(12);
 
    Txt("a1", x, y, StringFormat("alertas %d   acerto %d   fallo %d", gAlerts, gHit, gMiss),
        C'130,140,160', FS(8), "Arial");                                                   y += SP(12);
@@ -306,8 +308,8 @@ void Banner()
 
    Txt("bntx", bx + 18, by + 12, gBannerTxt, clrWhite, 22, "Arial");
    Txt("bnsub", bx + 18, by + 52,
-       StringFormat("fiabilidad medida %.2f%%  vs  azar %.2f%%   ->   NO OPERABLE",
-                    STAT_SIGNAL, STAT_NULL), br, 10, "Arial");
+       StringFormat("ventaja %.3f pips  vs  costo real %.3f pips   ->   NO OPERABLE",
+                    EDGE_PIPS, COST_REAL), br, 10, "Arial");
   }
 
 
@@ -428,7 +430,8 @@ void Heartbeat()
       "alertas         %d   acerto %d   fallo %d\n"
       "impulsos        %d\n"
       "ultima_alerta   %s\n"
-      "fiabilidad      %.2f%% medida vs %.2f%% azar  ->  NO OPERABLE\n",
+      "hallazgo        reversion %.2f%% (n=%d)  ventaja %.3f p/op\n"
+      "costo real      %.3f p en la senal = %.1fx la ventaja -> NO OPERABLE\n",
       TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS),
       (InpDemoMode ? "   [MODO DEMO]" : ""),
       _Symbol, EnumToString(_Period),
@@ -439,7 +442,7 @@ void Heartbeat()
       (gArmUp > 0 ? "ARMADO" : "esperando"),
       DoubleToString(lvlDn, _Digits), (t.bid - lvlDn) / (gPip * _Point),
       ((gArmDn > 0 && MathAbs(gArmDn - lvlDn) < gGrid / 2) ? "ARMADO" : "esperando"),
-      gX, gY, gW, gH, VelasTxt(), gTicks, gBarsLogged, gAlerts, gHit, gMiss, gImpulsos, gLast, STAT_SIGNAL, STAT_NULL));
+      gX, gY, gW, gH, VelasTxt(), gTicks, gBarsLogged, gAlerts, gHit, gMiss, gImpulsos, gLast, REV_P, REV_N, EDGE_PIPS, COST_REAL, COST_REAL/EDGE_PIPS));
    FileClose(fh);
   }
 
@@ -475,10 +478,10 @@ void Fire(const int dir, const double level)
    gBannerTxt = StringFormat("%s  %s  en %s", _Symbol, d, DoubleToString(level, _Digits));
    Banner();
    string msg = StringFormat("%s %s | %s en %s | stop %s objetivo %s | "
-      "fiabilidad %.2f%% vs azar %.2f%% -> NO OPERABLE",
+      "ventaja %.3fp vs costo real %.3fp -> NO OPERABLE",
       _Symbol, EnumToString(_Period), d, DoubleToString(level, _Digits),
       DoubleToString(stop, _Digits), DoubleToString(target, _Digits),
-      STAT_SIGNAL, STAT_NULL);
+      EDGE_PIPS, COST_REAL);
    Print("ALERTA >>> ", msg);
    if(InpSound) PlaySound("alert.wav");
    // Alert() es modal en MT5 y bloquea el hilo del experto bajo Wine.
@@ -491,7 +494,7 @@ void Fire(const int dir, const double level)
       FileSeek(fh, 0, SEEK_END);
       FileWrite(fh, TimeToString(gLastT, TIME_DATE | TIME_SECONDS), _Symbol, d,
                 DoubleToString(level, _Digits), DoubleToString(stop, _Digits),
-                DoubleToString(target, _Digits), DoubleToString(STAT_SIGNAL, 2),
+                DoubleToString(target, _Digits), DoubleToString(EDGE_PIPS, 3),
                 "NO_OPERABLE");
       FileClose(fh);
      }
