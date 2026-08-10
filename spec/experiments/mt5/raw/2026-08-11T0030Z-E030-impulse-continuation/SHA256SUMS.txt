@@ -1,0 +1,6 @@
+3f9aa52dc99c3fbc5b28aac252bf714a51dca9d6285748a4950fcec450e2d04a  E-MT5-030-e30a-impulse.csv
+632f31ad54fe00a6895eb940fb3d640b4761bc6eefae0460bd02c77ac718bd5d  E-MT5-030-e30b-impulse.csv
+a099557c51cfd0ac2645bdee8c6611f064f9537e2affe5f2ef554c84876edfe3  E-MT5-030-e30c-impulse.csv
+7dbb79c9fe36a223a6f9e66f2d323ab7a7c63be5732ddfe0a60c5ec99a814ef3  E-MT5-030-e30d-impulse.csv
+e9ca781c4e94cebe53dbb38264e0fb893b2e4b3244981c0a5689f2007a111f1a  E-MT5-030-impulse-continuation.mq5
+2e4ec9ad4b459a733bfcf66bb950885dbd96e5a03cd867dae435496ef7e0e608  MANIFEST.txt

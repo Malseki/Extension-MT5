@@ -25,9 +25,13 @@ input int    InpStopPips  = 20;
 input double InpTargetR   = 2.0;
 input bool   InpDemoMode  = false;   // true -> arming 1 pip, many alerts
 input bool   InpSound     = true;
-input bool   InpPopup     = true;    // aviso instantaneo imposible de perder
+input bool   InpPopup     = false;   // NUNCA true: Alert() es modal y CONGELA el EA
 input int    InpMaxArrows = 200;
 input int    InpBannerSec = 25;      // segundos que dura el cartel de alerta
+input bool   InpImpulso   = true;    // avisar movimientos fuertes en curso
+input double InpImpPips   = 5.0;     // pips de movimiento para considerarlo impulso
+input int    InpImpMin    = 5;       // en cuantos minutos
+input int    InpImpCoolS  = 300;     // no repetir el aviso antes de N segundos
 
 #define STAT_SIGNAL   28.90
 #define STAT_SIGNAL_N 872
@@ -49,7 +53,13 @@ string gLast = "sin senales todavia";
 datetime gLastT = 0;
 datetime gBannerUntil = 0;
 datetime gLastBar = 0;
+struct Pend { int dir; double lvl, sl, tp; datetime t0; bool open; };
+Pend gPend[]; int gNP = 0;
+int  gHit = 0, gMiss = 0;
 long gBarsLogged = 0;
+datetime gLastImp = 0;
+int      gImpDir  = 0;
+int      gImpulsos = 0;
 int      gBannerDir = 0;
 string   gBannerTxt = "";
 string gPfx = "TA1_";
@@ -140,6 +150,7 @@ void OnDeinit(const int reason)
   }
 
 void OnTimer() { Draw(); Banner(); LogBar(); Heartbeat(); }
+// Track() runs on ticks, where price actually moves
 
 //+------------------------------------------------------------------+
 //| user dragged the panel body or the resize grip                    |
@@ -211,7 +222,7 @@ void Draw()
    Txt("p3", x, y, StringFormat("spread %.2f pips  ·  impuesto %.2f pp", sp, tax),
        (sp > 1.5 ? clrOrange : C'130,140,160'), FS(8), "Arial");                          y += SP(12);
 
-   Txt("d0", x, y, "MOVIMIENTO ACTUAL", C'110,120,140', FS(7), "Arial");                     y += SP(15);
+   Txt("d0", x, y, "YA PASO  (hecho)", C'110,120,140', FS(7), "Arial");                     y += SP(15);
    string dir = (m15 > 0.5) ? "SUBIENDO" : ((m15 < -0.5) ? "BAJANDO" : "LATERAL");
    color  cd  = (m15 > 0.5) ? C'80,220,120' : ((m15 < -0.5) ? C'240,90,90' : C'170,170,170');
    Txt("d1", x, y, dir, cd, FS(9), "Arial");                                          y += SP(12);
@@ -244,7 +255,7 @@ void Draw()
        (t.bid - lvlDn) / (gPip * _Point), (armDn ? "ARMADO" : "esperando")),
        (armDn ? C'90,200,255' : C'110,120,140'), FS(8), "Arial");                        y += SP(12);
 
-   Txt("f0", x, y, "FIABILIDAD MEDIDA DE LA ALERTA", C'110,120,140', FS(7), "Arial");        y += SP(15);
+   Txt("f0", x, y, "LA ALERTA PREDICE  (va EN CONTRA)", C'110,120,140', FS(7), "Arial");        y += SP(15);
    Txt("f1", x, y, StringFormat("senal focal   %.2f %%   n=%d", STAT_SIGNAL, STAT_SIGNAL_N),
        C'240,110,110', FS(8), "Arial");                                                   y += SP(16);
    Txt("f2", x, y, StringFormat("entrada azar  %.2f %%   <- nulo real", STAT_NULL),
@@ -253,7 +264,7 @@ void Draw()
        C'150,160,180', FS(8), "Arial");                                                   y += SP(12);
    Txt("f4", x, y, "POR DEBAJO DEL AZAR - NO OPERABLE", C'255,70,70', FS(8), "Arial");y += SP(12);
 
-   Txt("a1", x, y, StringFormat("alertas hoy: %d     ticks: %I64d", gAlerts, gTicks),
+   Txt("a1", x, y, StringFormat("alertas %d   acerto %d   fallo %d", gAlerts, gHit, gMiss),
        C'130,140,160', FS(8), "Arial");                                                   y += SP(12);
    Txt("a2", x, y, "ultima: " + gLast, C'220,200,120', FS(8), "Arial");
 
@@ -321,6 +332,44 @@ string VelasTxt()
 //| spread and the detector state at close. From the moment this runs |
 //| it accumulates a sample nobody has looked at — the only genuinely |
 //| virgin data the project can still obtain.                         |
+
+//+------------------------------------------------------------------+
+//| Live self-scoring. Every alert is followed until it reaches its   |
+//| target or its stop, and the running hit rate is shown on screen.  |
+//| The detector grades itself in public — no way to look better than |
+//| it is.                                                            |
+//+------------------------------------------------------------------+
+void Track()
+  {
+   MqlTick t; if(!SymbolInfoTick(_Symbol, t)) return;
+   double b = t.bid;
+   for(int i = 0; i < gNP; i++)
+     {
+      if(!gPend[i].open) continue;
+      bool hit = false, miss = false;
+      if(gPend[i].dir > 0) { hit = (b >= gPend[i].tp); miss = (b <= gPend[i].sl); }
+      else                 { hit = (b <= gPend[i].tp); miss = (b >= gPend[i].sl); }
+      if(!hit && !miss) continue;
+      gPend[i].open = false;
+      if(hit) gHit++; else gMiss++;
+      int fr = FileOpen("TRADER-ALERT-001-results.csv",
+                        FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON
+                        | FILE_SHARE_READ | FILE_SHARE_WRITE, ',');
+      if(fr != INVALID_HANDLE)
+        {
+         if(FileSize(fr) == 0)
+            FileWrite(fr, "alerta_t", "cierre_t", "dir", "nivel", "resultado");
+         FileSeek(fr, 0, SEEK_END);
+         FileWrite(fr, TimeToString(gPend[i].t0, TIME_DATE|TIME_SECONDS),
+                   TimeToString(TimeCurrent(), TIME_DATE|TIME_SECONDS),
+                   (gPend[i].dir > 0 ? "SUBE" : "BAJA"),
+                   DoubleToString(gPend[i].lvl, _Digits),
+                   (hit ? "ACERTO" : "FALLO"));
+         FileClose(fr);
+        }
+     }
+  }
+
 //+------------------------------------------------------------------+
 void LogBar()
   {
@@ -376,7 +425,9 @@ void Heartbeat()
       "%s"
       "ticks           %I64d\n"
       "barras_forward  %I64d\n"
-      "alertas         %d     ultima: %s\n"
+      "alertas         %d   acerto %d   fallo %d\n"
+      "impulsos        %d\n"
+      "ultima_alerta   %s\n"
       "fiabilidad      %.2f%% medida vs %.2f%% azar  ->  NO OPERABLE\n",
       TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS),
       (InpDemoMode ? "   [MODO DEMO]" : ""),
@@ -388,7 +439,7 @@ void Heartbeat()
       (gArmUp > 0 ? "ARMADO" : "esperando"),
       DoubleToString(lvlDn, _Digits), (t.bid - lvlDn) / (gPip * _Point),
       ((gArmDn > 0 && MathAbs(gArmDn - lvlDn) < gGrid / 2) ? "ARMADO" : "esperando"),
-      gX, gY, gW, gH, VelasTxt(), gTicks, gBarsLogged, gAlerts, gLast, STAT_SIGNAL, STAT_NULL));
+      gX, gY, gW, gH, VelasTxt(), gTicks, gBarsLogged, gAlerts, gHit, gMiss, gImpulsos, gLast, STAT_SIGNAL, STAT_NULL));
    FileClose(fh);
   }
 
@@ -414,6 +465,11 @@ void Fire(const int dir, const double level)
    gLast = StringFormat("%s %s %s", TimeToString(gLastT, TIME_MINUTES), d,
                         DoubleToString(level, _Digits));
    Arrow(dir, level);
+   ArrayResize(gPend, gNP + 1);
+   gPend[gNP].dir = dir; gPend[gNP].lvl = level;
+   gPend[gNP].sl = level - dir * gStopD;
+   gPend[gNP].tp = level + dir * gStopD * InpTargetR;
+   gPend[gNP].t0 = TimeCurrent(); gPend[gNP].open = true; gNP++;
    gBannerDir = dir;
    gBannerUntil = TimeCurrent() + InpBannerSec;
    gBannerTxt = StringFormat("%s  %s  en %s", _Symbol, d, DoubleToString(level, _Digits));
@@ -425,7 +481,9 @@ void Fire(const int dir, const double level)
       STAT_SIGNAL, STAT_NULL);
    Print("ALERTA >>> ", msg);
    if(InpSound) PlaySound("alert.wav");
-   if(InpPopup) Alert(msg);
+   // Alert() es modal en MT5 y bloquea el hilo del experto bajo Wine.
+   // El aviso va por sonido + cartel en el grafico, que no bloquean.
+   if(false) Alert(msg);
    int fh = FileOpen("TRADER-ALERT-001-live.csv",
                      FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
    if(fh != INVALID_HANDLE)
@@ -441,11 +499,59 @@ void Fire(const int dir, const double level)
   }
 
 //+------------------------------------------------------------------+
+//| IMPULSE DETECTOR — observation, not prediction.                   |
+//| Fires anywhere in price, not only on focal levels. It reports what|
+//| the market IS doing. It makes no claim about what comes next.     |
+//+------------------------------------------------------------------+
+void CheckImpulso()
+  {
+   if(!InpImpulso) return;
+   if(TimeCurrent() - gLastImp < InpImpCoolS) return;
+
+   int bars = (int)MathMax(1, MathRound(InpImpMin / 5.0));
+   double mv = MovePips(bars);
+   if(MathAbs(mv) < InpImpPips) return;
+
+   int dir = (mv > 0) ? +1 : -1;
+   gLastImp = TimeCurrent();
+   gImpDir  = dir;
+   gImpulsos++;
+
+   MqlTick t; SymbolInfoTick(_Symbol, t);
+   string d = (dir > 0) ? "SUBIENDO FUERTE" : "BAJANDO FUERTE";
+   gBannerDir   = dir;
+   gBannerTxt   = StringFormat("%s   %+.1f pips en %d min", d, mv, InpImpMin);
+   gBannerUntil = TimeCurrent() + InpBannerSec;
+
+   gLast = StringFormat("%s %s %+.1f p", TimeToString(TimeCurrent(), TIME_MINUTES),
+                        (dir > 0 ? "IMPULSO+" : "IMPULSO-"), mv);
+
+   Print("IMPULSO >>> ", gBannerTxt, "  precio ", DoubleToString(t.bid, _Digits),
+         "  [observacion, no prediccion]");
+   if(InpSound) PlaySound("news.wav");
+
+   int fh = FileOpen("TRADER-IMPULSO.csv",
+                     FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
+   if(fh != INVALID_HANDLE)
+     {
+      FileSeek(fh, 0, SEEK_END);
+      FileWrite(fh, TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS), _Symbol,
+                (dir > 0 ? "SUBE" : "BAJA"), DoubleToString(mv, 1),
+                (string)InpImpMin, DoubleToString(t.bid, _Digits), "OBSERVACION");
+      FileClose(fh);
+     }
+   Draw();
+  }
+
+//+------------------------------------------------------------------+
 void OnTick()
   {
    MqlTick t; if(!SymbolInfoTick(_Symbol, t)) return;
    gTicks++;
+   Track();
    double b = t.bid;
+   CheckImpulso();
+
    if(gArmUp > 0 && b >= gArmUp) { Fire(-1, gArmUp); gArmUp = 0; }
    if(gArmDn > 0 && b <= gArmDn) { Fire(+1, gArmDn); gArmDn = 0; }
    double lvlDn = MathFloor(b / gGrid) * gGrid;

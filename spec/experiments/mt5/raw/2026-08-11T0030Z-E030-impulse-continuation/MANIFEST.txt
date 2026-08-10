@@ -1,0 +1,63 @@
+E-MT5-030 — IMPULSE CONTINUATION OBSERVER
+
+experiment  EXPLORATORY on EURUSD 2024-2026 (contaminated sample).
+            Pure observer: no orders, no account, no costs.
+            This is the 4th hypothesis; the declared budget was 3. Recorded as
+            exploratory, NOT confirmatory.
+
+question    Asked by the trader, in two parts:
+              (1) when price moves X pips in Y minutes, does it CONTINUE?
+              (2) how far and how long does the move run?
+
+design      On impulse detection, a SYMMETRIC race of +/- D pips from the
+            trigger price, in the direction of the impulse. Structural null is
+            50%: on a driftless walk a symmetric race is a coin flip.
+            Four cells declared before measuring, primary marked.
+
+RESULT (1) — IMPULSES DO NOT CONTINUE. THEY REVERT.
+
+  cell                          n        P(cont)    z        95% CI
+  imp  5p -> race +-10p  [PRIM] 10,674   47.95%    -4.24   [47.00, 48.90]
+  imp  5p -> race +-20p          3,436   49.30%    -0.82   [47.63, 50.97]
+  imp 10p -> race +-20p          1,933   49.35%    -0.57   [47.13, 51.58]
+  imp 10p -> race +-40p            ~900  (secondary, descriptive)
+
+  The primary cell is significant at z = -4.24 over 10,674 races.
+  CONSISTENT with E-MT5-029: the variance ratio found reversion at every
+  intraday scale on the same instrument, by a completely different method.
+  Two independent measurements, same conclusion: EURUSD intraday reverts.
+
+RESULT (2) — HOW FAR AND HOW LONG  (primary cell)
+
+  max favourable excursion   median  9.3 pips   p75 10.1   p90 10.4
+  time to that maximum       median 10.3 min    p75 35.0   p90 87.2
+  total duration             median 22.6 min    p75 58.2   p90 129.0
+
+  Half of all moves travel 9.3 pips and top out in ~10 minutes.
+  90% are exhausted inside 90 minutes.
+
+ECONOMICS — the recurring wall
+
+  Trading the reversion of ALL impulses:
+     gross EV +0.410 pips  -  spread 0.4614  =  -0.051 pips   NEGATIVE
+
+  Fifth time in this project that real structure lands just below the
+  execution tax.
+
+POST-HOC OBSERVATION — NOT A RESULT
+
+  Splitting by direction AFTER seeing the data:
+     bullish impulse  n=5,180  P(rev)=51.14%  z=-1.64  EV net -0.233 pips
+     bearish impulse  n=5,494  P(rev)=52.91%  z=-4.31  EV net +0.121 pips
+
+  The bearish-impulse rebound is the first positive net EV of the project.
+  IT IS POST-HOC. The direction split was chosen after inspecting results —
+  precisely the manoeuvre that produced the $10,862 balance that collapsed to
+  $12 on virgin GBPUSD.
+
+  It is NOT a finding. It is a hypothesis that requires preregistration and a
+  test against the reserved GBPUSD 2011-2023 sample, which remains untouched.
+
+VERDICT: impulses revert, significantly and consistently with E-MT5-029.
+The effect is below the execution tax when taken as a whole. The directional
+asymmetry is unvalidated and must not be traded on.
