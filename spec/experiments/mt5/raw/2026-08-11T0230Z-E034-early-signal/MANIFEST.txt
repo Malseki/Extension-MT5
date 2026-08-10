@@ -1,0 +1,40 @@
+E-MT5-034 — EARLY SIGNAL AS ENTRY TRIGGER, BOTH DIRECTIONS
+
+experiment  ECONOMIC A/B. Signal = 3 pips inside the FORMING M5 candle (the
+            early-warning detector added to the live EA). Two runs identical
+            except for entry direction.
+range       EURUSD 2024-2026, M5, model 4, market entry, fixed $100 risk
+prediction  RECORDED BEFORE MEASURING: both negative, and "with the move"
+            worse than "against it", because impulses revert. -> CONFIRMED.
+
+RESULT
+  direction              n     win%      PF   balance   totalR   spread@signal
+  AGAINST (reversion)  2631   47.78%  0.9212    10.54   -127.9      0.7560
+  WITH    (momentum)   1052   44.87%  0.7505    10.65   -122.1      0.7273
+
+  Trading WITH the move is 2.91 pp worse than trading against it.
+
+WHAT IT ESTABLISHES
+
+  1. FOURTH independent confirmation of reversion, now from the economic side.
+     If the market had momentum, "with the move" would have won. It lost more.
+
+  2. The early warning does NOT change profitability, exactly as predicted.
+     Earlier notice improves information about the present; it does not confer
+     any ability to predict the future.
+
+  3. Break-even with symmetric 10-pip stop/target is not 50% but 53.65%,
+     because the 0.73 pip spread must be covered on every trade:
+        pure observer          52.81%
+        real execution         47.78%   (-5.03 pp)
+        break-even needed      53.65%
+
+ON THE SELLING QUESTION (raised by the trader)
+  Selling was never under-represented. FX pairs are a ratio between two
+  currencies, so long and short are symmetric -- there is no equity-style
+  bullish bias. E-MT5-031 measured 62,208 bullish against 61,753 bearish
+  impulses and E-MT5-023 ran 1,520 BUY against 1,656 SELL. The only asymmetry
+  ever found did not survive virgin data.
+
+VERDICT: no configuration of this signal is profitable. The early warning is a
+usability improvement, not an economic one.

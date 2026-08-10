@@ -314,8 +314,8 @@ void Banner()
 
    Txt("bntx", bx + 18, by + 12, gBannerTxt, clrWhite, 22, "Arial");
    Txt("bnsub", bx + 18, by + 52,
-       StringFormat("ventaja %.3f pips  vs  costo real %.3f pips   ->   NO OPERABLE",
-                    EDGE_PIPS, COST_REAL), br, 10, "Arial");
+       StringFormat("medido: tras un movimiento asi, %.2f%% REVIERTE  (n=%d)",
+                    REV_P, REV_N), br, 10, "Arial");
   }
 
 
@@ -470,7 +470,7 @@ void Fire(const int dir, const double level)
   {
    double stop   = level - dir * gStopD;
    double target = level + dir * gStopD * InpTargetR;
-   string d = (dir > 0) ? "SUBE" : "BAJA";
+   string d = (dir > 0) ? "BUY / COMPRA" : "SELL / VENTA";
    gAlerts++; gLastT = TimeCurrent();
    gLast = StringFormat("%s %s %s", TimeToString(gLastT, TIME_MINUTES), d,
                         DoubleToString(level, _Digits));
@@ -535,7 +535,7 @@ void CheckTemprano()
    gLastTemp = TimeCurrent();
    gTempranos++;
 
-   string d = (dir > 0) ? "EMPEZANDO A SUBIR" : "EMPEZANDO A BAJAR";
+   string d = (dir > 0) ? "SUBIENDO  ->  COMPRA / BUY" : "BAJANDO  ->  VENTA / SELL";
    gBannerDir   = dir;
    gBannerTxt   = StringFormat("%s   %+.1f pips en la vela", d, gIntraPips);
    gBannerUntil = TimeCurrent() + InpBannerSec;
@@ -575,7 +575,7 @@ void CheckImpulso()
    gImpulsos++;
 
    MqlTick t; SymbolInfoTick(_Symbol, t);
-   string d = (dir > 0) ? "SUBIENDO FUERTE" : "BAJANDO FUERTE";
+   string d = (dir > 0) ? "SUBE FUERTE  ->  BUY" : "BAJA FUERTE  ->  SELL";
    gBannerDir   = dir;
    gBannerTxt   = StringFormat("%s   %+.1f pips en %d min", d, mv, InpImpMin);
    gBannerUntil = TimeCurrent() + InpBannerSec;
