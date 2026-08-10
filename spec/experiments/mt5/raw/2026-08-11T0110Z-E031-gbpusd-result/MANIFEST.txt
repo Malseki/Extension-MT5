@@ -1,0 +1,56 @@
+E-MT5-031 — BEARISH-IMPULSE REBOUND ON RESERVED GBPUSD
+
+experiment   REPLICATION on virgin data. Preregistered at commit 4612ade,
+             sealed BEFORE any GBPUSD tick prior to 2024 was downloaded.
+binary       ea8d8ed3dc309193c36dc5b22778d65a60e4afe5f4b38d832d3cd0c5c0c73e68
+             byte-identical to E-MT5-030. No code written for this test.
+range        GBPUSD 2012.01.01 -> 2023.12.31, M5, model 4, real ticks
+             (the last reserved virgin sample of the project)
+n            123,961 resolved races
+
+RESULT 1 — THE MECHANISM SURVIVED
+  P(rebound) = 53.37% against a 50% null, z = +23.71.
+  Reversion of impulses is REAL on virgin data. Third independent
+  confirmation: E-MT5-029 (variance ratio), E-MT5-030 (EURUSD), this.
+
+RESULT 2 — THE PREREGISTERED HYPOTHESIS WAS REFUTED
+  The direction asymmetry INVERTED between samples:
+     EURUSD 2024-26 (discovery)  bearish 52.91%  bullish 51.14%   +1.77 pp
+     GBPUSD 2012-23 (virgin)     bearish 52.99%  bullish 53.74%   -0.75 pp (z=-2.65)
+  The bullish arm outperforms the bearish one, the opposite of the
+  hypothesis. Criterion (D) applies: the directional asymmetry does not
+  exist. What exists is symmetric reversion, already known.
+
+ERROR FOUND AND CORRECTED IN THE PREREGISTRATION
+  The preregistration fixed the economic threshold at 52.31%, computed with
+  the EURUSD spread (0.4614). This test is on GBPUSD, whose measured spread
+  is 0.6986 (E-MT5-028). The correct threshold is 53.49%.
+  With the right threshold the sign of every EV flips:
+     arm        P(rev)    EV @0.4614    EV @0.6986 (correct)
+     both       53.37%      +0.212        -0.025
+     bearish    52.99%      +0.137        -0.101
+     bullish    53.74%      +0.287        +0.050
+  Recorded rather than quietly fixed: the threshold must be recomputed per
+  instrument, and that requirement is now part of the protocol.
+
+DATA CONTAMINATION — December 2014
+  2014 showed 70.03% reversion against 51-53% in every other year.
+  Audit found the cause:
+     2014.12    3,803 events    96.21% reversion    median duration 0.0 min
+     other mo.  ~700 events     50-57%              15-40 min
+     races resolved in < 60 s:  2014 = 39.1%,  every other year 2-7%
+     median MFE: 2014 = 2.1 pips,  other years ~9 pips
+  Price is jumping +/-10 pips inside a single tick. That is broken feed data,
+  not market behaviour. December 2014 alone is 3.1% of the whole sample and
+  was inflating the headline number.
+
+CLEAN RESULT  (excluding 2014 and races under 60 s)
+     n = 108,678    P(rebound) = 52.81%    z vs 50% = +18.50
+     z vs economic threshold = -4.54       EV = -0.137 pips
+  The mechanism is real and 0.69 pp BELOW the threshold that would make it
+  tradeable on this instrument.
+
+VERDICT: criterion (B). REAL BUT NOT EXPLOITABLE. Sixth confirmation of the
+execution-tax law s/(3D) discovered in E-MT5-024.
+
+The reserved sample is now spent. No untouched historical data remains.
