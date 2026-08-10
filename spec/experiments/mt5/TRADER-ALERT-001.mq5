@@ -31,7 +31,10 @@ input int    InpBannerSec = 25;      // segundos que dura el cartel de alerta
 input bool   InpImpulso   = true;    // avisar movimientos fuertes en curso
 input double InpImpPips   = 5.0;     // pips de movimiento para considerarlo impulso
 input int    InpImpMin    = 5;       // en cuantos minutos
-input int    InpImpCoolS  = 300;     // no repetir el aviso antes de N segundos
+input int    InpImpCoolS  = 300;
+input bool   InpTemprano  = true;    // aviso apenas arranca el movimiento
+input double InpTempPips  = 3.0;     // pips dentro de la vela EN CURSO
+input int    InpTempCoolS = 180;     // no repetir antes de N segundos     // no repetir el aviso antes de N segundos
 
 // FINDINGS-001: hallazgos consolidados, no la senal focal refutada
 #define REV_P      52.81    // P(reversion) medida, GBPUSD virgen n=108,678
@@ -60,6 +63,9 @@ Pend gPend[]; int gNP = 0;
 int  gHit = 0, gMiss = 0;
 long gBarsLogged = 0;
 datetime gLastImp = 0;
+datetime gLastTemp = 0;
+int      gTempranos = 0;
+double   gIntraPips = 0;
 int      gImpDir  = 0;
 int      gImpulsos = 0;
 int      gBannerDir = 0;
@@ -428,7 +434,8 @@ void Heartbeat()
       "ticks           %I64d\n"
       "barras_forward  %I64d\n"
       "alertas         %d   acerto %d   fallo %d\n"
-      "impulsos        %d\n"
+      "impulsos        %d   tempranos %d\n"
+      "vela_en_curso   %+.1f pips (umbral %.1f)\n"
       "ultima_alerta   %s\n"
       "hallazgo        reversion %.2f%% (n=%d)  ventaja %.3f p/op\n"
       "costo real      %.3f p en la senal = %.1fx la ventaja -> NO OPERABLE\n",
@@ -442,7 +449,7 @@ void Heartbeat()
       (gArmUp > 0 ? "ARMADO" : "esperando"),
       DoubleToString(lvlDn, _Digits), (t.bid - lvlDn) / (gPip * _Point),
       ((gArmDn > 0 && MathAbs(gArmDn - lvlDn) < gGrid / 2) ? "ARMADO" : "esperando"),
-      gX, gY, gW, gH, VelasTxt(), gTicks, gBarsLogged, gAlerts, gHit, gMiss, gImpulsos, gLast, REV_P, REV_N, EDGE_PIPS, COST_REAL, COST_REAL/EDGE_PIPS));
+      gX, gY, gW, gH, VelasTxt(), gTicks, gBarsLogged, gAlerts, gHit, gMiss, gImpulsos, gTempranos, gIntraPips, InpTempPips, gLast, REV_P, REV_N, EDGE_PIPS, COST_REAL, COST_REAL/EDGE_PIPS));
    FileClose(fh);
   }
 
@@ -506,6 +513,53 @@ void Fire(const int dir, const double level)
 //| Fires anywhere in price, not only on focal levels. It reports what|
 //| the market IS doing. It makes no claim about what comes next.     |
 //+------------------------------------------------------------------+
+//| AVISO TEMPRANO — mide el movimiento DENTRO de la vela en curso.   |
+//| El detector de impulso compara contra la vela ya cerrada, o sea   |
+//| contra un punto de hasta 10 min atras. Este mira el open de la    |
+//| vela viva, asi avisa apenas el movimiento arranca.                |
+//| Sigue siendo OBSERVACION: dice lo que esta pasando, no predice.   |
+//+------------------------------------------------------------------+
+void CheckTemprano()
+  {
+   if(!InpTemprano) return;
+   MqlTick t; if(!SymbolInfoTick(_Symbol, t)) return;
+
+   double op = iOpen(_Symbol, PERIOD_M5, 0);      // vela EN FORMACION
+   if(op <= 0) return;
+   gIntraPips = (t.bid - op) / (gPip * _Point);
+
+   if(TimeCurrent() - gLastTemp < InpTempCoolS) return;
+   if(MathAbs(gIntraPips) < InpTempPips) return;
+
+   int dir = (gIntraPips > 0) ? +1 : -1;
+   gLastTemp = TimeCurrent();
+   gTempranos++;
+
+   string d = (dir > 0) ? "EMPEZANDO A SUBIR" : "EMPEZANDO A BAJAR";
+   gBannerDir   = dir;
+   gBannerTxt   = StringFormat("%s   %+.1f pips en la vela", d, gIntraPips);
+   gBannerUntil = TimeCurrent() + InpBannerSec;
+   gLast = StringFormat("%s %s %+.1f p", TimeToString(TimeCurrent(), TIME_MINUTES),
+                        (dir > 0 ? "TEMPRANO+" : "TEMPRANO-"), gIntraPips);
+
+   Print("AVISO TEMPRANO >>> ", gBannerTxt, "  precio ",
+         DoubleToString(t.bid, _Digits), "  [observacion en curso]");
+   if(InpSound) PlaySound("tick.wav");
+
+   int fh2 = FileOpen("TRADER-TEMPRANO.csv",
+                      FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
+   if(fh2 != INVALID_HANDLE)
+     {
+      FileSeek(fh2, 0, SEEK_END);
+      FileWrite(fh2, TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS), _Symbol,
+                (dir > 0 ? "SUBE" : "BAJA"), DoubleToString(gIntraPips, 1),
+                DoubleToString(t.bid, _Digits), "TEMPRANO");
+      FileClose(fh2);
+     }
+   Draw();
+  }
+
+//+------------------------------------------------------------------+
 void CheckImpulso()
   {
    if(!InpImpulso) return;
@@ -553,6 +607,7 @@ void OnTick()
    gTicks++;
    Track();
    double b = t.bid;
+   CheckTemprano();
    CheckImpulso();
 
    if(gArmUp > 0 && b >= gArmUp) { Fire(-1, gArmUp); gArmUp = 0; }
