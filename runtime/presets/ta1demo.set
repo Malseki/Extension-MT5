@@ -1,0 +1,16 @@
+InpGridPips=10
+InpUPips=4
+InpStopPips=20
+InpTargetR=2.0
+InpDemoMode=false
+InpSound=true
+InpPopup=false
+InpMaxArrows=200
+InpBannerSec=25
+InpImpulso=true
+InpImpPips=5.0
+InpImpMin=5
+InpImpCoolS=300
+InpTemprano=true
+InpTempPips=3.0
+InpTempCoolS=180

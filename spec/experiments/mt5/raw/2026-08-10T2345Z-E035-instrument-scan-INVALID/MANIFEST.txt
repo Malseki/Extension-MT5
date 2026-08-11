@@ -1,0 +1,52 @@
+E-MT5-035 — INSTRUMENT COST/VOLATILITY SCAN   ***  INVALID — DO NOT CITE  ***
+
+experiment  Pure observer over 11 symbols. Idea under test: the reversion edge
+            scales with the instrument (edge = 0.0562 * D, D = 2*sigma_M5), so
+            what decides tradability is not the spread in pips but the spread
+            RELATIVE to how much the instrument moves. The idea is sound. The
+            measurement is not.
+run         2026-08-10 20:45 local (23:45Z), live terminal, EURUSD M5 chart.
+status      NOT PREREGISTERED. Run before writing a prediction, against
+            protocol. Kept only so the reasoning is not repeated.
+
+WHY IT IS INVALID
+
+  1. The spread was read as an INSTANTANEOUS SNAPSHOT, not an average:
+     source line 71 uses SymbolInfoInteger(s, SYMBOL_SPREAD) once per symbol.
+     The CSV column is nevertheless labelled "avg_spread_pips".
+
+  2. Four symbols returned a spread of exactly 0.0000 — EURUSD, USDCHF,
+     AUDUSD, NZDUSD. A zero spread is impossible. The live MetaQuotes-Demo
+     feed reports ask == bid for these symbols, so the reading is empty, not
+     small. Every "POSIBLE" verdict in the CSV rests on a cost read as zero.
+
+  3. Even a correct average would have been the wrong number. E-MT5-032
+     established that the spread at the instant of a signal is 1.3-2.0x its
+     own average, because signals fire when price moves and market makers
+     widen when price moves. This scan compares an edge against a cost the
+     project had already shown to be an underestimate.
+
+WHAT THE SEALED CSV ACTUALLY SAYS ABOUT GOLD
+
+     XAUUSD,2,19999,53.0000,388.4685,0.1364,43.6639,no cubre
+
+  cost 53.00 against an edge of 43.66 -> margin -9.34, verdict "no cubre".
+  Any later note claiming gold showed a cost of ~30 and a margin of +13.66
+  does not come from this experiment. There is no run behind that number.
+
+WHAT REMAINS TRUE
+
+  The ratio spread/sigma is the right quantity to compare across instruments.
+  Nothing here establishes that gold does or does not clear its cost, and
+  nothing here says anything about whether reversion exists in gold at all —
+  the 0.0562 coefficient was measured on GBPUSD and has never been tested on
+  any metal.
+
+DECISION (trader, 2026-08-11)
+  Scope restricted to EURUSD. Rationale: the methodology itself is
+  instrument-specific, not just the thresholds — which extends the lesson
+  already recorded in FINDINGS-001 §4.2. The gold line is not pursued.
+
+VERDICT: measurement discarded. The question it asked stays open and would
+need a real spread measurement, sampled at the instant of the signal, per
+instrument.

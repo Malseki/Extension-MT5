@@ -54,6 +54,7 @@ double gGrid, gU, gStopD;
 double gArmUp = 0, gArmDn = 0;
 int    gAlerts = 0, gArrowSeq = 0;
 long   gTicks = 0;
+long   gLastMsc = -1;   // ultimo tick ya procesado por Pulse(), evita contarlo dos veces
 string gLast = "sin senales todavia";
 datetime gLastT = 0;
 datetime gBannerUntil = 0;
@@ -157,8 +158,15 @@ void OnDeinit(const int reason)
    ObjectsDeleteAll(0, gPfx);
   }
 
-void OnTimer() { Draw(); Banner(); LogBar(); Heartbeat(); }
-// Track() runs on ticks, where price actually moves
+void OnTimer() { Pulse(); Draw(); Banner(); LogBar(); Heartbeat(); }
+// Pulse() carries the detection. It runs from OnTick() when the terminal
+// delivers tick events, and from OnTimer() when it does not: under Wine a
+// chart that never renders gets no OnTick at all, and the detector sat blind
+// from 2026-08-10 to 2026-08-11 with ticks=0 while the panel kept updating.
+// OnTimer is a system timer, independent of the chart, so it always fires.
+// Cost of the fallback: detection resolves to 1 s instead of per tick, so a
+// level touched and reverted inside the same second is missed. Both hits and
+// misses are lost the same way, so it does not bias direction.
 
 //+------------------------------------------------------------------+
 //| user dragged the panel body or the resize grip                    |
@@ -601,9 +609,11 @@ void CheckImpulso()
   }
 
 //+------------------------------------------------------------------+
-void OnTick()
+void Pulse()
   {
    MqlTick t; if(!SymbolInfoTick(_Symbol, t)) return;
+   if(t.time_msc == gLastMsc) return;   // ya procesado: llego por la otra via
+   gLastMsc = t.time_msc;
    gTicks++;
    Track();
    double b = t.bid;
@@ -617,4 +627,7 @@ void OnTick()
    if(gArmUp <= 0 || b <= gArmUp - gU) { if(b <= lvlUp - gU) gArmUp = lvlUp; }
    if(gArmDn <= 0 || b >= gArmDn + gU) { if(b >= lvlDn + gU) gArmDn = lvlDn; }
   }
+
+//+------------------------------------------------------------------+
+void OnTick() { Pulse(); }
 //+------------------------------------------------------------------+

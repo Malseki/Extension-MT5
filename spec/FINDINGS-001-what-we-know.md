@@ -118,6 +118,32 @@ identical-looking result. Every subsequent experiment carries one.
 expert thread under Wine after the first alert; the system appeared to run
 while processing nothing.
 
+**4.7 A live detector can be blind while looking perfectly healthy.** From
+2026-08-10 to 2026-08-11 the detector ran with `ticks = 0`. `OnTick()` is
+never delivered under Wine when the chart does not render; all detection lived
+inside it, so no early warning, impulse or level touch could ever fire. What
+kept working was `OnTimer()`, a system timer independent of the chart — so the
+panel refreshed, the price moved, M5 bars were logged, and the heartbeat
+advanced once per second. Every visible sign of health was produced by the one
+path that still worked.
+
+Two failures compounded it. The startup preset `ta1demo.set` set
+`InpPopup=true`, the value the source marks as fatal (§4.6), and
+`InpDemoMode=true`, arming at 1 pip; the preset silently overrode both safe
+defaults. And the scan of E-MT5-035 had been attached to the same EURUSD M5
+chart, evicting the detector — one chart runs one expert.
+
+Fixed 2026-08-11: detection extracted to `Pulse()`, called from `OnTick()` and
+from `OnTimer()`, guarded by `time_msc` against double counting. Cost of the
+fallback: detection resolves to 1 s instead of per tick, so a level touched and
+reverted inside the same second is missed — symmetrically for hits and misses,
+so it does not bias direction.
+
+**The lesson generalises past this bug: a liveness signal must be produced by
+the path being trusted, not by a neighbouring one.** The heartbeat proved the
+timer was alive and was read as proof the detector was alive. `ticks = 0` sat
+in plain sight in the panel for two days.
+
 ---
 
 ## 5. What remains open
@@ -127,8 +153,10 @@ while processing nothing.
   This is a different product with different requirements and has not been
   studied. [NOT ESTABLISHED]
 - **Forward data.** No untouched historical sample remains. The live detector
-  has been accumulating M5 bars, signals and outcomes since 2026-08-10; that is
-  the only virgin data that will exist from here.
+  is the only virgin data that will exist from here. **It accumulated nothing
+  usable between 2026-08-10 and 2026-08-11:** see §4.7. Signal capture starts
+  2026-08-11 12:00 local; M5 bars before that are intact but sparse, and there
+  are no signals at all in that window because none could be detected.
 - **Whether the reversion effect is stable going forward.** Neely et al. showed
   FX technical edges died in the mid-1990s. Nothing guarantees this one persists.
 
