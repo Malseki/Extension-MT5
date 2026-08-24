@@ -35,6 +35,12 @@ input int    InpImpCoolS  = 300;
 input bool   InpTemprano  = true;    // aviso apenas arranca el movimiento
 input double InpTempPips  = 3.0;     // pips dentro de la vela EN CURSO
 input int    InpTempCoolS = 180;     // no repetir antes de N segundos     // no repetir el aviso antes de N segundos
+// EVENT RISK — SPEC-FUND-001 §8. Calendario nativo de MT5, no depende de la web.
+input bool   InpEventRisk    = true;  // marcar senales que caen en ventana de evento
+input int    InpEventBeforeM = 15;    // minutos ANTES del evento que cuentan como ventana
+input int    InpEventAfterM  = 15;    // minutos DESPUES
+input bool   InpEventHighOnly= true;  // solo importancia HIGH (tier 1)
+input bool   InpEventBlock   = false; // true = ademas silencia los avisos en ventana
 
 // FINDINGS-001: hallazgos consolidados, no la senal focal refutada
 #define REV_P      52.81    // P(reversion) medida, GBPUSD virgen n=108,678
@@ -55,6 +61,14 @@ double gArmUp = 0, gArmDn = 0;
 int    gAlerts = 0, gArrowSeq = 0;
 long   gTicks = 0;
 long   gLastMsc = -1;   // ultimo tick ya procesado por Pulse(), evita contarlo dos veces
+
+// EVENT RISK — cache del calendario. Se refresca cada 5 min, no por tick.
+struct EvRow { datetime t; string name; string cur; int imp; };
+EvRow    gEv[];
+int      gNEv = 0;
+datetime gEvRefreshed = 0;
+bool     gEvOk = false;         // false = el calendario no respondio; se degrada a "sin datos"
+int      gEvSuppressed = 0;     // avisos silenciados por ventana de evento
 string gLast = "sin senales todavia";
 datetime gLastT = 0;
 datetime gBannerUntil = 0;
@@ -143,6 +157,10 @@ int OnInit()
    gU     = (InpDemoMode ? 1 : InpUPips) * gPip * _Point;
    gStopD = InpStopPips * gPip * _Point;
    LoadGeom();
+   // La ultima barra cerrada ya fue registrada antes de este arranque. Sin esto
+   // cada reinicio la vuelve a escribir y el CSV queda con duplicados, que
+   // sesgan el analisis; perder una barra solo reduce n, que es preferible.
+   gLastBar = iTime(_Symbol, PERIOD_M5, 1);
    ChartSetInteger(0, CHART_EVENT_OBJECT_DELETE, true);
    EventSetTimer(1);
    Draw();
@@ -158,7 +176,7 @@ void OnDeinit(const int reason)
    ObjectsDeleteAll(0, gPfx);
   }
 
-void OnTimer() { Pulse(); Draw(); Banner(); LogBar(); Heartbeat(); }
+void OnTimer() { EventRefresh(); Pulse(); Draw(); Banner(); LogBar(); Heartbeat(); }
 // Pulse() carries the detection. It runs from OnTick() when the terminal
 // delivers tick events, and from OnTimer() when it does not: under Wine a
 // chart that never renders gets no OnTick at all, and the detector sat blind
@@ -355,6 +373,109 @@ string VelasTxt()
 //| The detector grades itself in public — no way to look better than |
 //| it is.                                                            |
 //+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
+//| EVENT RISK — SPEC-FUND-001 §8                                     |
+//|                                                                   |
+//| Why it exists: E-MT5-032 measured the spread at the instant of a  |
+//| signal at 1.96x its own average on EURUSD, against an edge of     |
+//| 0.562 pips. An event window is the strongest form of that effect. |
+//| This module predicts nothing. It marks when a signal was born      |
+//| somewhere the execution cost is known to explode.                 |
+//|                                                                   |
+//| It MARKS by default and blocks only under InpEventBlock. Marking   |
+//| keeps both arms of E-MT5-036 Test A in the sample; blocking would  |
+//| destroy the very data that decides whether the filter is worth     |
+//| having. Reads the native MT5 calendar, so it needs no web access.  |
+//+------------------------------------------------------------------+
+void EventRefresh()
+  {
+   if(!InpEventRisk) return;
+   if(gEvRefreshed > 0 && TimeCurrent() - gEvRefreshed < 300) return;
+   gEvRefreshed = TimeCurrent();
+
+   ArrayResize(gEv, 0); gNEv = 0; gEvOk = false;
+
+   datetime from = TimeCurrent() - 12 * 3600;
+   datetime to   = TimeCurrent() + 36 * 3600;
+   string cur[2]; cur[0] = "USD"; cur[1] = "EUR";
+
+   for(int c = 0; c < 2; c++)
+     {
+      MqlCalendarValue v[];
+      int n = CalendarValueHistory(v, from, to, NULL, cur[c]);
+      if(n <= 0) continue;
+      gEvOk = true;                     // el calendario respondio al menos una vez
+      for(int i = 0; i < n; i++)
+        {
+         MqlCalendarEvent ev;
+         if(!CalendarEventById(v[i].event_id, ev)) continue;
+         if(ev.importance == CALENDAR_IMPORTANCE_NONE) continue;
+         if(InpEventHighOnly && ev.importance != CALENDAR_IMPORTANCE_HIGH) continue;
+         int k = gNEv;
+         ArrayResize(gEv, k + 1);
+         gEv[k].t    = v[i].time;
+         gEv[k].name = ev.name;
+         gEv[k].cur  = cur[c];
+         gEv[k].imp  = (int)ev.importance;
+         gNEv = k + 1;
+        }
+     }
+  }
+
+//| "" si t no cae en ventana de evento; si cae, el rotulo del evento
+string EventWindow(const datetime t, int &minsTo)
+  {
+   minsTo = 0;
+   if(!InpEventRisk || gNEv <= 0) return("");
+   for(int i = 0; i < gNEv; i++)
+     {
+      long d = (long)(gEv[i].t - t);        // >0 falta, <0 ya ocurrio
+      if(d <= (long)InpEventBeforeM * 60 && d >= -(long)InpEventAfterM * 60)
+        {
+         minsTo = (int)(d / 60);
+         return(gEv[i].cur + " " + gEv[i].name);
+        }
+     }
+   return("");
+  }
+
+//| campo para CSV. NOCAL distingue "no hay evento" de "no hubo calendario":
+//| sin esa distincion una falla del calendario se leeria como ausencia de
+//| riesgo, que es el error que este proyecto ya cometio con ticks=0.
+string EventTag(const datetime t)
+  {
+   if(!InpEventRisk) return("OFF");
+   if(!gEvOk)        return("NOCAL");
+   int m; string e = EventWindow(t, m);
+   if(e == "") return("NONE");
+   StringReplace(e, ",", " ");            // la coma rompe el CSV
+   return(StringFormat("%s@%+dmin", e, m));
+  }
+
+//| proximo evento futuro, para el panel
+string EventNext(int &minsTo)
+  {
+   minsTo = -1;
+   if(gNEv <= 0) return("");
+   long best = 0; string bn = "";
+   for(int i = 0; i < gNEv; i++)
+     {
+      long d = (long)(gEv[i].t - TimeCurrent());
+      if(d < 0) continue;
+      if(bn == "" || d < best) { best = d; bn = gEv[i].cur + " " + gEv[i].name; }
+     }
+   if(bn != "") minsTo = (int)(best / 60);
+   return(bn);
+  }
+
+//| true si hay que silenciar el aviso (solo con InpEventBlock)
+bool EventBlocked()
+  {
+   if(!InpEventRisk || !InpEventBlock) return(false);
+   int m; return(EventWindow(TimeCurrent(), m) != "");
+  }
+
+//+------------------------------------------------------------------+
 void Track()
   {
    MqlTick t; if(!SymbolInfoTick(_Symbol, t)) return;
@@ -407,16 +528,37 @@ void LogBar()
    if(fb == INVALID_HANDLE) return;
    if(FileSize(fb) == 0)
       FileWrite(fb, "time", "symbol", "open", "high", "low", "close",
-                "tick_volume", "spread_pips", "alerts_so_far");
+                "tick_volume", "spread_pips", "alerts_so_far",
+                "range_pips", "event");
    FileSeek(fb, 0, SEEK_END);
+   // range_pips y event alimentan el control positivo de E-MT5-036 Test A:
+   // el rango M5 DEBE ser mayor dentro de ventana de evento. Si no lo es,
+   // el problema esta en el pipeline, no en la hipotesis.
    FileWrite(fb, TimeToString(bt, TIME_DATE | TIME_SECONDS), _Symbol,
              DoubleToString(o, _Digits), DoubleToString(h, _Digits),
              DoubleToString(l, _Digits), DoubleToString(c, _Digits),
              (string)v,
              DoubleToString((t.ask - t.bid) / (gPip * _Point), 3),
-             (string)gAlerts);
+             (string)gAlerts,
+             DoubleToString((h - l) / (gPip * _Point), 1),
+             EventTag(bt));
    FileClose(fb);
    gBarsLogged++;
+  }
+
+//| estado del filtro de eventos, para el panel                       |
+string EventStatusTxt()
+  {
+   if(!InpEventRisk) return("filtro apagado");
+   if(!gEvOk)        return("calendario SIN DATOS");
+   int m; string w = EventWindow(TimeCurrent(), m);
+   if(w != "")
+      return(StringFormat("VENTANA >>> %s (%+d min)%s", w, m,
+                          (InpEventBlock ? "  [SILENCIA]" : "  [marca]")));
+   int mn; string nx = EventNext(mn);
+   if(nx == "")
+      return(StringFormat("sin eventos proximos  (%d en cache)", gNEv));
+   return(StringFormat("proximo %s en %d min  (%d en cache)", nx, mn, gNEv));
   }
 
 //+------------------------------------------------------------------+
@@ -443,6 +585,7 @@ void Heartbeat()
       "barras_forward  %I64d\n"
       "alertas         %d   acerto %d   fallo %d\n"
       "impulsos        %d   tempranos %d\n"
+      "evento          %s\n"
       "vela_en_curso   %+.1f pips (umbral %.1f)\n"
       "ultima_alerta   %s\n"
       "hallazgo        reversion %.2f%% (n=%d)  ventaja %.3f p/op\n"
@@ -457,7 +600,7 @@ void Heartbeat()
       (gArmUp > 0 ? "ARMADO" : "esperando"),
       DoubleToString(lvlDn, _Digits), (t.bid - lvlDn) / (gPip * _Point),
       ((gArmDn > 0 && MathAbs(gArmDn - lvlDn) < gGrid / 2) ? "ARMADO" : "esperando"),
-      gX, gY, gW, gH, VelasTxt(), gTicks, gBarsLogged, gAlerts, gHit, gMiss, gImpulsos, gTempranos, gIntraPips, InpTempPips, gLast, REV_P, REV_N, EDGE_PIPS, COST_REAL, COST_REAL/EDGE_PIPS));
+      gX, gY, gW, gH, VelasTxt(), gTicks, gBarsLogged, gAlerts, gHit, gMiss, gImpulsos, gTempranos, EventStatusTxt(), gIntraPips, InpTempPips, gLast, REV_P, REV_N, EDGE_PIPS, COST_REAL, COST_REAL/EDGE_PIPS));
    FileClose(fh);
   }
 
@@ -488,20 +631,35 @@ void Fire(const int dir, const double level)
    gPend[gNP].sl = level - dir * gStopD;
    gPend[gNP].tp = level + dir * gStopD * InpTargetR;
    gPend[gNP].t0 = TimeCurrent(); gPend[gNP].open = true; gNP++;
-   gBannerDir = dir;
-   gBannerUntil = TimeCurrent() + InpBannerSec;
-   gBannerTxt = StringFormat("%s  %s  en %s", _Symbol, d, DoubleToString(level, _Digits));
-   Banner();
+   MqlTick tk; SymbolInfoTick(_Symbol, tk);
+   bool blk = EventBlocked();
+   if(blk) gEvSuppressed++;
+   string etag = EventTag(gLastT);
+   double spr  = (tk.ask - tk.bid) / (gPip * _Point);
+
    string msg = StringFormat("%s %s | %s en %s | stop %s objetivo %s | "
       "ventaja %.3fp vs costo real %.3fp -> NO OPERABLE",
       _Symbol, EnumToString(_Period), d, DoubleToString(level, _Digits),
       DoubleToString(stop, _Digits), DoubleToString(target, _Digits),
       EDGE_PIPS, COST_REAL);
-   Print("ALERTA >>> ", msg);
-   if(InpSound) PlaySound("alert.wav");
-   // Alert() es modal en MT5 y bloquea el hilo del experto bajo Wine.
-   // El aviso va por sonido + cartel en el grafico, que no bloquean.
-   if(false) Alert(msg);
+
+   if(!blk)
+     {
+      gBannerDir = dir;
+      gBannerUntil = TimeCurrent() + InpBannerSec;
+      gBannerTxt = StringFormat("%s  %s  en %s", _Symbol, d, DoubleToString(level, _Digits));
+      if(etag != "NONE" && etag != "OFF" && etag != "NOCAL")
+         gBannerTxt = gBannerTxt + "   [EVENTO: " + etag + "]";
+      Banner();
+      Print("ALERTA >>> ", msg, (etag == "NONE" ? "" : "  [" + etag + "]"));
+      if(InpSound) PlaySound("alert.wav");
+      // Alert() es modal en MT5 y bloquea el hilo del experto bajo Wine.
+      // El aviso va por sonido + cartel en el grafico, que no bloquean.
+      if(false) Alert(msg);
+     }
+   else
+      Print("ALERTA silenciada por ventana de evento: ", etag, " | ", msg);
+
    int fh = FileOpen("TRADER-ALERT-001-live.csv",
                      FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
    if(fh != INVALID_HANDLE)
@@ -510,7 +668,8 @@ void Fire(const int dir, const double level)
       FileWrite(fh, TimeToString(gLastT, TIME_DATE | TIME_SECONDS), _Symbol, d,
                 DoubleToString(level, _Digits), DoubleToString(stop, _Digits),
                 DoubleToString(target, _Digits), DoubleToString(EDGE_PIPS, 3),
-                "NO_OPERABLE");
+                "NO_OPERABLE",
+                DoubleToString(spr, 2), etag, (blk ? "SILENCIADO" : "AVISADO"));
       FileClose(fh);
      }
    Draw();
@@ -543,16 +702,30 @@ void CheckTemprano()
    gLastTemp = TimeCurrent();
    gTempranos++;
 
+   // El registro se escribe SIEMPRE, tambien cuando el aviso se silencia:
+   // E-MT5-036 Test A necesita las dos ramas para poder compararlas.
+   bool blk = EventBlocked();
+   if(blk) gEvSuppressed++;
+   string etag = EventTag(TimeCurrent());
+   double spr  = (t.ask - t.bid) / (gPip * _Point);
+
    string d = (dir > 0) ? "SUBIENDO  ->  COMPRA / BUY" : "BAJANDO  ->  VENTA / SELL";
-   gBannerDir   = dir;
-   gBannerTxt   = StringFormat("%s   %+.1f pips en la vela", d, gIntraPips);
-   gBannerUntil = TimeCurrent() + InpBannerSec;
+   if(!blk)
+     {
+      gBannerDir   = dir;
+      gBannerTxt   = StringFormat("%s   %+.1f pips en la vela", d, gIntraPips);
+      if(etag != "NONE" && etag != "OFF" && etag != "NOCAL")
+         gBannerTxt = gBannerTxt + "   [EVENTO: " + etag + "]";
+      gBannerUntil = TimeCurrent() + InpBannerSec;
+      Print("AVISO TEMPRANO >>> ", gBannerTxt, "  precio ",
+            DoubleToString(t.bid, _Digits), "  [observacion en curso]");
+      if(InpSound) PlaySound("tick.wav");
+     }
+   else
+      Print("AVISO TEMPRANO silenciado por ventana de evento: ", etag);
+
    gLast = StringFormat("%s %s %+.1f p", TimeToString(TimeCurrent(), TIME_MINUTES),
                         (dir > 0 ? "TEMPRANO+" : "TEMPRANO-"), gIntraPips);
-
-   Print("AVISO TEMPRANO >>> ", gBannerTxt, "  precio ",
-         DoubleToString(t.bid, _Digits), "  [observacion en curso]");
-   if(InpSound) PlaySound("tick.wav");
 
    int fh2 = FileOpen("TRADER-TEMPRANO.csv",
                       FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
@@ -561,7 +734,8 @@ void CheckTemprano()
       FileSeek(fh2, 0, SEEK_END);
       FileWrite(fh2, TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS), _Symbol,
                 (dir > 0 ? "SUBE" : "BAJA"), DoubleToString(gIntraPips, 1),
-                DoubleToString(t.bid, _Digits), "TEMPRANO");
+                DoubleToString(t.bid, _Digits), "TEMPRANO",
+                DoubleToString(spr, 2), etag, (blk ? "SILENCIADO" : "AVISADO"));
       FileClose(fh2);
      }
    Draw();
@@ -583,17 +757,28 @@ void CheckImpulso()
    gImpulsos++;
 
    MqlTick t; SymbolInfoTick(_Symbol, t);
+   bool blk = EventBlocked();
+   if(blk) gEvSuppressed++;
+   string etag = EventTag(TimeCurrent());
+   double spr  = (t.ask - t.bid) / (gPip * _Point);
+
    string d = (dir > 0) ? "SUBE FUERTE  ->  BUY" : "BAJA FUERTE  ->  SELL";
-   gBannerDir   = dir;
-   gBannerTxt   = StringFormat("%s   %+.1f pips en %d min", d, mv, InpImpMin);
-   gBannerUntil = TimeCurrent() + InpBannerSec;
+   if(!blk)
+     {
+      gBannerDir   = dir;
+      gBannerTxt   = StringFormat("%s   %+.1f pips en %d min", d, mv, InpImpMin);
+      if(etag != "NONE" && etag != "OFF" && etag != "NOCAL")
+         gBannerTxt = gBannerTxt + "   [EVENTO: " + etag + "]";
+      gBannerUntil = TimeCurrent() + InpBannerSec;
+      Print("IMPULSO >>> ", gBannerTxt, "  precio ", DoubleToString(t.bid, _Digits),
+            "  [observacion, no prediccion]");
+      if(InpSound) PlaySound("news.wav");
+     }
+   else
+      Print("IMPULSO silenciado por ventana de evento: ", etag);
 
    gLast = StringFormat("%s %s %+.1f p", TimeToString(TimeCurrent(), TIME_MINUTES),
                         (dir > 0 ? "IMPULSO+" : "IMPULSO-"), mv);
-
-   Print("IMPULSO >>> ", gBannerTxt, "  precio ", DoubleToString(t.bid, _Digits),
-         "  [observacion, no prediccion]");
-   if(InpSound) PlaySound("news.wav");
 
    int fh = FileOpen("TRADER-IMPULSO.csv",
                      FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
@@ -602,7 +787,8 @@ void CheckImpulso()
       FileSeek(fh, 0, SEEK_END);
       FileWrite(fh, TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS), _Symbol,
                 (dir > 0 ? "SUBE" : "BAJA"), DoubleToString(mv, 1),
-                (string)InpImpMin, DoubleToString(t.bid, _Digits), "OBSERVACION");
+                (string)InpImpMin, DoubleToString(t.bid, _Digits), "OBSERVACION",
+                DoubleToString(spr, 2), etag, (blk ? "SILENCIADO" : "AVISADO"));
       FileClose(fh);
      }
    Draw();
