@@ -420,6 +420,57 @@ void EventRefresh()
          gNEv = k + 1;
         }
      }
+   CalendarDump();
+  }
+
+//| Los valores del calendario vienen multiplicados por 1e6, y LONG_MIN
+//| significa "no hay valor". Sin esa distincion un dato ausente se leeria
+//| como cero, que es un numero perfectamente creible y completamente falso.
+bool   CalHas(const long v) { return(v != LONG_MIN); }
+string CalTxt(const long v)
+  {
+   if(v == LONG_MIN) return("");           // vacio, NUNCA cero
+   return(DoubleToString((double)v / 1000000.0, 3));
+  }
+
+//| Vuelca el calendario a CSV para que el reporte fundamental lo lea de una
+//| fuente verificable. Existe porque las paginas de calendario consultadas por
+//| web devolvieron valores "actual" para eventos que todavia no ocurrieron.
+//| Aqui el actual esta vacio hasta que el terminal lo recibe del proveedor.
+void CalendarDump()
+  {
+   int fh = FileOpen("TRADER-CALENDAR.csv",
+                     FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON
+                     | FILE_SHARE_READ | FILE_SHARE_WRITE, ',');
+   if(fh == INVALID_HANDLE) return;
+   FileWrite(fh, "event_time_server", "currency", "importance", "event",
+             "actual", "forecast", "previous", "has_actual", "dumped_at");
+
+   datetime from = TimeCurrent() - 48 * 3600;
+   datetime to   = TimeCurrent() + 96 * 3600;
+   string cur[2]; cur[0] = "USD"; cur[1] = "EUR";
+   string now = TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS);
+
+   for(int c = 0; c < 2; c++)
+     {
+      MqlCalendarValue v[];
+      int n = CalendarValueHistory(v, from, to, NULL, cur[c]);
+      for(int i = 0; i < n; i++)
+        {
+         MqlCalendarEvent ev;
+         if(!CalendarEventById(v[i].event_id, ev)) continue;
+         if(ev.importance == CALENDAR_IMPORTANCE_NONE) continue;
+         if(ev.importance == CALENDAR_IMPORTANCE_LOW)  continue;
+         string nm = ev.name; StringReplace(nm, ",", " ");
+         string imp = (ev.importance == CALENDAR_IMPORTANCE_HIGH) ? "HIGH" : "MODERATE";
+         FileWrite(fh, TimeToString(v[i].time, TIME_DATE | TIME_MINUTES),
+                   cur[c], imp, nm,
+                   CalTxt(v[i].actual_value), CalTxt(v[i].forecast_value),
+                   CalTxt(v[i].prev_value),
+                   (CalHas(v[i].actual_value) ? "YES" : "NO"), now);
+        }
+     }
+   FileClose(fh);
   }
 
 //| "" si t no cae en ventana de evento; si cae, el rotulo del evento
