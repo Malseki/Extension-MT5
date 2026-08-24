@@ -1,1 +1,2 @@
 date,session,bias,score_raw,score,conviction,environment,event_risk,random_control_bias,eurusd_open_ny,eurusd_close_ny,daily_direction,match,engines_off,notes
+2026-08-24,ENDOFDAY,NEUTRAL,+1.35,+1,LOW,UNFAVORABLE,HIGH,SHORT,,1.16655,DOWN,,M1;M3;M4,"primer registro real. M4 dormido (sin percentil 3a). M3 sin actuals: calendario del terminal reporta 0 eventos con has_actual=YES en la ventana. DXY 5d aproximado desde variacion mensual. Event risk HIGH por New Home Sales y CB Consumer Confidence manana"
