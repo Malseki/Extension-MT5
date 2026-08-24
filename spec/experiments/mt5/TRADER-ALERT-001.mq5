@@ -49,6 +49,8 @@ input bool   InpEventBlock   = false; // true = ademas silencia los avisos en ve
 #define COST_REAL  0.838    // costo REAL en el instante de la senal (E-MT5-032)
 #define COST_AVG   0.427    // spread promedio, el que enganaba antes
 
+#define TA1_LOCK "TA1_OWNER_CHART"   // candado de instancia unica, ver OnInit
+
 #define W_BASE 232
 #define H_BASE 380
 #define W_MIN  190
@@ -156,6 +158,27 @@ int OnInit()
    gGrid  = InpGridPips * gPip * _Point;
    gU     = (InpDemoMode ? 1 : InpUPips) * gPip * _Point;
    gStopD = InpStopPips * gPip * _Point;
+   // CANDADO DE INSTANCIA UNICA.
+   // MT5 restaura los graficos guardados del perfil Y ADEMAS live.ini crea el
+   // suyo, asi que arrancaban DOS instancias del EA sobre EURUSD M5. Las dos
+   // escribian los mismos CSV: contadores mezclados, barras duplicadas y el
+   // heartbeat congelado cuando una bloqueaba el archivo de la otra.
+   // La global del terminal guarda el ChartID dueño y se refresca cada segundo
+   // desde OnTimer; si su marca de tiempo tiene menos de 10 s, hay alguien vivo.
+   long myChart = ChartID();
+   if(GlobalVariableCheck(TA1_LOCK))
+     {
+      long     owner = (long)GlobalVariableGet(TA1_LOCK);
+      datetime beat  = GlobalVariableTime(TA1_LOCK);
+      if(owner != myChart && (TimeLocal() - beat) < 10)
+        {
+         Print("TRADER-ALERT-001: ya hay una instancia viva en el grafico ", owner,
+               ". Esta se desactiva para no corromper los CSV del experimento.");
+         return(INIT_FAILED);
+        }
+     }
+   GlobalVariableSet(TA1_LOCK, (double)myChart);
+
    LoadGeom();
    // La ultima barra cerrada ya fue registrada antes de este arranque. Sin esto
    // cada reinicio la vuelve a escribir y el CSV queda con duplicados, que
@@ -176,7 +199,11 @@ void OnDeinit(const int reason)
    ObjectsDeleteAll(0, gPfx);
   }
 
-void OnTimer() { EventRefresh(); Pulse(); Draw(); Banner(); LogBar(); Heartbeat(); }
+void OnTimer()
+  {
+   GlobalVariableSet(TA1_LOCK, (double)ChartID());   // refresca el candado
+   EventRefresh(); Pulse(); Draw(); Banner(); LogBar(); Heartbeat();
+  }
 // Pulse() carries the detection. It runs from OnTick() when the terminal
 // delivers tick events, and from OnTimer() when it does not: under Wine a
 // chart that never renders gets no OnTick at all, and the detector sat blind
