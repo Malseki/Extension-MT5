@@ -71,6 +71,15 @@ int      gNEv = 0;
 datetime gEvRefreshed = 0;
 bool     gEvOk = false;         // false = el calendario no respondio; se degrada a "sin datos"
 int      gEvSuppressed = 0;     // avisos silenciados por ventana de evento
+
+// El candado de instancia unica vive en TA1_LOCK (ver #define arriba y OnInit).
+// Evidencia de que hacia falta, medida sobre los CSV el 2026-08-25:
+//   resultados      42 de 110 filas duplicadas
+//   avisos tempranos 36 de 75
+// El aviso temprano tiene 180 s de enfriamiento, asi que una sola instancia no
+// puede emitirlo dos veces en el mismo segundo: habia dos escribiendo el mismo
+// archivo Common. Un dato repetido NO es una observacion nueva — inflaba n y
+// con el la significancia aparente (z -1,55 contra -0,94 real).
 string gLast = "sin senales todavia";
 datetime gLastT = 0;
 datetime gBannerUntil = 0;
