@@ -1,8 +1,9 @@
 # SPEC-FUND-002 — FUENTES VERIFICADAS PARA EL MOTOR FUNDAMENTAL
 
-    STATUS   OPERATIVO. Cada fuente de esta lista fue CONSULTADA y su salida
-             inspeccionada el 2026-08-24. No hay ninguna supuesta.
-    DATE     2026-08-24 22:40Z
+    STATUS   OPERATIVO. Cada fuente marcada OK fue CONSULTADA y su salida
+             inspeccionada. La afirmacion original — "no hay ninguna supuesta" —
+             era falsa para dos fuentes del ECB: ver la correccion en §7.
+    DATE     2026-08-24 22:40Z  ·  corregido 2026-08-25 14:20Z
     DEPENDE  SPEC-FUND-001 (reglas congeladas). Este documento no modifica
              ningun peso ni umbral: solo fija de donde sale cada dato.
 
@@ -73,7 +74,8 @@ terminal y el campo se llena solo cuando el dato existe.
 | dato | fuente | estado |
 |---|---|---|
 | Probabilidades Fed por reunion | `investing.com/central-banks/fed-rate-monitor` | **OK** — devuelve la distribucion por rango objetivo y reunion |
-| Expectativas ECB | `euroyields.com/en/ecb-watch` · `rateprobability.com/ecb` | **OK** — subas descontadas y fecha implicada |
+| Expectativas ECB | `euroyields.com/en/ecb-watch` | **OK** — verificada 2026-08-25: 94% de hold en sep-2026, 2 subas hasta jul-2027 (2,25% -> 2,75%) |
+| Expectativas ECB (alternativa) | `rateprobability.com/ecb` | **NO VERIFICADA** — ver §7 |
 | US 2 años | `tradingeconomics.com/united-states/2-year-note-yield` | **OK** — nivel, variacion diaria y mensual |
 | Alemania 2 años | `tradingeconomics.com/germany/2-year-note-yield` | **OK** |
 | DXY | `tradingeconomics.com/united-states/currency` | **OK** — nivel, diaria, mensual |
@@ -142,3 +144,43 @@ inflacion de M1 se puntua con servicios como proxy **declarado**, o va a 0.
 honesto: significa que ese dia no habia evidencia suficiente. El sistema ya
 tiene una salida prevista para eso — NEUTRAL, y la decision queda en el price
 action.
+
+---
+
+## 7. CORRECCION 2026-08-25 — dos fuentes se listaron sin haberlas consultado
+
+[OBSERVED] El encabezado de este documento afirmaba que **toda** fuente listada
+habia sido consultada y su salida inspeccionada. Era falso para dos:
+`euroyields.com/en/ecb-watch` y `rateprobability.com/ecb` entraron a la tabla a
+partir de **resultados de busqueda**, sin haber sido descargadas nunca.
+
+- `euroyields.com/en/ecb-watch` — consultada el 2026-08-25 y **funciona**.
+- `rateprobability.com/ecb` — sigue **sin verificar**. No usarla hasta probarla.
+
+[DERIVED] El error es de la misma familia que el documento denuncia en §1: dar
+por bueno un dato que nadie miro. Que apareciera en un documento cuyo proposito
+es exactamente evitar eso muestra lo facil que es cometerlo.
+
+## 8. Las tareas programadas se cuelgan con dominios fuera de la lista
+
+[OBSERVED] 2026-08-24/25, tres corridas desatendidas quedaron colgadas —una de
+ellas 12 horas— al pedir permiso para una herramienta. Una tarea programada no
+tiene a nadie que apruebe: **no falla, espera para siempre.**
+
+Progresion medida al ir abriendo permisos:
+
+| corrida | mensajes alcanzados | donde freno |
+|---|---|---|
+| sin allowlist | 27 | primer Bash |
+| con allowlist acotada | 80 | WebFetch a un dominio no listado |
+
+[DERIVED] Ampliar la lista ayuda pero nunca sera exhaustiva. La defensa real es
+el **limite duro de dominios** agregado al prompt de las dos tareas: consultar
+solo las URLs enumeradas y, ante un dato ausente, poner el motor en CERO y
+declararlo. Un motor apagado es un resultado; una tarea colgada no.
+
+Permisos concedidos en `~/.claude/settings.json`: lectura de los CSV del
+detector y del repo, escritura solo sobre `fundamental-log.csv`,
+`cot-eur-weekly.csv` y `/tmp/sis-commit-msg.txt`, `WebSearch`, y `WebFetch`
+restringido a los dominios de §3 y §13 de SPEC-FUND-001. Ningun comando
+destructivo.
