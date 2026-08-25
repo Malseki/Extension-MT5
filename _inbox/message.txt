@@ -1,0 +1,344 @@
+//@version=6
+indicator("HTF Market Structure Trend", overlay=true, max_labels_count=500)
+
+// ==========================================================================
+// INPUTS
+// ==========================================================================
+grpStruct = "Estructura"
+atrPeriod         = input.int(14, "ATR Period", minval=1, group=grpStruct)
+minDisplacement   = input.float(1.0, "Minimum Displacement (x ATR)", minval=0.1, step=0.1, group=grpStruct)
+maxCandles        = input.int(8, "Maximum Candles", minval=1, group=grpStruct)
+bosConfirmCandles = input.int(1, "BOS Confirmation Candles", options=[1, 2], group=grpStruct)
+
+grpEma   = "EMA"
+emaPeriod = input.int(50, "EMA Period", minval=1, group=grpEma)
+showEma   = input.bool(true, "Show EMA lines", group=grpEma)
+
+grpVis = "Visual"
+showStructure = input.bool(true, "Show Structure", group=grpVis)
+
+// ==========================================================================
+// MOTOR DE ESTRUCTURA (una instancia independiente por cada request.security)
+// ==========================================================================
+f_htfStructure(atrLen, minDispATR, maxBars, bosConfirmN, emaLen) =>
+    atrVal = ta.atr(atrLen)
+    emaVal = ta.ema(close, emaLen)
+    emaBullCtx = close > emaVal and emaVal > emaVal[1]
+    emaBearCtx = close < emaVal and emaVal < emaVal[1]
+
+    // ---- Leg tracking secuencial ----
+    var int   legDir         = 0     // 1 = leg alcista (running high), -1 = leg bajista (running low)
+    var float legExtreme     = na
+    var float legAnchor      = na
+    var int   legExtremeTime = na
+
+    // ---- Candidatos ----
+    var float candHigh          = na
+    var int   candHighTime      = na
+    var float postCandHighLow   = na
+    var bool  candHighDispOK    = false
+    var bool  candHighExpired   = false
+    var int   barsSinceCandHigh = 0
+
+    var float candLow          = na
+    var int   candLowTime      = na
+    var float postCandLowHigh  = na
+    var bool  candLowDispOK    = false
+    var bool  candLowExpired   = false
+    var int   barsSinceCandLow = 0
+
+    // ---- Niveles estructurales confirmados ----
+    var float structHigh     = na
+    var float prevStructHigh = na
+    var float structLow      = na
+    var float prevStructLow  = na
+
+    var int aboveHighCount = 0
+    var int belowLowCount  = 0
+
+    // ---- Tendencia ----
+    var int trendCode  = 0   // -1 Bear, 0 Neutral/Initializing, 1 Bull
+    var int transState = 0   // 0 ninguno, 1 = pendiente Bear (venia de Bull), 2 = pendiente Bull (venia de Bear)
+
+    // ---- Salidas de evento de la barra actual (se resetean SIEMPRE, incluso en vela no confirmada) ----
+    var int hEventCode = 0
+    var int hEventTime = na
+    var int lEventCode = 0
+    var int lEventTime = na
+    var int bosCode    = 0
+    var int chochCode  = 0
+    hEventCode := 0
+    hEventTime := na
+    lEventCode := 0
+    lEventTime := na
+    bosCode    := 0
+    chochCode  := 0
+
+    if barstate.isconfirmed
+        // ================= 1) LEG TRACKING =================
+        if legDir == 0
+            if bar_index > 0
+                if close > close[1]
+                    legDir := 1
+                    legExtreme := high
+                    legAnchor  := low
+                    legExtremeTime := time
+                else
+                    legDir := -1
+                    legExtreme := low
+                    legAnchor  := high
+                    legExtremeTime := time
+        else if legDir == 1
+            if high >= legExtreme
+                legExtreme := high
+                legAnchor  := low
+                legExtremeTime := time
+            else if low < legAnchor
+                candHigh := legExtreme
+                candHighTime := legExtremeTime
+                postCandHighLow := low
+                candHighDispOK := false
+                candHighExpired := false
+                barsSinceCandHigh := 0
+                legDir := -1
+                legExtreme := low
+                legAnchor  := high
+                legExtremeTime := time
+        else
+            if low <= legExtreme
+                legExtreme := low
+                legAnchor  := high
+                legExtremeTime := time
+            else if high > legAnchor
+                candLow := legExtreme
+                candLowTime := legExtremeTime
+                postCandLowHigh := high
+                candLowDispOK := false
+                candLowExpired := false
+                barsSinceCandLow := 0
+                legDir := 1
+                legExtreme := high
+                legAnchor  := low
+                legExtremeTime := time
+
+        // ================= 2) DESPLAZAMIENTO (condicion independiente de la ruptura) =================
+        if not na(candHigh) and not candHighExpired and not candHighDispOK
+            postCandHighLow := math.min(postCandHighLow, low)
+            barsSinceCandHigh += 1
+            if (candHigh - postCandHighLow) >= minDispATR * atrVal
+                candHighDispOK := true
+            else if barsSinceCandHigh > maxBars
+                candHighExpired := true
+
+        if not na(candLow) and not candLowExpired and not candLowDispOK
+            postCandLowHigh := math.max(postCandLowHigh, high)
+            barsSinceCandLow += 1
+            if (postCandLowHigh - candLow) >= minDispATR * atrVal
+                candLowDispOK := true
+            else if barsSinceCandLow > maxBars
+                candLowExpired := true
+
+        // ================= 3) BOOTSTRAP (primer High/Low sin ruptura previa) =================
+        if na(structHigh) and candHighDispOK and not na(candHigh)
+            structHigh := candHigh
+            hEventCode := 3
+            hEventTime := candHighTime
+            candHigh := na
+            aboveHighCount := 0
+
+        if na(structLow) and candLowDispOK and not na(candLow)
+            structLow := candLow
+            lEventCode := 3
+            lEventTime := candLowTime
+            candLow := na
+            belowLowCount := 0
+
+        // ================= 4) CONTEO DE CIERRES PARA RUPTURA =================
+        aboveHighCount := not na(structHigh) and close > structHigh ? aboveHighCount + 1 : 0
+        belowLowCount  := not na(structLow)  and close < structLow  ? belowLowCount + 1  : 0
+
+        bullishBreak = not na(structHigh) and aboveHighCount == bosConfirmN
+        bearishBreak = not na(structLow)  and belowLowCount  == bosConfirmN
+
+        // ================= 5) RUPTURA ALCISTA =================
+        if bullishBreak
+            if not na(candLow) and candLowDispOK and not candLowExpired and not na(structLow)
+                prevLow = structLow
+                lEventCode := candLow > prevLow ? 1 : 2   // 1 = HL, 2 = LL
+                lEventTime := candLowTime
+                prevStructLow := prevLow
+                structLow := candLow
+                candLow := na
+                belowLowCount := 0
+
+            if trendCode == 1
+                if transState == 1
+                    if lEventCode == 2
+                        trendCode := -1
+                        transState := 0
+                        bosCode := 2
+                    else
+                        transState := 0
+                        bosCode := 1
+                else
+                    bosCode := 1
+            else if trendCode == -1
+                if transState == 0
+                    chochCode := 1
+                    transState := 2
+                else if transState == 2
+                    if lEventCode == 1
+                        trendCode := 1
+                        transState := 0
+                        bosCode := 1
+                    else
+                        transState := 0
+                        bosCode := 2
+            else
+                trendCode := 1
+                bosCode := 1
+
+        // ================= 6) RUPTURA BAJISTA =================
+        if bearishBreak
+            if not na(candHigh) and candHighDispOK and not candHighExpired and not na(structHigh)
+                prevHigh = structHigh
+                hEventCode := candHigh > prevHigh ? 1 : 2   // 1 = HH, 2 = LH
+                hEventTime := candHighTime
+                prevStructHigh := prevHigh
+                structHigh := candHigh
+                candHigh := na
+                aboveHighCount := 0
+
+            if trendCode == -1
+                if transState == 2
+                    if hEventCode == 1
+                        trendCode := 1
+                        transState := 0
+                        bosCode := 1
+                    else
+                        transState := 0
+                        bosCode := 2
+                else
+                    bosCode := 2
+            else if trendCode == 1
+                if transState == 0
+                    chochCode := 2
+                    transState := 1
+                else if transState == 1
+                    if hEventCode == 2
+                        trendCode := -1
+                        transState := 0
+                        bosCode := 2
+                    else
+                        transState := 0
+                        bosCode := 1
+            else
+                trendCode := -1
+                bosCode := 2
+
+    [trendCode, emaVal, emaBullCtx, emaBearCtx, structHigh, structLow, hEventCode, hEventTime, lEventCode, lEventTime, bosCode, chochCode, time]
+
+// ==========================================================================
+// LLAMADAS MULTI-TIMEFRAME (estados totalmente independientes)
+// ==========================================================================
+[trendW, emaW, emaBullW, emaBearW, sHighW, sLowW, hEvW, hTW, lEvW, lTW, bosW, chochW, tW] =
+     request.security(syminfo.tickerid, "W", f_htfStructure(atrPeriod, minDisplacement, maxCandles, bosConfirmCandles, emaPeriod), lookahead=barmerge.lookahead_off)
+
+[trendD, emaD, emaBullD, emaBearD, sHighD, sLowD, hEvD, hTD, lEvD, lTD, bosD, chochD, tD] =
+     request.security(syminfo.tickerid, "D", f_htfStructure(atrPeriod, minDisplacement, maxCandles, bosConfirmCandles, emaPeriod), lookahead=barmerge.lookahead_off)
+
+[trend4H, ema4H, emaBull4H, emaBear4H, sHigh4H, sLow4H, hEv4H, hT4H, lEv4H, lT4H, bos4H, choch4H, t4H] =
+     request.security(syminfo.tickerid, "240", f_htfStructure(atrPeriod, minDisplacement, maxCandles, bosConfirmCandles, emaPeriod), lookahead=barmerge.lookahead_off)
+
+[trend1H, ema1H, emaBull1H, emaBear1H, sHigh1H, sLow1H, hEv1H, hT1H, lEv1H, lT1H, bos1H, choch1H, t1H] =
+     request.security(syminfo.tickerid, "60", f_htfStructure(atrPeriod, minDisplacement, maxCandles, bosConfirmCandles, emaPeriod), lookahead=barmerge.lookahead_off)
+
+// ==========================================================================
+// EMA (solo contexto visual)
+// ==========================================================================
+plot(showEma ? emaW  : na, title="EMA 1W",  color=color.new(color.blue, 60),    linewidth=1)
+plot(showEma ? emaD  : na, title="EMA 1D",  color=color.new(color.aqua, 50),    linewidth=1)
+plot(showEma ? ema4H : na, title="EMA 4H",  color=color.new(color.fuchsia, 40), linewidth=1)
+plot(showEma ? ema1H : na, title="EMA 1H",  color=color.new(color.yellow, 30),  linewidth=1)
+
+// ==========================================================================
+// VISUALIZACION DE ESTRUCTURA
+// ==========================================================================
+f_plotHigh(tfTag, code, x, y) =>
+    if code == 1
+        label.new(x, y, tfTag + " HH", xloc=xloc.bar_time, style=label.style_label_down, color=color.new(color.green, 0), textcolor=color.white, size=size.tiny)
+    else if code == 2
+        label.new(x, y, tfTag + " LH", xloc=xloc.bar_time, style=label.style_label_down, color=color.new(color.orange, 0), textcolor=color.white, size=size.tiny)
+    else if code == 3
+        label.new(x, y, tfTag + " High", xloc=xloc.bar_time, style=label.style_label_down, color=color.new(color.gray, 0), textcolor=color.white, size=size.tiny)
+
+f_plotLow(tfTag, code, x, y) =>
+    if code == 1
+        label.new(x, y, tfTag + " HL", xloc=xloc.bar_time, style=label.style_label_up, color=color.new(color.green, 0), textcolor=color.white, size=size.tiny)
+    else if code == 2
+        label.new(x, y, tfTag + " LL", xloc=xloc.bar_time, style=label.style_label_up, color=color.new(color.red, 0), textcolor=color.white, size=size.tiny)
+    else if code == 3
+        label.new(x, y, tfTag + " Low", xloc=xloc.bar_time, style=label.style_label_up, color=color.new(color.gray, 0), textcolor=color.white, size=size.tiny)
+
+f_plotBosChoch(tfTag, bosC, chochC, sHigh, sLow, x) =>
+    if bosC == 1
+        label.new(x, sHigh, tfTag + " BOS", xloc=xloc.bar_time, style=label.style_label_down, color=color.new(color.blue, 0), textcolor=color.white, size=size.tiny)
+    else if bosC == 2
+        label.new(x, sLow, tfTag + " BOS", xloc=xloc.bar_time, style=label.style_label_up, color=color.new(color.blue, 0), textcolor=color.white, size=size.tiny)
+    if chochC == 1
+        label.new(x, sLow, tfTag + " CHoCH", xloc=xloc.bar_time, style=label.style_label_up, color=color.new(color.purple, 0), textcolor=color.white, size=size.tiny)
+    else if chochC == 2
+        label.new(x, sHigh, tfTag + " CHoCH", xloc=xloc.bar_time, style=label.style_label_down, color=color.new(color.purple, 0), textcolor=color.white, size=size.tiny)
+
+if showStructure
+    if hEvW != 0
+        f_plotHigh("1W", hEvW, hTW, sHighW)
+    if lEvW != 0
+        f_plotLow("1W", lEvW, lTW, sLowW)
+    if bosW != 0 or chochW != 0
+        f_plotBosChoch("1W", bosW, chochW, sHighW, sLowW, tW)
+
+    if hEvD != 0
+        f_plotHigh("1D", hEvD, hTD, sHighD)
+    if lEvD != 0
+        f_plotLow("1D", lEvD, lTD, sLowD)
+    if bosD != 0 or chochD != 0
+        f_plotBosChoch("1D", bosD, chochD, sHighD, sLowD, tD)
+
+    if hEv4H != 0
+        f_plotHigh("4H", hEv4H, hT4H, sHigh4H)
+    if lEv4H != 0
+        f_plotLow("4H", lEv4H, lT4H, sLow4H)
+    if bos4H != 0 or choch4H != 0
+        f_plotBosChoch("4H", bos4H, choch4H, sHigh4H, sLow4H, t4H)
+
+    if hEv1H != 0
+        f_plotHigh("1H", hEv1H, hT1H, sHigh1H)
+    if lEv1H != 0
+        f_plotLow("1H", lEv1H, lT1H, sLow1H)
+    if bos1H != 0 or choch1H != 0
+        f_plotBosChoch("1H", bos1H, choch1H, sHigh1H, sLow1H, t1H)
+
+// ==========================================================================
+// PANEL "HTF TREND" (esquina superior derecha)
+// ==========================================================================
+f_trendText(code) => code == 1 ? "Bull" : code == -1 ? "Bear" : "--"
+f_trendColor(code) => code == 1 ? color.new(color.green, 0) : code == -1 ? color.new(color.red, 0) : color.new(color.gray, 40)
+
+var table htfTable = table.new(position.top_right, 2, 5, border_width=1, border_color=color.new(color.gray, 0), frame_color=color.new(color.gray, 0), frame_width=1)
+
+if barstate.islast
+    table.cell(htfTable, 0, 0, "HTF TREND", text_color=color.white, bgcolor=color.new(color.black, 0), text_size=size.small)
+    table.cell(htfTable, 1, 0, "", text_color=color.white, bgcolor=color.new(color.black, 0), text_size=size.small)
+
+    table.cell(htfTable, 0, 1, "1W", text_color=color.white, bgcolor=color.new(color.black, 20), text_size=size.small)
+    table.cell(htfTable, 1, 1, f_trendText(trendW), text_color=color.white, bgcolor=f_trendColor(trendW), text_size=size.small)
+
+    table.cell(htfTable, 0, 2, "1D", text_color=color.white, bgcolor=color.new(color.black, 20), text_size=size.small)
+    table.cell(htfTable, 1, 2, f_trendText(trendD), text_color=color.white, bgcolor=f_trendColor(trendD), text_size=size.small)
+
+    table.cell(htfTable, 0, 3, "4H", text_color=color.white, bgcolor=color.new(color.black, 20), text_size=size.small)
+    table.cell(htfTable, 1, 3, f_trendText(trend4H), text_color=color.white, bgcolor=f_trendColor(trend4H), text_size=size.small)
+
+    table.cell(htfTable, 0, 4, "1H", text_color=color.white, bgcolor=color.new(color.black, 20), text_size=size.small)
+    table.cell(htfTable, 1, 4, f_trendText(trend1H), text_color=color.white, bgcolor=f_trendColor(trend1H), text_size=size.small)

@@ -51,6 +51,7 @@ input bool   InpEventBlock   = false; // true = ademas silencia los avisos en ve
 
 #define TA1_LOCK "TA1_OWNER_CHART"   // candado de instancia unica, ver OnInit
 #define TA1_BEAT "TA1_OWNER_BEAT"    // latido del dueño, TimeLocal() como valor
+bool gMirror = false;                // true = instancia espejo: dibuja, NO escribe
 
 #define W_BASE 232
 #define H_BASE 380
@@ -190,14 +191,22 @@ int OnInit()
       long     age   = (long)TimeLocal() - (long)beat;
       if(owner != myChart && age >= 0 && age < 10)
         {
-         Print("TRADER-ALERT-001: ya hay una instancia viva en el grafico ", owner,
-               " (latido hace ", age, " s). Esta se desactiva para no corromper ",
-               "los CSV del experimento.");
-         return(INIT_FAILED);
+         // MODO ESPEJO. Antes esto era INIT_FAILED, lo que impedia mirar el
+         // detector en dos temporalidades a la vez. Ahora la instancia
+         // secundaria vive: dibuja el panel y las flechas, pero NO escribe ni
+         // un byte. Asi se pueden tener M5 y H1 en paralelo sin que la muestra
+         // de E-MT5-036 se duplique, que es lo unico que el candado protege.
+         gMirror = true;
+         Print("TRADER-ALERT-001: ya hay una instancia escribiendo (grafico ", owner,
+               ", latido hace ", age, " s). Esta arranca en MODO ESPEJO: ",
+               "muestra el panel y NO registra nada.");
         }
      }
-   GlobalVariableSet(TA1_LOCK, (double)myChart);
-   GlobalVariableSet(TA1_BEAT, (double)TimeLocal());
+   if(!gMirror)
+     {
+      GlobalVariableSet(TA1_LOCK, (double)myChart);
+      GlobalVariableSet(TA1_BEAT, (double)TimeLocal());
+     }
 
    LoadGeom();
    // La ultima barra cerrada ya fue registrada antes de este arranque. Sin esto
@@ -296,10 +305,15 @@ void Draw()
 
    int x = gX + SP(12), y = gY + SP(14);
 
-   Txt("h1", x, y, "PROJECT TRADER", clrWhite, FS(9), "Arial");   y += SP(15);
-   Txt("h2", x, y, (InpDemoMode ? "MODO DEMO — armado 1 pip"
-                                : "detector + alerta  ·  nunca opera solo"),
-       (InpDemoMode ? C'250,200,80' : C'130,140,160'), FS(7), "Arial");  y += SP(12);
+   Txt("h1", x, y, (gMirror ? "PROJECT TRADER  [ESPEJO]" : "PROJECT TRADER"),
+       (gMirror ? C'120,200,255' : clrWhite), FS(9), "Arial");   y += SP(15);
+   // El rotulo importa: en dos graficos a la vez hay que poder ver de un
+   // vistazo cual es la instancia que esta registrando la muestra.
+   Txt("h2", x, y, (gMirror ? "solo vista  ·  NO registra"
+                            : (InpDemoMode ? "MODO DEMO — armado 1 pip"
+                                           : "detector + alerta  ·  nunca opera solo")),
+       (gMirror ? C'120,200,255' : (InpDemoMode ? C'250,200,80' : C'130,140,160')),
+       FS(7), "Arial");  y += SP(12);
 
    Txt("p1", x, y, _Symbol + "  " + EnumToString(_Period), C'150,160,180', FS(8), "Arial"); y += SP(12);
    Txt("p2", x, y, DoubleToString(t.bid, _Digits), clrWhite, FS(11), "Arial");           y += SP(16);
@@ -489,6 +503,7 @@ string CalTxt(const long v)
 //| Aqui el actual esta vacio hasta que el terminal lo recibe del proveedor.
 void CalendarDump()
   {
+   if(gMirror) return;                 // espejo: no escribe
    int fh = FileOpen("TRADER-CALENDAR.csv",
                      FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON
                      | FILE_SHARE_READ | FILE_SHARE_WRITE, ',');
@@ -590,6 +605,7 @@ void Track()
       if(!hit && !miss) continue;
       gPend[i].open = false;
       if(hit) gHit++; else gMiss++;
+      if(gMirror) continue;            // espejo: cuenta para el panel, no registra
       int fr = FileOpen("TRADER-ALERT-001-results.csv",
                         FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON
                         | FILE_SHARE_READ | FILE_SHARE_WRITE, ',');
@@ -611,6 +627,7 @@ void Track()
 //+------------------------------------------------------------------+
 void LogBar()
   {
+   if(gMirror) return;                 // espejo: no escribe
    datetime bt = iTime(_Symbol, PERIOD_M5, 1);
    if(bt == 0 || bt == gLastBar) return;
    gLastBar = bt;
@@ -665,6 +682,7 @@ string EventStatusTxt()
 //+------------------------------------------------------------------+
 void Heartbeat()
   {
+   if(gMirror) return;                 // espejo: no pisa el state de la primaria
    MqlTick t; if(!SymbolInfoTick(_Symbol, t)) return;
    double lvlDn = MathFloor(t.bid / gGrid) * gGrid;
    double lvlUp = lvlDn + gGrid;
@@ -761,7 +779,8 @@ void Fire(const int dir, const double level)
    else
       Print("ALERTA silenciada por ventana de evento: ", etag, " | ", msg);
 
-   int fh = FileOpen("TRADER-ALERT-001-live.csv",
+   int fh = gMirror ? INVALID_HANDLE       // espejo: avisa en pantalla, no registra
+                    : FileOpen("TRADER-ALERT-001-live.csv",
                      FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
    if(fh != INVALID_HANDLE)
      {
@@ -828,7 +847,8 @@ void CheckTemprano()
    gLast = StringFormat("%s %s %+.1f p", TimeToString(TimeCurrent(), TIME_MINUTES),
                         (dir > 0 ? "TEMPRANO+" : "TEMPRANO-"), gIntraPips);
 
-   int fh2 = FileOpen("TRADER-TEMPRANO.csv",
+   int fh2 = gMirror ? INVALID_HANDLE      // espejo: avisa en pantalla, no registra
+                     : FileOpen("TRADER-TEMPRANO.csv",
                       FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
    if(fh2 != INVALID_HANDLE)
      {
@@ -881,7 +901,8 @@ void CheckImpulso()
    gLast = StringFormat("%s %s %+.1f p", TimeToString(TimeCurrent(), TIME_MINUTES),
                         (dir > 0 ? "IMPULSO+" : "IMPULSO-"), mv);
 
-   int fh = FileOpen("TRADER-IMPULSO.csv",
+   int fh = gMirror ? INVALID_HANDLE       // espejo: avisa en pantalla, no registra
+                    : FileOpen("TRADER-IMPULSO.csv",
                      FILE_READ | FILE_WRITE | FILE_CSV | FILE_ANSI | FILE_COMMON, ',');
    if(fh != INVALID_HANDLE)
      {
