@@ -50,6 +50,7 @@ input bool   InpEventBlock   = false; // true = ademas silencia los avisos en ve
 #define COST_AVG   0.427    // spread promedio, el que enganaba antes
 
 #define TA1_LOCK "TA1_OWNER_CHART"   // candado de instancia unica, ver OnInit
+#define TA1_BEAT "TA1_OWNER_BEAT"    // latido del dueño, TimeLocal() como valor
 
 #define W_BASE 232
 #define H_BASE 380
@@ -174,19 +175,29 @@ int OnInit()
    // heartbeat congelado cuando una bloqueaba el archivo de la otra.
    // La global del terminal guarda el ChartID dueño y se refresca cada segundo
    // desde OnTimer; si su marca de tiempo tiene menos de 10 s, hay alguien vivo.
+   // El latido va como VALOR en su propia global, NO por GlobalVariableTime().
+   // Esa funcion resulto poco fiable aqui: el 2026-08-25 rechazo una segunda
+   // instancia a las 09:00 y despues dejo entrar a seis (D1, W1, M15, M30, H4,
+   // M5) sin una sola linea de rechazo. Si devuelve 0 o usa otra base horaria
+   // que TimeLocal(), la resta da un numero enorme, la condicion nunca se
+   // cumple y el candado deja pasar a todos EN SILENCIO. Guardando el latido
+   // como valor, los dos lados de la comparacion usan la misma base.
    long myChart = ChartID();
-   if(GlobalVariableCheck(TA1_LOCK))
+   if(GlobalVariableCheck(TA1_LOCK) && GlobalVariableCheck(TA1_BEAT))
      {
       long     owner = (long)GlobalVariableGet(TA1_LOCK);
-      datetime beat  = GlobalVariableTime(TA1_LOCK);
-      if(owner != myChart && (TimeLocal() - beat) < 10)
+      datetime beat  = (datetime)GlobalVariableGet(TA1_BEAT);
+      long     age   = (long)TimeLocal() - (long)beat;
+      if(owner != myChart && age >= 0 && age < 10)
         {
          Print("TRADER-ALERT-001: ya hay una instancia viva en el grafico ", owner,
-               ". Esta se desactiva para no corromper los CSV del experimento.");
+               " (latido hace ", age, " s). Esta se desactiva para no corromper ",
+               "los CSV del experimento.");
          return(INIT_FAILED);
         }
      }
    GlobalVariableSet(TA1_LOCK, (double)myChart);
+   GlobalVariableSet(TA1_BEAT, (double)TimeLocal());
 
    LoadGeom();
    // La ultima barra cerrada ya fue registrada antes de este arranque. Sin esto
@@ -210,7 +221,10 @@ void OnDeinit(const int reason)
 
 void OnTimer()
   {
-   GlobalVariableSet(TA1_LOCK, (double)ChartID());   // refresca el candado
+   // Refresca el candado solo si seguimos siendo el dueño. Si otra instancia se
+   // apropio, esta deja de latir y de escribir en vez de pelear por el archivo.
+   if((long)GlobalVariableGet(TA1_LOCK) == ChartID())
+      GlobalVariableSet(TA1_BEAT, (double)TimeLocal());
    EventRefresh(); Pulse(); Draw(); Banner(); LogBar(); Heartbeat();
   }
 // Pulse() carries the detection. It runs from OnTick() when the terminal
