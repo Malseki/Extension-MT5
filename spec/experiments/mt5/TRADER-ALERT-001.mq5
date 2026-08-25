@@ -225,14 +225,32 @@ void OnDeinit(const int reason)
   {
    EventKillTimer();
    SaveGeom();
-   ObjectsDeleteAll(0, gPfx);
+   // Borrar SOLO cuando el usuario quita el EA a proposito. Antes se borraba
+   // siempre, y OnDeinit corre tambien al recompilar, al cambiar de
+   // temporalidad y al cerrar el terminal: cada reinicio se llevaba todas las
+   // flechas de alerta, que son el registro visual de lo que el detector aviso.
+   // El 2026-08-25 desaparecieron por esto, tras varios reinicios seguidos.
+   // Los objetos del panel no hace falta borrarlos: Draw() los reutiliza.
+   if(reason == REASON_REMOVE)
+      ObjectsDeleteAll(0, gPfx);
   }
 
 void OnTimer()
   {
-   // Refresca el candado solo si seguimos siendo el dueño. Si otra instancia se
-   // apropio, esta deja de latir y de escribir en vez de pelear por el archivo.
-   if((long)GlobalVariableGet(TA1_LOCK) == ChartID())
+   // RESOLUCION DE LA CARRERA DE ARRANQUE. Si dos graficos cargan el EA en el
+   // mismo instante — como pasa cuando el perfil restaura M5 y H1 a la vez —
+   // ninguno alcanza a ver el latido del otro y AMBOS se creen primarios. Paso
+   // de verdad el 2026-08-25 a las 18:07:36.401: las dos instancias arrancaron
+   // en el mismo milisegundo y una barra M5 quedo escrita tres veces.
+   // La global es la autoridad: el que no figura como dueño cede aqui, un
+   // segundo despues del arranque.
+   if(!gMirror && (long)GlobalVariableGet(TA1_LOCK) != ChartID())
+     {
+      gMirror = true;
+      Print("TRADER-ALERT-001: otra instancia quedo como dueña del registro. ",
+            "Esta pasa a MODO ESPEJO: muestra el panel y NO registra nada.");
+     }
+   if(!gMirror)
       GlobalVariableSet(TA1_BEAT, (double)TimeLocal());
    EventRefresh(); Pulse(); Draw(); Banner(); LogBar(); Heartbeat();
   }
@@ -726,13 +744,35 @@ void Heartbeat()
 //+------------------------------------------------------------------+
 void Arrow(const int dir, const double price)
   {
-   string n = StringFormat("%sarr%d", gPfx, gArrowSeq++);
+   // Nombre por marca de tiempo, no por contador: gArrowSeq volvia a 0 en cada
+   // carga del EA, asi que tras un reinicio las flechas nuevas pisaban a las
+   // viejas una por una.
+   string n = StringFormat("%sarr_%I64d_%d", gPfx, (long)TimeCurrent(), dir);
+   if(ObjectFind(0, n) >= 0) n = n + "_" + (string)(gArrowSeq++);
    ObjectCreate(0, n, dir > 0 ? OBJ_ARROW_UP : OBJ_ARROW_DOWN, 0, TimeCurrent(), price);
    ObjectSetInteger(0, n, OBJPROP_COLOR, dir > 0 ? clrLime : clrRed);
    ObjectSetInteger(0, n, OBJPROP_WIDTH, 4);
    ObjectSetInteger(0, n, OBJPROP_SELECTABLE, false);
-   if(gArrowSeq > InpMaxArrows)
-      ObjectDelete(0, StringFormat("%sarr%d", gPfx, gArrowSeq - InpMaxArrows - 1));
+
+   // Poda por antiguedad real: se recorren las flechas existentes y se borra la
+   // mas vieja mientras se pase del maximo. El metodo anterior restaba indices,
+   // que dejaba de tener sentido apenas los nombres no eran correlativos.
+   string pfxArr = gPfx + "arr_";
+   int guard = 0;
+   while(guard++ < 50)
+     {
+      int cnt = 0; datetime oldest = 0; string oldestName = "";
+      for(int i = ObjectsTotal(0, 0, -1) - 1; i >= 0; i--)
+        {
+         string on = ObjectName(0, i, 0, -1);
+         if(StringFind(on, pfxArr) != 0) continue;
+         cnt++;
+         datetime ot = (datetime)ObjectGetInteger(0, on, OBJPROP_TIME, 0);
+         if(oldestName == "" || ot < oldest) { oldest = ot; oldestName = on; }
+        }
+      if(cnt <= InpMaxArrows || oldestName == "") break;
+      ObjectDelete(0, oldestName);
+     }
   }
 
 //+------------------------------------------------------------------+
