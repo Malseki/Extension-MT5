@@ -1,0 +1,294 @@
+//@version=6
+indicator("Market Structure BOS/CHoCH - Origen Directo [Scalping]", overlay=true, max_lines_count=500, max_labels_count=500)
+
+// ============================================================
+//  INPUTS (sin cambios respecto a la versión anterior)
+// ============================================================
+grpPivot    = "Pivotes"
+leftBars    = input.int(5, "Left Bars", minval=1, group=grpPivot)
+rightBars   = input.int(5, "Right Bars", minval=1, group=grpPivot)
+
+grpConfirm  = "Confirmación de Ruptura"
+useWick     = input.bool(false, "Confirmar con mecha (High/Low) en vez de cierre", group=grpConfirm,
+     tooltip="Activado: usa high/low de la vela para validar el rompimiento. Desactivado: usa el cierre (close).")
+
+grpStyle    = "Estilo Visual"
+bullColor   = input.color(color.new(#089981, 0), "Color Alcista (BOS/CHoCH)", group=grpStyle)
+bearColor   = input.color(color.new(#f23645, 0), "Color Bajista (BOS/CHoCH)", group=grpStyle)
+structColor = input.color(color.new(color.gray, 35), "Color línea de estructura (BOS pendiente)", group=grpStyle)
+invalColor  = input.color(color.new(color.orange, 20), "Color línea de invalidez (CHoCH pendiente)", group=grpStyle)
+showLiveLines = input.bool(true, "Mostrar líneas activas (estructura/invalidez)", group=grpStyle)
+showLabels  = input.bool(true, "Mostrar etiquetas BOS/CHoCH", group=grpStyle)
+labelSize   = input.string(size.small, "Tamaño de etiquetas", options=[size.tiny, size.small, size.normal], group=grpStyle)
+lineWidthConfirmed = input.int(2, "Grosor línea confirmada", minval=1, maxval=4, group=grpStyle)
+extendBars  = input.int(5, "Extender línea tras la ruptura (barras)", minval=0, maxval=50, group=grpStyle,
+     tooltip="Prolonga la línea de BOS/CHoCH unas barras hacia adelante tras la vela de confirmación, para que se vea como una línea de tendencia trazada sobre el precio.")
+
+grpClean    = "Limpieza (Scalping)"
+maxKeep     = input.int(40, "Máx. líneas/etiquetas históricas a conservar", minval=5, maxval=300, group=grpClean,
+     tooltip="Elimina automáticamente objetos confirmados (BOS/CHoCH) antiguos para no saturar el gráfico en TF bajas.")
+
+// ============================================================
+//  DETECCIÓN DE PIVOTES
+// ============================================================
+float pivotHighVal = ta.pivothigh(high, leftBars, rightBars)
+float pivotLowVal  = ta.pivotlow(low, leftBars, rightBars)
+
+// ============================================================
+//  ESTADO PERSISTENTE
+// ============================================================
+// Últimos pivotes "en bruto" detectados
+var float lastPH    = na
+var int   lastPHBar = na
+var float lastPL    = na
+var int   lastPLBar = na
+
+// Extremo estructural activo -> nivel de BOS (continuación). Sigue igual que antes: solo se actualiza
+// cuando se forma un pivote MÁS extremo que el anterior.
+var float keyHigh       = na
+var int   keyHighBar    = na
+var bool  keyHighBroken = false
+var line  keyHighLine   = na
+
+var float keyLow        = na
+var int   keyLowBar     = na
+var bool  keyLowBroken  = false
+var line  keyLowLine    = na
+
+// --- NUEVA LÓGICA DE CHoCH ---
+// originHigh = el ÚLTIMO Pivot High que generó (precedió) al ÚLTIMO Pivot Low registrado.
+//              Romperlo al alza = CHoCH Alcista.
+// originLow  = el ÚLTIMO Pivot Low que generó (precedió) al ÚLTIMO Pivot High registrado.
+//              Romperlo a la baja = CHoCH Bajista.
+// A diferencia del extremo estructural, estos niveles se recalculan con CADA nuevo pivote del tipo
+// opuesto (no solo cuando se supera un extremo), tal como exige la nueva regla.
+var float originLow        = na
+var int   originLowBar     = na
+var bool  originLowBroken  = false
+var line  originLowLine    = na
+
+var float originHigh       = na
+var int   originHighBar    = na
+var bool  originHighBroken = false
+var line  originHighLine   = na
+
+var int trend = 0   // 0 = indefinido, 1 = alcista, -1 = bajista
+
+var line[]  histLines  = array.new_line()
+var label[] histLabels = array.new_label()
+
+// ============================================================
+//  REGISTRO DE NUEVOS PIVOTES
+// ============================================================
+
+// --- Nuevo Pivot High ---
+if not na(pivotHighVal)
+    float ph    = pivotHighVal
+    int   phBar = bar_index - rightBars
+    lastPH    := ph
+    lastPHBar := phBar
+
+    // Extremo estructural (BOS) -> igual que antes, solo si es un nuevo máximo
+    if na(keyHigh) or ph > keyHigh
+        if not na(keyHighLine) and not keyHighBroken
+            line.delete(keyHighLine)
+        keyHigh       := ph
+        keyHighBar    := phBar
+        keyHighBroken := false
+        keyHighLine   := line.new(keyHighBar, keyHigh, bar_index, keyHigh, color=structColor, width=1, style=line.style_dashed)
+
+    // NUEVO: nivel de CHoCH Bajista = Pivot Low que precedió a ESTE Pivot High (siempre se actualiza)
+    if not na(originLowLine) and not originLowBroken
+        line.delete(originLowLine)
+    originLow       := lastPL
+    originLowBar    := lastPLBar
+    originLowBroken := false
+    originLowLine   := na
+    if not na(originLow)
+        originLowLine := line.new(originLowBar, originLow, bar_index, originLow, color=invalColor, width=1, style=line.style_dashed)
+
+// --- Nuevo Pivot Low ---
+if not na(pivotLowVal)
+    float pl    = pivotLowVal
+    int   plBar = bar_index - rightBars
+    lastPL    := pl
+    lastPLBar := plBar
+
+    // Extremo estructural (BOS) -> igual que antes, solo si es un nuevo mínimo
+    if na(keyLow) or pl < keyLow
+        if not na(keyLowLine) and not keyLowBroken
+            line.delete(keyLowLine)
+        keyLow       := pl
+        keyLowBar    := plBar
+        keyLowBroken := false
+        keyLowLine   := line.new(keyLowBar, keyLow, bar_index, keyLow, color=structColor, width=1, style=line.style_dashed)
+
+    // NUEVO: nivel de CHoCH Alcista = Pivot High que precedió a ESTE Pivot Low (siempre se actualiza)
+    if not na(originHighLine) and not originHighBroken
+        line.delete(originHighLine)
+    originHigh       := lastPH
+    originHighBar    := lastPHBar
+    originHighBroken := false
+    originHighLine   := na
+    if not na(originHigh)
+        originHighLine := line.new(originHighBar, originHigh, bar_index, originHigh, color=invalColor, width=1, style=line.style_dashed)
+
+// ============================================================
+//  EXTENDER LÍNEAS ACTIVAS (hasta que sean rotas)
+// ============================================================
+if showLiveLines
+    if not na(keyHighLine) and not keyHighBroken
+        line.set_x2(keyHighLine, bar_index)
+    if not na(keyLowLine) and not keyLowBroken
+        line.set_x2(keyLowLine, bar_index)
+    // originLow solo es relevante como disparador mientras la tendencia no sea ya bajista
+    if not na(originLowLine) and not originLowBroken and trend != -1
+        line.set_x2(originLowLine, bar_index)
+    // originHigh solo es relevante como disparador mientras la tendencia no sea ya alcista
+    if not na(originHighLine) and not originHighBroken and trend != 1
+        line.set_x2(originHighLine, bar_index)
+
+// ============================================================
+//  FUENTE DE CONFIRMACIÓN
+// ============================================================
+float srcUp   = useWick ? high : close
+float srcDown = useWick ? low  : close
+
+// ============================================================
+//  FUNCIÓN AUXILIAR: ETIQUETAS
+// ============================================================
+placeLabel(string txt, bool isBull, color col) =>
+    float off  = ta.atr(14) * 0.6
+    float yPos = isBull ? high + off : low - off
+    label lbl = label.new(bar_index, yPos, txt,
+         style     = isBull ? label.style_label_down : label.style_label_up,
+         color     = col,
+         textcolor = color.white,
+         size      = labelSize)
+    lbl
+
+// ============================================================
+//  MÁQUINA DE ESTADOS: BOS / CHoCH
+// ============================================================
+bool bullChoch = false
+bool bullBos   = false
+bool bearChoch = false
+bool bearBos   = false
+
+if trend == 0
+    // Sin tendencia confirmada: la primera ruptura de un nivel de origen establece el CHoCH inicial
+    if not originHighBroken and not na(originHigh) and srcUp > originHigh
+        bullChoch := true
+        originHighBroken := true
+        line.set_color(originHighLine, bullColor)
+        line.set_width(originHighLine, lineWidthConfirmed)
+        line.set_style(originHighLine, line.style_solid)
+        line.set_x2(originHighLine, bar_index + extendBars)
+        array.push(histLines, originHighLine)
+        keyHigh       := originHigh
+        keyHighBar    := originHighBar
+        keyHighBroken := true
+        keyHighLine   := originHighLine
+        trend := 1
+    else if not originLowBroken and not na(originLow) and srcDown < originLow
+        bearChoch := true
+        originLowBroken := true
+        line.set_color(originLowLine, bearColor)
+        line.set_width(originLowLine, lineWidthConfirmed)
+        line.set_style(originLowLine, line.style_solid)
+        line.set_x2(originLowLine, bar_index + extendBars)
+        array.push(histLines, originLowLine)
+        keyLow       := originLow
+        keyLowBar    := originLowBar
+        keyLowBroken := true
+        keyLowLine   := originLowLine
+        trend := -1
+
+else if trend == 1
+    // --- BOS Alcista: continuación, rompe el máximo estructural (keyHigh) ---
+    if not keyHighBroken and not na(keyHigh) and srcUp > keyHigh
+        bullBos := true
+        keyHighBroken := true
+        line.set_color(keyHighLine, bullColor)
+        line.set_width(keyHighLine, lineWidthConfirmed)
+        line.set_x2(keyHighLine, bar_index + extendBars)
+        array.push(histLines, keyHighLine)
+
+    // --- CHoCH Bajista: rompe el Pivot Low que generó el último Pivot High (originLow) ---
+    if not originLowBroken and not na(originLow) and srcDown < originLow
+        bearChoch := true
+        originLowBroken := true
+        if not na(originLowLine)
+            line.set_color(originLowLine, bearColor)
+            line.set_width(originLowLine, lineWidthConfirmed)
+            line.set_style(originLowLine, line.style_solid)
+            line.set_x2(originLowLine, bar_index + extendBars)
+            array.push(histLines, originLowLine)
+        // El nivel roto pasa a ser la nueva referencia de BOS bajista
+        keyLow       := originLow
+        keyLowBar    := originLowBar
+        keyLowBroken := true
+        keyLowLine   := originLowLine
+        trend := -1
+
+else if trend == -1
+    // --- BOS Bajista: continuación, rompe el mínimo estructural (keyLow) ---
+    if not keyLowBroken and not na(keyLow) and srcDown < keyLow
+        bearBos := true
+        keyLowBroken := true
+        line.set_color(keyLowLine, bearColor)
+        line.set_width(keyLowLine, lineWidthConfirmed)
+        line.set_x2(keyLowLine, bar_index + extendBars)
+        array.push(histLines, keyLowLine)
+
+    // --- CHoCH Alcista: rompe el Pivot High que generó el último Pivot Low (originHigh) ---
+    if not originHighBroken and not na(originHigh) and srcUp > originHigh
+        bullChoch := true
+        originHighBroken := true
+        if not na(originHighLine)
+            line.set_color(originHighLine, bullColor)
+            line.set_width(originHighLine, lineWidthConfirmed)
+            line.set_style(originHighLine, line.style_solid)
+            line.set_x2(originHighLine, bar_index + extendBars)
+            array.push(histLines, originHighLine)
+        // El nivel roto pasa a ser la nueva referencia de BOS alcista
+        keyHigh       := originHigh
+        keyHighBar    := originHighBar
+        keyHighBroken := true
+        keyHighLine   := originHighLine
+        trend := 1
+
+// ============================================================
+//  ETIQUETAS Y ALERTAS
+// ============================================================
+if showLabels
+    if bullChoch
+        array.push(histLabels, placeLabel("CHoCH", true, bullColor))
+    if bullBos
+        array.push(histLabels, placeLabel("BOS", true, bullColor))
+    if bearChoch
+        array.push(histLabels, placeLabel("CHoCH", false, bearColor))
+    if bearBos
+        array.push(histLabels, placeLabel("BOS", false, bearColor))
+
+if bullChoch
+    alert("CHoCH Alcista en " + syminfo.ticker + " (" + timeframe.period + ")", alert.freq_once_per_bar_close)
+if bullBos
+    alert("BOS Alcista en " + syminfo.ticker + " (" + timeframe.period + ")", alert.freq_once_per_bar_close)
+if bearChoch
+    alert("CHoCH Bajista en " + syminfo.ticker + " (" + timeframe.period + ")", alert.freq_once_per_bar_close)
+if bearBos
+    alert("BOS Bajista en " + syminfo.ticker + " (" + timeframe.period + ")", alert.freq_once_per_bar_close)
+
+alertcondition(bullChoch, title="CHoCH Alcista", message="CHoCH Alcista: ruptura del Pivot High que generó el último Pivot Low")
+alertcondition(bullBos,   title="BOS Alcista",   message="BOS Alcista: continuación de tendencia alcista")
+alertcondition(bearChoch, title="CHoCH Bajista", message="CHoCH Bajista: ruptura del Pivot Low que generó el último Pivot High")
+alertcondition(bearBos,   title="BOS Bajista",   message="BOS Bajista: continuación de tendencia bajista")
+
+// ============================================================
+//  LIMPIEZA DE OBJETOS ANTIGUOS (rendimiento en TF bajas)
+// ============================================================
+if array.size(histLines) > maxKeep
+    line.delete(array.shift(histLines))
+if array.size(histLabels) > maxKeep
+    label.delete(array.shift(histLabels))
