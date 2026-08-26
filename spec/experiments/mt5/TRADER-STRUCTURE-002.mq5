@@ -45,8 +45,9 @@ input bool   InpShowLines  = true;
 input bool   InpShowLabels = true;
 input bool   InpShowPanel  = true;
 input bool   InpLogCsv     = true;   // registrar eventos en CSV
-input int    InpPanelX     = 124;   // a la derecha del panel de ESTRUCTURA HTF
-input int    InpPanelY     = 436;   // misma fila que ESTRUCTURA HTF, bajo el detector
+input bool   InpPanelAuto  = true;  // ubicar solo, al costado del panel del detector
+input int    InpPanelX     = 124;   // panel: x (solo si InpPanelAuto=false)
+input int    InpPanelY     = 436;   // panel: y (solo si InpPanelAuto=false)
 
 #define PFX "TS2_"
 #define MAXEV 300
@@ -285,6 +286,24 @@ void PanelTxt(const string nm, const int x, const int y, const string s,
    ObjectSetInteger(0, nm, OBJPROP_SELECTABLE, false);
   }
 
+// El detector (TRADER-ALERT-001) publica la geometria de su cuadro en variables
+// globales del terminal. Leerlas deja este panel SIEMPRE fuera del cuadro, y lo
+// hace seguir al cuadro si el usuario lo arrastra o lo redimensiona.
+int DetectorRightX()
+  {
+   int bx = 12, bw = 232;
+   if(GlobalVariableCheck("TA1_x")) bx = (int)GlobalVariableGet("TA1_x");
+   if(GlobalVariableCheck("TA1_w")) bw = (int)GlobalVariableGet("TA1_w");
+   return(bx + bw + 16);
+  }
+
+int DetectorTopY()
+  {
+   int by = 48;
+   if(GlobalVariableCheck("TA1_y")) by = (int)GlobalVariableGet("TA1_y");
+   return(by);
+  }
+
 //+------------------------------------------------------------------+
 void Render()
   {
@@ -311,17 +330,18 @@ void Render()
    if(InpShowPanel)
      {
       int x = InpPanelX, y = InpPanelY;
+      if(InpPanelAuto) { x = DetectorRightX(); y = DetectorTopY() + 140; }
       PanelTxt(PFX+"h", x, y, "BOS/CHoCH  (pivotes " +
-               (string)InpLeftBars + "/" + (string)InpRightBars + ")", clrWhite, 9);
+               (string)InpLeftBars + "/" + (string)InpRightBars + ")", clrWhite, 10);
       string tt = (gTrend == 1 ? "ALCISTA" : (gTrend == -1 ? "BAJISTA" : "--"));
       color  tc = (gTrend == 1 ? clrLimeGreen : (gTrend == -1 ? clrRed : clrGray));
-      PanelTxt(PFX+"t", x, y+15, EnumToString(_Period) + "   " + tt, tc, 9);
+      PanelTxt(PFX+"t", x, y+18, EnumToString(_Period) + "   " + tt, tc, 10);
       int nB = 0, nC = 0;
       for(int i = 0; i < gNEv; i++) { if(gEvs[i].kind <= 2) nB++; else nC++; }
-      PanelTxt(PFX+"c", x, y+30, StringFormat("BOS %d   CHoCH %d", nB, nC), clrSilver, 8);
+      PanelTxt(PFX+"c", x, y+36, StringFormat("BOS %d   CHoCH %d", nB, nC), clrSilver, 9);
       if(gNEv > 0)
-         PanelTxt(PFX+"u", x, y+45, "ultimo: " + KindTxt(gEvs[gNEv-1].kind), clrSilver, 8);
-      PanelTxt(PFX+"f", x, y+60, "lectura visual - no validada", C'130,140,160', 8);
+         PanelTxt(PFX+"u", x, y+54, "ultimo: " + KindTxt(gEvs[gNEv-1].kind), clrSilver, 9);
+      PanelTxt(PFX+"f", x, y+72, "lectura visual - no validada", C'130,140,160', 8);
      }
    ChartRedraw();
   }

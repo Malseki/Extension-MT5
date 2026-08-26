@@ -34,8 +34,9 @@ input bool   InpUseW         = true;  // usar 1 semana
 input bool   InpUseD         = true;  // usar 1 dia
 input bool   InpUse4H        = true;  // usar 4 horas
 input bool   InpUse1H        = true;  // usar 1 hora
-input int    InpPanelX       = 12;    // panel: x
-input int    InpPanelY       = 436;   // panel: y (el detector ocupa 48..428)
+input bool   InpPanelAuto    = true;  // ubicar solo, al costado del panel del detector
+input int    InpPanelX       = 12;    // panel: x (solo si InpPanelAuto=false)
+input int    InpPanelY       = 436;   // panel: y (solo si InpPanelAuto=false)
 
 #define PFX "TS1_"
 #define MAXEV 400
@@ -338,6 +339,24 @@ void PanelCell(const string name, const int x, const int y, const string txt,
 string TrendTxt(const int c) { return(c == 1 ? "ALCISTA" : (c == -1 ? "BAJISTA" : "--")); }
 color  TrendCol(const int c) { return(c == 1 ? clrLimeGreen : (c == -1 ? clrRed : clrGray)); }
 
+// El detector (TRADER-ALERT-001) publica la geometria de su cuadro en variables
+// globales del terminal. Leerlas deja este panel SIEMPRE fuera del cuadro, y lo
+// hace seguir al cuadro si el usuario lo arrastra o lo redimensiona.
+int DetectorRightX()
+  {
+   int bx = 12, bw = 232;
+   if(GlobalVariableCheck("TA1_x")) bx = (int)GlobalVariableGet("TA1_x");
+   if(GlobalVariableCheck("TA1_w")) bw = (int)GlobalVariableGet("TA1_w");
+   return(bx + bw + 16);
+  }
+
+int DetectorTopY()
+  {
+   int by = 48;
+   if(GlobalVariableCheck("TA1_y")) by = (int)GlobalVariableGet("TA1_y");
+   return(by);
+  }
+
 //+------------------------------------------------------------------+
 int OnInit()
   {
@@ -364,13 +383,14 @@ void Refresh()
 
    if(!InpShowPanel) return;
    int x = InpPanelX, y = InpPanelY;
-   PanelCell(PFX + "hdr", x, y, "ESTRUCTURA HTF", clrWhite, 9);
+   if(InpPanelAuto) { x = DetectorRightX(); y = DetectorTopY(); }
+   PanelCell(PFX + "hdr", x, y, "ESTRUCTURA HTF", clrWhite, 10);
    int row = 1;
-   if(InpUseW)  { PanelCell(PFX+"rW", x, y+15*row, "1W   " + TrendTxt(tw), TrendCol(tw), 9); row++; }
-   if(InpUseD)  { PanelCell(PFX+"rD", x, y+15*row, "1D   " + TrendTxt(td), TrendCol(td), 9); row++; }
-   if(InpUse4H) { PanelCell(PFX+"r4", x, y+15*row, "4H   " + TrendTxt(t4), TrendCol(t4), 9); row++; }
-   if(InpUse1H) { PanelCell(PFX+"r1", x, y+15*row, "1H   " + TrendTxt(t1), TrendCol(t1), 9); row++; }
-   PanelCell(PFX + "ftr", x, y+15*row, "lectura visual - no validada", clrSilver, 8);
+   if(InpUseW)  { PanelCell(PFX+"rW", x, y+18*row, "1W   " + TrendTxt(tw), TrendCol(tw), 10); row++; }
+   if(InpUseD)  { PanelCell(PFX+"rD", x, y+18*row, "1D   " + TrendTxt(td), TrendCol(td), 10); row++; }
+   if(InpUse4H) { PanelCell(PFX+"r4", x, y+18*row, "4H   " + TrendTxt(t4), TrendCol(t4), 10); row++; }
+   if(InpUse1H) { PanelCell(PFX+"r1", x, y+18*row, "1H   " + TrendTxt(t1), TrendCol(t1), 10); row++; }
+   PanelCell(PFX + "ftr", x, y+18*row, "lectura visual - no validada", clrSilver, 8);
    ChartRedraw();
   }
 
