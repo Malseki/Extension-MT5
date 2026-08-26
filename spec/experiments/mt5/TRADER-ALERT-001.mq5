@@ -530,7 +530,11 @@ void EventRefresh()
 bool   CalHas(const long v) { return(v != LONG_MIN); }
 string CalTxt(const long v)
   {
-   if(v == LONG_MIN) return("");           // vacio, NUNCA cero
+   // Marcador explicito, NO cadena vacia. FileWrite con FILE_CSV colapsa los
+   // campos vacios y corre todas las columnas siguientes: el 2026-08-26 el
+   // acumulador leia el dumped_at en la columna de forecast y has_actual salia
+   // 0 en las 77 filas. Un hueco tiene que ocupar su lugar en la fila.
+   if(v == LONG_MIN) return("NA");         // sin dato, NUNCA cero y NUNCA vacio
    return(DoubleToString((double)v / 1000000.0, 3));
   }
 
