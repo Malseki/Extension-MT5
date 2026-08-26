@@ -35,7 +35,7 @@ input bool   InpUseD         = true;  // usar 1 dia
 input bool   InpUse4H        = true;  // usar 4 horas
 input bool   InpUse1H        = true;  // usar 1 hora
 input int    InpPanelX       = 12;    // panel: x
-input int    InpPanelY       = 260;   // panel: y (debajo del panel del detector)
+input int    InpPanelY       = 436;   // panel: y (el detector ocupa 48..428)
 
 #define PFX "TS1_"
 #define MAXEV 400
@@ -364,13 +364,13 @@ void Refresh()
 
    if(!InpShowPanel) return;
    int x = InpPanelX, y = InpPanelY;
-   PanelCell(PFX + "hdr", x, y, "ESTRUCTURA HTF", clrWhite, 10);
+   PanelCell(PFX + "hdr", x, y, "ESTRUCTURA HTF", clrWhite, 9);
    int row = 1;
-   if(InpUseW)  { PanelCell(PFX+"rW", x, y+18*row, "1W   " + TrendTxt(tw), TrendCol(tw), 10); row++; }
-   if(InpUseD)  { PanelCell(PFX+"rD", x, y+18*row, "1D   " + TrendTxt(td), TrendCol(td), 10); row++; }
-   if(InpUse4H) { PanelCell(PFX+"r4", x, y+18*row, "4H   " + TrendTxt(t4), TrendCol(t4), 10); row++; }
-   if(InpUse1H) { PanelCell(PFX+"r1", x, y+18*row, "1H   " + TrendTxt(t1), TrendCol(t1), 10); row++; }
-   PanelCell(PFX + "ftr", x, y+18*row, "lectura visual - no validada", clrSilver, 8);
+   if(InpUseW)  { PanelCell(PFX+"rW", x, y+15*row, "1W   " + TrendTxt(tw), TrendCol(tw), 9); row++; }
+   if(InpUseD)  { PanelCell(PFX+"rD", x, y+15*row, "1D   " + TrendTxt(td), TrendCol(td), 9); row++; }
+   if(InpUse4H) { PanelCell(PFX+"r4", x, y+15*row, "4H   " + TrendTxt(t4), TrendCol(t4), 9); row++; }
+   if(InpUse1H) { PanelCell(PFX+"r1", x, y+15*row, "1H   " + TrendTxt(t1), TrendCol(t1), 9); row++; }
+   PanelCell(PFX + "ftr", x, y+15*row, "lectura visual - no validada", clrSilver, 8);
    ChartRedraw();
   }
 

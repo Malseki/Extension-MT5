@@ -45,8 +45,8 @@ input bool   InpShowLines  = true;
 input bool   InpShowLabels = true;
 input bool   InpShowPanel  = true;
 input bool   InpLogCsv     = true;   // registrar eventos en CSV
-input int    InpPanelX     = 12;
-input int    InpPanelY     = 470;
+input int    InpPanelX     = 124;   // a la derecha del panel de ESTRUCTURA HTF
+input int    InpPanelY     = 436;   // misma fila que ESTRUCTURA HTF, bajo el detector
 
 #define PFX "TS2_"
 #define MAXEV 300
@@ -312,16 +312,16 @@ void Render()
      {
       int x = InpPanelX, y = InpPanelY;
       PanelTxt(PFX+"h", x, y, "BOS/CHoCH  (pivotes " +
-               (string)InpLeftBars + "/" + (string)InpRightBars + ")", clrWhite, 10);
+               (string)InpLeftBars + "/" + (string)InpRightBars + ")", clrWhite, 9);
       string tt = (gTrend == 1 ? "ALCISTA" : (gTrend == -1 ? "BAJISTA" : "--"));
       color  tc = (gTrend == 1 ? clrLimeGreen : (gTrend == -1 ? clrRed : clrGray));
-      PanelTxt(PFX+"t", x, y+18, EnumToString(_Period) + "   " + tt, tc, 10);
+      PanelTxt(PFX+"t", x, y+15, EnumToString(_Period) + "   " + tt, tc, 9);
       int nB = 0, nC = 0;
       for(int i = 0; i < gNEv; i++) { if(gEvs[i].kind <= 2) nB++; else nC++; }
-      PanelTxt(PFX+"c", x, y+36, StringFormat("BOS %d   CHoCH %d", nB, nC), clrSilver, 9);
+      PanelTxt(PFX+"c", x, y+30, StringFormat("BOS %d   CHoCH %d", nB, nC), clrSilver, 8);
       if(gNEv > 0)
-         PanelTxt(PFX+"u", x, y+52, "ultimo: " + KindTxt(gEvs[gNEv-1].kind), clrSilver, 8);
-      PanelTxt(PFX+"f", x, y+68, "lectura visual - no validada", C'130,140,160', 8);
+         PanelTxt(PFX+"u", x, y+45, "ultimo: " + KindTxt(gEvs[gNEv-1].kind), clrSilver, 8);
+      PanelTxt(PFX+"f", x, y+60, "lectura visual - no validada", C'130,140,160', 8);
      }
    ChartRedraw();
   }
