@@ -189,7 +189,12 @@ int OnInit()
       long     owner = (long)GlobalVariableGet(TA1_LOCK);
       datetime beat  = (datetime)GlobalVariableGet(TA1_BEAT);
       long     age   = (long)TimeLocal() - (long)beat;
-      if(owner != myChart && age >= 0 && age < 10)
+      // PRIORIDAD DE M5. La muestra de E-MT5-036 esta definida sobre M5, asi
+      // que la instancia de M5 se queda con el registro aunque otra haya
+      // llegado antes. Sin esto el dueño lo decide el orden de carga: el
+      // 2026-08-26 quedo registrando la de H1 y el panel mostraba PERIOD_H1,
+      // que es confuso aunque las mediciones sigan pidiendo M5 explicitamente.
+      if(owner != myChart && age >= 0 && age < 10 && _Period != PERIOD_M5)
         {
          // MODO ESPEJO. Antes esto era INIT_FAILED, lo que impedia mirar el
          // detector en dos temporalidades a la vez. Ahora la instancia
@@ -244,7 +249,21 @@ void OnTimer()
    // en el mismo milisegundo y una barra M5 quedo escrita tres veces.
    // La global es la autoridad: el que no figura como dueño cede aqui, un
    // segundo despues del arranque.
-   if(!gMirror && (long)GlobalVariableGet(TA1_LOCK) != ChartID())
+   bool owned = ((long)GlobalVariableGet(TA1_LOCK) == ChartID());
+   if(!owned && _Period == PERIOD_M5)
+     {
+      // M5 reclama el registro siempre: la muestra del experimento es M5.
+      GlobalVariableSet(TA1_LOCK, (double)ChartID());
+      GlobalVariableSet(TA1_BEAT, (double)TimeLocal());
+      if(gMirror)
+        {
+         gMirror = false;
+         Print("TRADER-ALERT-001: M5 reclama el registro (la muestra se define ",
+               "sobre M5). Esta instancia vuelve a PRIMARIA.");
+        }
+      owned = true;
+     }
+   else if(!gMirror && !owned)
      {
       gMirror = true;
       Print("TRADER-ALERT-001: otra instancia quedo como dueña del registro. ",
