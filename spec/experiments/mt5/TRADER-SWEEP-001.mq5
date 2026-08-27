@@ -53,7 +53,12 @@ input int    InpBarsBack   = 300;    // barras a procesar por TF
 input int    InpMaxLevels  = 12;     // niveles a mostrar por TF y por lado
 input bool   InpShowPend   = true;   // mostrar liquidez PENDIENTE
 input bool   InpShowTaken  = true;   // mostrar la ya tomada
-input int    InpKeepTaken  = 6;      // cuantos niveles tomados conservar
+// Cupos SEPARADOS. Antes un solo contador de 6 mezclaba sweeps y rupturas, y
+// como las rupturas son mas numerosas se comian el cupo: de 48 sweeps validos
+// se dibujaban 6. El sweep es lo que el operador quiere ver, la ruptura es
+// contexto.
+input int    InpKeepSweep  = 24;     // sweeps (sobre umbral) a dibujar
+input int    InpKeepBreak  = 8;      // rupturas a dibujar
 input bool   InpLogCsv     = true;
 // Umbral de penetracion. Medido sobre 50 sweeps de EURUSD el 2026-08-27:
 // mediana 1,7 pips, y 11 de 50 (22%) penetraron MENOS que el spread real en
@@ -289,7 +294,7 @@ void Render()
    ObjectsDeleteAll(0, PFX + "n");
 
    datetime ahora = TimeCurrent();
-   int drawnP = 0, drawnT = 0;
+   int drawnP = 0, drawnS = 0, drawnB = 0;
    int nPend = 0, nSweep = 0, nBreak = 0, nRuido = 0;
 
    // los mas recientes primero: la liquidez vieja importa menos
@@ -299,10 +304,15 @@ void Render()
       if(gL[i].state == ST_SWEEP) { if(gL[i].wickBeyond >= InpMinSweepP) nSweep++; else nRuido++; }
       if(gL[i].state == ST_BREAK) nBreak++;
 
-      bool pend = (gL[i].state == ST_PEND);
-      if(pend  && (!InpShowPend  || drawnP >= InpMaxLevels)) continue;
-      if(!pend && (!InpShowTaken || drawnT >= InpKeepTaken)) continue;
-      if(pend) drawnP++; else drawnT++;
+      bool pend  = (gL[i].state == ST_PEND);
+      bool sweep = (gL[i].state == ST_SWEEP && gL[i].wickBeyond >= InpMinSweepP);
+      bool ruido = (gL[i].state == ST_SWEEP && gL[i].wickBeyond <  InpMinSweepP);
+      if(pend && (!InpShowPend || drawnP >= InpMaxLevels)) continue;
+      if(!pend && !InpShowTaken) continue;
+      if(sweep && drawnS >= InpKeepSweep) continue;
+      if(!pend && !sweep && drawnB >= InpKeepBreak) continue;
+      if(ruido) continue;                 // el ruido no se dibuja, solo se cuenta
+      if(pend) drawnP++; else if(sweep) drawnS++; else drawnB++;
 
       color c; int w; int style; string tag;
       if(gL[i].state == ST_PEND)
