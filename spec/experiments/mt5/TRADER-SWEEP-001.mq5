@@ -32,10 +32,23 @@
 #property indicator_chart_window
 #property indicator_plots 0
 
+// Una temporalidad por bloque, con su propio left/right. El retardo de
+// confirmacion es right x duracion de la vela: con right=3 en H1 un nivel
+// tarda 3 HORAS en aparecer, y para operar intradia eso llega tarde. El
+// 2026-08-27 el trader marco un objetivo en 1.16374 que el indicador no tenia,
+// justamente por eso. M15 con right=2 lo confirma en 30 minutos.
+input bool   InpUseM5      = false;  // niveles de 5 minutos
+input int    InpLeftM5     = 3;
+input int    InpRightM5    = 2;
+input bool   InpUseM15     = true;   // niveles de 15 minutos
+input int    InpLeftM15    = 3;
+input int    InpRightM15   = 2;
 input bool   InpUseH1      = true;   // niveles de 1 hora
+input int    InpLeftH1     = 3;
+input int    InpRightH1    = 2;
 input bool   InpUseH4      = true;   // niveles de 4 horas
-input int    InpLeftBars   = 3;      // barras izq. del swing (en su propio TF)
-input int    InpRightBars  = 3;      // barras der. — retardo de confirmacion
+input int    InpLeftH4     = 3;
+input int    InpRightH4    = 3;
 input int    InpBarsBack   = 300;    // barras a procesar por TF
 input int    InpMaxLevels  = 12;     // niveles a mostrar por TF y por lado
 input bool   InpShowPend   = true;   // mostrar liquidez PENDIENTE
@@ -54,7 +67,10 @@ input int    InpPanelX     = 12;
 input int    InpPanelY     = 560;
 
 #define PFX  "TSW_"
-#define MAXL 200
+// 200 quedaba corto con tres temporalidades activas: el 2026-08-27 se lleno
+// exacto (M15 72 + H1 66 + H4 62) y como el escaneo va en orden, H4 quedaba
+// truncado a la mitad. Un tope que se alcanza en silencio es peor que uno alto.
+#define MAXL 600
 
 //--- estado del nivel
 #define ST_PEND   0
@@ -70,6 +86,7 @@ struct Liq
    datetime tHit;     // cuando fue tomado (0 si sigue pendiente)
    double   wickBeyond; // cuanto lo penetro la mecha, en pips
    string   tf;
+   int      perSec;     // duracion de la vela de ese TF, para la guarda de frescura
   };
 
 Liq      gL[];
@@ -78,21 +95,23 @@ datetime gLastAviso = 0;
 int      gPip = 1;
 
 //+------------------------------------------------------------------+
-bool PivHigh(const MqlRates &r[], const int p, const int n)
+bool PivHigh(const MqlRates &r[], const int p, const int n,
+             const int left, const int right)
   {
-   if(p - InpLeftBars < 0 || p + InpRightBars >= n) return(false);
+   if(p - left < 0 || p + right >= n) return(false);
    double v = r[p].high;
-   for(int j = p - InpLeftBars; j < p; j++)       if(r[j].high >= v) return(false);
-   for(int j = p + 1; j <= p + InpRightBars; j++) if(r[j].high >= v) return(false);
+   for(int j = p - left; j < p; j++)       if(r[j].high >= v) return(false);
+   for(int j = p + 1; j <= p + right; j++) if(r[j].high >= v) return(false);
    return(true);
   }
 
-bool PivLow(const MqlRates &r[], const int p, const int n)
+bool PivLow(const MqlRates &r[], const int p, const int n,
+            const int left, const int right)
   {
-   if(p - InpLeftBars < 0 || p + InpRightBars >= n) return(false);
+   if(p - left < 0 || p + right >= n) return(false);
    double v = r[p].low;
-   for(int j = p - InpLeftBars; j < p; j++)       if(r[j].low <= v) return(false);
-   for(int j = p + 1; j <= p + InpRightBars; j++) if(r[j].low <= v) return(false);
+   for(int j = p - left; j < p; j++)       if(r[j].low <= v) return(false);
+   for(int j = p + 1; j <= p + right; j++) if(r[j].low <= v) return(false);
    return(true);
   }
 
@@ -104,18 +123,19 @@ bool PivLow(const MqlRates &r[], const int p, const int n)
 //| SWEEP — se llevo los stops y el precio volvio. Si cierra por      |
 //| encima, es RUPTURA: el nivel cedio y no hay rechazo que leer.     |
 //+------------------------------------------------------------------+
-void ScanTF(const ENUM_TIMEFRAMES tf, const string tag)
+void ScanTF(const ENUM_TIMEFRAMES tf, const string tag,
+            const int left, const int right)
   {
    MqlRates r[]; ArraySetAsSeries(r, false);
-   int n = CopyRates(_Symbol, tf, 0, InpBarsBack + InpLeftBars + InpRightBars + 5, r);
-   if(n < InpLeftBars + InpRightBars + 10) return;
+   int n = CopyRates(_Symbol, tf, 0, InpBarsBack + left + right + 5, r);
+   if(n < left + right + 10) return;
 
    double pipSz = gPip * _Point;
 
-   for(int p = InpLeftBars; p < n - InpRightBars; p++)
+   for(int p = left; p < n - right; p++)
      {
-      bool isH = PivHigh(r, p, n);
-      bool isL = PivLow(r, p, n);
+      bool isH = PivHigh(r, p, n, left, right);
+      bool isL = PivLow(r, p, n, left, right);
       if(!isH && !isL) continue;
 
       double lvl = isH ? r[p].high : r[p].low;
@@ -125,7 +145,7 @@ void ScanTF(const ENUM_TIMEFRAMES tf, const string tag)
 
       // El estado se decide mirando SOLO velas posteriores al swing, y desde
       // que quedo confirmado (p + right). Antes de eso el nivel no existia.
-      for(int k = p + InpRightBars + 1; k < n; k++)
+      for(int k = p + right + 1; k < n; k++)
         {
          if(isH && r[k].high > lvl)
            {
@@ -143,10 +163,15 @@ void ScanTF(const ENUM_TIMEFRAMES tf, const string tag)
            }
         }
 
-      if(gNL >= MAXL) return;
+      if(gNL >= MAXL)
+        {
+         Print("TRADER-SWEEP-001: tope de ", MAXL, " niveles alcanzado en ", tag,
+               ". Los TF siguientes quedan sin escanear — subi MAXL o baja InpBarsBack.");
+         return;
+        }
       gL[gNL].t = r[p].time; gL[gNL].price = lvl; gL[gNL].isHigh = isH;
       gL[gNL].state = st; gL[gNL].tHit = tHit; gL[gNL].wickBeyond = wick;
-      gL[gNL].tf = tag;
+      gL[gNL].tf = tag; gL[gNL].perSec = PeriodSeconds(tf);
       gNL++;
      }
   }
@@ -191,7 +216,7 @@ void Aviso()
    if(idx < 0 || best == gLastAviso) return;
 
    // solo si es fresco: dentro de las ultimas 2 velas del TF de ese nivel
-   int per = (gL[idx].tf == "H4") ? 4 * 3600 : 3600;
+   int per = gL[idx].perSec;
    if(TimeCurrent() - best > 2 * per) { gLastAviso = best; return; }
 
    gLastAviso = best;
@@ -253,8 +278,10 @@ void Panel(const string nm, const int x, const int y, const string s,
 void Render()
   {
    gNL = 0; ArrayResize(gL, MAXL);
-   if(InpUseH1) ScanTF(PERIOD_H1, "H1");
-   if(InpUseH4) ScanTF(PERIOD_H4, "H4");
+   if(InpUseM5)  ScanTF(PERIOD_M5,  "M5",  InpLeftM5,  InpRightM5);
+   if(InpUseM15) ScanTF(PERIOD_M15, "M15", InpLeftM15, InpRightM15);
+   if(InpUseH1)  ScanTF(PERIOD_H1,  "H1",  InpLeftH1,  InpRightH1);
+   if(InpUseH4)  ScanTF(PERIOD_H4,  "H4",  InpLeftH4,  InpRightH4);
 
    LogCsv();
    Aviso();
