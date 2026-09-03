@@ -54,7 +54,7 @@ input bool   InpEventBlock   = false; // true = ademas silencia los avisos en ve
 bool gMirror = false;                // true = instancia espejo: dibuja, NO escribe
 
 #define W_BASE 232
-#define H_BASE 380
+#define H_BASE 421
 #define W_MIN  190
 #define H_MIN  300
 #define GRIP   12
@@ -88,6 +88,41 @@ datetime gBannerUntil = 0;
 datetime gLastBar = 0;
 struct Pend { int dir; double lvl, sl, tp; datetime t0; bool open; };
 Pend gPend[]; int gNP = 0;
+
+//--- COMPROMISO DIRECCIONAL -----------------------------------------
+// Antes habia tres emisores independientes (nivel, temprano, impulso) y
+// ninguno miraba lo que decian los otros: el 2026-09-03 salieron 77 avisos
+// en un dia y 45 de las 76 transiciones cambiaban de signo en menos de
+// 30 min, incluyendo BAJA a las 10:02 y SUBE a las 10:03 al MISMO precio.
+// Un panel no puede afirmar dos cosas opuestas a la vez.
+// Regla: mientras una llamada siga viva, no se emite la contraria.
+// Se considera resuelta cuando el precio recorre el objetivo a favor o el
+// stop en contra, la misma vara con la que ya se puntuaban las alertas.
+int      gDirActual = 0;      // +1 / -1 / 0 = sin compromiso
+double   gDirLvl    = 0.0;
+datetime gDirT      = 0;
+int      gContradic = 0;      // cuantas se suprimieron por contradecir
+
+//--- cierra el compromiso si el precio ya lo resolvio
+void DirRefresh()
+  {
+   if(gDirActual == 0) return;
+   MqlTick t; if(!SymbolInfoTick(_Symbol, t)) return;
+   double mv = (t.bid - gDirLvl) / (gPip * _Point) * gDirActual;
+   if(mv >= InpStopPips * InpTargetR || mv <= -InpStopPips)
+      gDirActual = 0;
+  }
+
+//--- unica puerta por la que pasan los tres emisores
+bool DirPermite(const int dir)
+  {
+   DirRefresh();
+   if(gDirActual != 0 && dir != gDirActual) { gContradic++; return(false); }
+   return(true);
+  }
+
+void DirTomar(const int dir, const double lvl)
+  { gDirActual = dir; gDirLvl = lvl; gDirT = TimeCurrent(); }
 int  gHit = 0, gMiss = 0;
 long gBarsLogged = 0;
 datetime gLastImp = 0;
@@ -118,6 +153,9 @@ void LoadGeom()
    if(GlobalVariableCheck(gPfx + "h")) gH = (int)GlobalVariableGet(gPfx + "h");
    if(gW < W_MIN) gW = W_MIN;
    if(gH < H_MIN) gH = H_MIN;
+   // la seccion "LLAMADA VIGENTE" agrego 3 filas: una geometria guardada de
+   // antes de ese cambio deja el texto fuera de la caja. Se estira una vez.
+   if(gH < H_BASE) gH = H_BASE;
   }
 
 //+------------------------------------------------------------------+
@@ -398,6 +436,19 @@ void Draw()
    Txt("f3", x, y, StringFormat("costo real %.3f p = %.1fx", COST_REAL, COST_REAL/EDGE_PIPS),
        C'240,110,110', FS(8), "Arial");                                                   y += SP(12);
    Txt("f4", x, y, "EL COSTO SUPERA LA VENTAJA", C'255,70,70', FS(8), "Arial");y += SP(12);
+
+   DirRefresh();
+   string llam = (gDirActual == 0) ? "sin llamada vigente"
+                 : StringFormat("%s desde %s en %s",
+                     (gDirActual > 0 ? "SUBE" : "BAJA"),
+                     TimeToString(gDirT, TIME_MINUTES),
+                     DoubleToString(gDirLvl, _Digits));
+   color cll = (gDirActual == 0) ? C'150,160,180'
+               : (gDirActual > 0 ? C'80,220,120' : C'255,110,110');
+   Txt("k0", x, y, "LLAMADA VIGENTE  (una sola a la vez)", C'110,120,140', FS(7), "Arial"); y += SP(15);
+   Txt("k1", x, y, llam, cll, FS(9), "Arial");                                             y += SP(12);
+   Txt("k2", x, y, StringFormat("suprimidas por contradecir: %d", gContradic),
+       C'150,160,180', FS(8), "Arial");                                                    y += SP(14);
 
    Txt("a1", x, y, StringFormat("alertas %d   acerto %d   fallo %d", gAlerts, gHit, gMiss),
        C'130,140,160', FS(8), "Arial");                                                   y += SP(12);
@@ -801,6 +852,15 @@ void Arrow(const int dir, const double price)
 //+------------------------------------------------------------------+
 void Fire(const int dir, const double level)
   {
+   if(!DirPermite(dir))
+     {
+      Print("ALERTA suprimida: contradice la llamada vigente (",
+            (gDirActual > 0 ? "SUBE" : "BAJA"), " desde ",
+            TimeToString(gDirT, TIME_MINUTES), " en ",
+            DoubleToString(gDirLvl, _Digits), ")");
+      return;
+     }
+   DirTomar(dir, level);
    double stop   = level - dir * gStopD;
    double target = level + dir * gStopD * InpTargetR;
    string d = (dir > 0) ? "BUY / COMPRA" : "SELL / VENTA";
@@ -882,6 +942,14 @@ void CheckTemprano()
    if(MathAbs(gIntraPips) < InpTempPips) return;
 
    int dir = (gIntraPips > 0) ? +1 : -1;
+   if(!DirPermite(dir))
+     {
+      gLastTemp = TimeCurrent();
+      Print("AVISO TEMPRANO suprimido: contradice la llamada vigente (",
+            (gDirActual > 0 ? "SUBE" : "BAJA"), ")");
+      return;
+     }
+   DirTomar(dir, t.bid);
    gLastTemp = TimeCurrent();
    gTempranos++;
 
@@ -936,6 +1004,15 @@ void CheckImpulso()
    if(MathAbs(mv) < InpImpPips) return;
 
    int dir = (mv > 0) ? +1 : -1;
+   if(!DirPermite(dir))
+     {
+      gLastImp = TimeCurrent();
+      Print("IMPULSO suprimido: contradice la llamada vigente (",
+            (gDirActual > 0 ? "SUBE" : "BAJA"), ")");
+      return;
+     }
+   MqlTick t0; SymbolInfoTick(_Symbol, t0);
+   DirTomar(dir, t0.bid);
    gLastImp = TimeCurrent();
    gImpDir  = dir;
    gImpulsos++;
