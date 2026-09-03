@@ -15,8 +15,8 @@
 #property copyright "PROJECT TRADER"
 #property version   "1.00"
 
-input string InpDesde       = "2026.06.01";
-input string InpHasta       = "2026.09.04";
+input string InpDesde       = "2026.04.01";
+input string InpHasta       = "2026.04.30";
 input int    InpNyOffset    = -7;     // servidor GMT+3 -> ET
 input int    InpGmtOffset   = -3;
 input int    InpAsiaIni     = 1380;   // 23:00 GMT
@@ -27,6 +27,7 @@ input int    InpRetestMin   = 60;     // minutos para volver a la zona (eleccion
 input bool   InpExigirM3M5  = true;   // confirmacion multi-TF (v2: "tambien en dos minutos")
 input int    InpPivL        = 3;
 input int    InpPivR        = 3;
+input bool   InpLiqInterna = true;   // pivotes M5/M15: la "liquidez interna" de v5
 input int    InpIdmPiv      = 2;      // pivote menor para el inducement
 input double InpIdmMinP     = 0.3;    // penetracion minima del inducement
 input bool   InpSoloVentana = false;  // false = todo el dia (para medir frecuencia real)
@@ -124,6 +125,32 @@ int OnInit()
          L[nL].tAlta=(k==0)?h1[p+InpPivR].time:h4[p+InpPivR].time; L[nL].tBarrido=0; nL++;
         }
      }
+   //--- LIQUIDEZ INTERNA: pivotes de M5 y M15
+   //    El fotograma de v4 (00:00:34) muestra que el nivel barrido era un
+   //    minimo del propio M1 de ~27 min antes, no PDL/Asia/H1/H4. Es lo que
+   //    v5 llama "liquidez interna". Sin esto el detector no puede ver lo que
+   //    ve el trader: el 2026-04-10 no aparecia.
+   if(InpLiqInterna)
+     {
+      MqlRates m15[]; ArraySetAsSeries(m15,false);
+      int n15=CopyRates(_Symbol,PERIOD_M15,desde,hasta,m15);
+      for(int k=0;k<2;k++)
+        {
+         int nn=(k==0)?n5:n15;
+         for(int p=3;p<nn-3&&nL<7990;p++)
+           {
+            bool ih=true,il=true;
+            if(k==0){for(int j=p-3;j<p;j++){if(m5[j].high>=m5[p].high)ih=false; if(m5[j].low<=m5[p].low)il=false;}
+                     for(int j=p+1;j<=p+3;j++){if(m5[j].high>=m5[p].high)ih=false; if(m5[j].low<=m5[p].low)il=false;}}
+            else    {for(int j=p-3;j<p;j++){if(m15[j].high>=m15[p].high)ih=false; if(m15[j].low<=m15[p].low)il=false;}
+                     for(int j=p+1;j<=p+3;j++){if(m15[j].high>=m15[p].high)ih=false; if(m15[j].low<=m15[p].low)il=false;}}
+            if(!ih&&!il) continue;
+            if(ih){L[nL].p=(k==0)?m5[p].high:m15[p].high; L[nL].isHigh=true;  L[nL].kind=(k==0)?"M5_H":"M15_H";}
+            else  {L[nL].p=(k==0)?m5[p].low :m15[p].low;  L[nL].isHigh=false; L[nL].kind=(k==0)?"M5_L":"M15_L";}
+            L[nL].tAlta=(k==0)?m5[p+3].time:m15[p+3].time; L[nL].tBarrido=0; nL++;
+           }
+        }
+     }
    PrintFormat("niveles: %d", nL);
 
    int fh=FileOpen("E-MT5-040-candidatos.csv",FILE_WRITE|FILE_CSV|FILE_ANSI|FILE_COMMON,',');
@@ -178,33 +205,61 @@ int OnInit()
       cRBmtf++;
 
       //--- 3) el precio vuelve a la zona
+      // v4 dice "VUELVE a retestear la zona": volver exige haberse ido.
+      // Sin esta condicion, 11 de 15 candidatos daban un "retest" a los 2 min,
+      // que no es un retest sino el precio que todavia no se movio.
+      // Distancia de salida = la altura de la propia zona (se escala sola).
       int iR=-1;
       double zLo=MathMin(zA,zB), zHi=MathMax(zA,zB);
+      double alto=MathMax(zHi-zLo, InpMinSweepP*pipSz);
+      bool salio=false;
       for(int j=i+2;j<n1 && (m1[j].time-m1[i].time)<=InpRetestMin*60;j++)
-        { if(m1[j].high>=zLo && m1[j].low<=zHi){ iR=j; break; } }
+        {
+         if(!salio)
+           {
+            if(dir<0 && m1[j].low  <= zLo-alto) salio=true;   // venta: se aleja hacia abajo
+            if(dir>0 && m1[j].high >= zHi+alto) salio=true;   // compra: se aleja hacia arriba
+            continue;
+           }
+         if(m1[j].high>=zLo && m1[j].low<=zHi){ iR=j; break; }
+        }
       if(iR<0) continue;
       cRetest++;
       int minsRetest=(int)((m1[iR].time-m1[i].time)/60);
 
       //--- 4) inducement entre el sweep y el retest
       //    pivote menor en direccion contraria al trade, dentro del tramo
+      // v4: "especulando con que saque el Indusment, toque la Rejection y se vaya".
+      // O sea: el inducement esta EN EL CAMINO de vuelta a la zona, no en
+      // cualquier lado. Para una VENTA (zona arriba) el precio sube hacia la
+      // zona y en el camino se lleva MAXIMOS MENORES que quedaron por DEBAJO
+      // de la zona: ahi estan los stops. Para una COMPRA, minimos menores por
+      // encima de la zona.
       double idm=0; string idmEst="no_habia";
-      for(int p=iR-InpIdmPiv-1; p>i+InpIdmPiv; p--)
+      for(int p=i+InpIdmPiv+1; p<iR-InpIdmPiv; p++)
         {
          bool ok=true;
-         if(dir>0){ for(int z=p-InpIdmPiv;z<p;z++) if(m1[z].high>=m1[p].high) ok=false;
-                    for(int z=p+1;z<=p+InpIdmPiv;z++) if(m1[z].high>=m1[p].high) ok=false;
-                    if(ok){ idm=m1[p].high; break; } }
-         else     { for(int z=p-InpIdmPiv;z<p;z++) if(m1[z].low<=m1[p].low) ok=false;
-                    for(int z=p+1;z<=p+InpIdmPiv;z++) if(m1[z].low<=m1[p].low) ok=false;
-                    if(ok){ idm=m1[p].low; break; } }
+         if(dir<0)   // venta: maximo menor por DEBAJO de la zona
+           {
+            if(m1[p].high >= zLo) continue;
+            for(int z=p-InpIdmPiv;z<p;z++)      if(m1[z].high>=m1[p].high) ok=false;
+            for(int z=p+1;z<=p+InpIdmPiv;z++)   if(m1[z].high>=m1[p].high) ok=false;
+            if(ok && m1[p].high>idm) idm=m1[p].high;   // el mas alto = el ultimo antes de la zona
+           }
+         else        // compra: minimo menor por ENCIMA de la zona
+           {
+            if(m1[p].low <= zHi) continue;
+            for(int z=p-InpIdmPiv;z<p;z++)      if(m1[z].low<=m1[p].low) ok=false;
+            for(int z=p+1;z<=p+InpIdmPiv;z++)   if(m1[z].low<=m1[p].low) ok=false;
+            if(ok && (idm==0 || m1[p].low<idm)) idm=m1[p].low;  // el mas bajo
+           }
         }
       if(idm>0)
         {
          idmEst="no_tomado";
          for(int j=i+1;j<=iR;j++)
-           { if(dir>0 && (m1[j].high-idm)/pipSz>=InpIdmMinP){ idmEst="tomado"; break; }
-             if(dir<0 && (idm-m1[j].low )/pipSz>=InpIdmMinP){ idmEst="tomado"; break; } }
+           { if(dir<0 && (m1[j].high-idm)/pipSz>=InpIdmMinP){ idmEst="tomado"; break; }
+             if(dir>0 && (idm-m1[j].low )/pipSz>=InpIdmMinP){ idmEst="tomado"; break; } }
         }
       if(idmEst=="tomado") cIdmTomado++;
       else if(idmEst=="no_tomado") cIdmNo++;

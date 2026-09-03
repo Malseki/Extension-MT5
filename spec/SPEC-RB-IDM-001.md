@@ -146,10 +146,128 @@ Criterio fijado ahora, antes de medir:
 | 0,5 - 3 | compatible con lo que reporta |
 | > 6 | demasiado laxa, esta marcando ruido |
 
-### 3.4 Lo que sigue sin poder medirse
+### 3.4 CORRECCION 2026-09-03 — los videos SON los datos etiquetados
+
+Se extrajeron fotogramas de v4 en el segundo exacto en que el trader dice
+*"me deja este Rejection Block de aca"* (00:00:34) e *"Indusment de aca"*
+(00:00:42). Lo que muestra la pantalla cambia dos cosas:
+
+**(a) Los videos son REPLAYS de fechas pasadas.** v4 se grabo el 2026-08-11
+pero esta reproduciendo el **viernes 10 de abril de 2026** (etiqueta en pantalla
+`Fri 10 Apr '26`, plataforma FX Replay sobre feed OANDA).
+
+Consecuencia: el cruce que se hizo contra las fechas de los archivos de video
+(0 de 4 coincidencias) **no probaba nada**: comparaba contra las fechas de
+GRABACION, no contra las fechas de los setups. Queda retirado.
+
+**(b) El grafico corre en UTC−4, o sea hora de Nueva York exacta.**
+Reloj en pantalla: `03:33:59 UTC-4`. La inferencia previa de ET−1, sacada de v3,
+era incorrecta.
+
+Eso reabre la discrepancia de la ventana, con una explicacion mejor: en v3 dice
+que Nueva York abre a las 8:30 de su grafico. Si el grafico ya esta en ET, se
+refiere a la apertura de las **8:30 ET** (apertura de futuros / horario de
+noticias), no a la de acciones de las 9:30. Sus 12 operaciones entre 08:44 y
+09:20 ET caen dentro de una ventana que arranca 8:30, no 9:30.
+
+[NOT ESTABLISHED] Que su ventana real sea 08:30-09:45 ET. Es la lectura que
+concilia v3, el huso horario verificado y los 12 horarios, pero el trader
+escribio 09:30-10:45 y no lo confirmo.
+
+**(c) La medicion que hacia falta ya existe y se puede cosechar.**
+No hace falta pedirle que etiquete casos: la fecha del replay, la hora y el
+precio **estan a la vista en cada fotograma**. Procedimiento:
+
+1. `whisper-cli -osrt` da el segundo exacto de cada mencion ("Rejection Block",
+   "Indusment", "cambio de estructura", "FVG").
+2. `ffmpeg -ss <segundo>` extrae el fotograma.
+3. Del fotograma se leen: fecha del replay, hora, precio y la zona que dibujo.
+
+Primer caso extraido asi, para usar como positivo conocido:
+
+| campo | valor |
+|---|---|
+| fecha del replay | 2026-04-10 (viernes) |
+| hora | ~03:00 ET (ventana de Londres) |
+| instrumento | EURUSD, M1, OANDA |
+| zona Rejection Block | 1.16820 - 1.16833 (~1,3 pips de alto) |
+| nivel barrido | ~1.16835, un minimo anterior de las ~02:30 |
+
+### 3.5 Lo que sigue sin poder medirse
 
 - **Zona horaria exacta de su grafico.** Se derivo ET−1 de v3
   (*"apertura de Nueva York, son las 8 y cuarto, faltan 15 minutos"*), y encaja
   con sus 12 horarios y con v4. Pero es inferencia, no dato.
 - **Cuantos setups VE contra cuantos TOMA.** Los 12 son los tomados. Si ve 30 y
   toma 12, la frecuencia objetivo es otra.
+
+
+---
+
+## 4. RESULTADO DE LA CALIBRACION POR FRECUENCIA (2026-09-03)
+
+Se probo el detector contra el unico positivo etiquetado disponible: el caso de
+v4, extraido del fotograma (2026-04-10, ~03:00 ET, EURUSD).
+
+### 4.1 Falsacion y diagnostico
+
+Con niveles PDH/PDL + Asia + pivotes H1/H4, el 2026-04-10 **no aparecia**.
+
+El fotograma muestra por que: el nivel que el trader barre es **un minimo del
+propio M1 de ~27 minutos antes** (la linea horizontal se extiende desde las
+~02:30 hasta la vela del sweep a las ~02:57). No es PDL, ni minimo de Asia, ni
+un pivote H1/H4. Es la "liquidez interna" que v5 nombra:
+
+> v5: *"En una hora marcamos esta liquidez, que seria como una liquidez interna"*
+
+### 4.2 Correccion aplicada
+
+Se agregaron pivotes 3/3 de **M5 y M15** al conjunto de niveles.
+
+| medida | antes | despues |
+|---|---|---|
+| niveles | 662 | 1.691 |
+| sweeps | 25 | 180 |
+| + rejection (mecha >=50%) | 14 | 118 |
+| + confirmado M3/M5 | 10 | 107 |
+| + retest valido | 7 | 76 |
+| **candidatos por dia** | **0,24** | **2,62** |
+| candidatos el 2026-04-10 | 0 | 4 |
+
+**2,62/dia cae dentro de la banda 0,5-3 declarada como "compatible" en §3.3
+ANTES de medir.** La calibracion por frecuencia se cumplio.
+
+Composicion de los 76 candidatos: 53 M5_L, 16 M5_H, 3 H1_L, 2 PDL, 1 H1_H,
+1 ASIA_L. **El 91% es liquidez interna.** El conjunto de niveles anterior no
+podia ver el 91% de lo que el trader opera.
+
+### 4.3 Lo que NO se puede afirmar todavia
+
+El candidato de las **02:57 ET del 10 de abril** coincide en fecha, hora
+(~02:57-03:00) y tipo de nivel (M5_L) con el Rejection Block del video. Pero la
+zona no calza exacta:
+
+| | zona |
+|---|---|
+| video (FX Replay, feed OANDA) | 1,16820 - 1,16833 |
+| candidato (feed del broker MT5) | 1,16840 - 1,16857 |
+
+[NOT ESTABLISHED] Que sean el mismo evento. La diferencia es de ~1-2 pips y hay
+una explicacion visible: el fotograma muestra `C1.16832` en un minuto donde los
+datos de MT5 dan ~1,16843. **Son feeds distintos** (OANDA contra el broker del
+terminal). Eso explicaria el corrimiento, pero no esta verificado.
+
+Para cerrarlo hace falta cosechar mas positivos con el metodo de §3.4 y ver si
+el corrimiento es constante. Con un solo caso no se distingue "misma zona con
+otro feed" de "zona distinta".
+
+### 4.4 Advertencia sobre lo que esto NO demuestra
+
+Que la definicion ahora encuentre lo que el trader encuentra **no dice nada
+sobre si gana**. E-MT5-040 no mide resultado a proposito. Lo unico establecido
+es que la definicion pasa la calibracion de frecuencia y ya no es ciega al tipo
+de nivel que el trader usa.
+
+Medir rendimiento sobre estos 76 candidatos, ahora que ya se vio el embudo,
+seria medir sobre datos que ya se miraron. Ese experimento va aparte, con su
+propio pre-registro.
