@@ -43,6 +43,9 @@ input double InpCostPips     = 0.838;
 input int    InpMaxHoldMin   = 240;
 input bool   InpBreakEven    = true;  // stop a la entrada al llegar a +1R
 input bool   InpExigirM3M5   = true;  // FVG "claro": confirmado en M3 o M5
+input int    InpPivL         = 3;     // pivotes H1/H4: barras a izquierda
+input int    InpPivR         = 3;     // pivotes H1/H4: barras a derecha
+input int    InpCaducaDias   = 0;     // 0 = los niveles no caducan
 
 int gPip = 1;
 double pipSz = 0;
@@ -174,7 +177,30 @@ int OnInit()
          hay=false;
         }
      }
-   PrintFormat("niveles de liquidez: %d  (PDH/PDL + Asia H/L)", nL);
+   //--- NIVELES: maximos/minimos de swing en H1 y H4
+   //    el texto del trader los pedia y v5 los confirma ("liquidez interna" en 1h).
+   //    Van SUMADOS a PDH/PDL y Asia, no en su lugar.
+   MqlRates h4[]; ArraySetAsSeries(h4,false);
+   int nh4 = CopyRates(_Symbol, PERIOD_H4, desde, hasta, h4);
+   for(int k=0;k<2;k++)
+     {
+      int nn = (k==0)? nh1 : nh4;
+      for(int p=InpPivL; p<nn-InpPivR && nL<7990; p++)
+        {
+         bool ih=true, il=true;
+         if(k==0){ for(int j=p-InpPivL;j<p;j++){if(h1[j].high>=h1[p].high)ih=false; if(h1[j].low<=h1[p].low)il=false;}
+                   for(int j=p+1;j<=p+InpPivR;j++){if(h1[j].high>=h1[p].high)ih=false; if(h1[j].low<=h1[p].low)il=false;} }
+         else    { for(int j=p-InpPivL;j<p;j++){if(h4[j].high>=h4[p].high)ih=false; if(h4[j].low<=h4[p].low)il=false;}
+                   for(int j=p+1;j<=p+InpPivR;j++){if(h4[j].high>=h4[p].high)ih=false; if(h4[j].low<=h4[p].low)il=false;} }
+         if(!ih && !il) continue;
+         if(ih){ L[nL].p=(k==0)?h1[p].high:h4[p].high; L[nL].isHigh=true;  L[nL].kind=(k==0)?"H1_H":"H4_H"; }
+         else  { L[nL].p=(k==0)?h1[p].low :h4[p].low;  L[nL].isHigh=false; L[nL].kind=(k==0)?"H1_L":"H4_L"; }
+         L[nL].tAlta = (k==0)? h1[p+InpPivR].time : h4[p+InpPivR].time;  // recien cuando el pivote queda confirmado
+         L[nL].tBarrido = 0;
+         nL++;
+        }
+     }
+   PrintFormat("niveles de liquidez: %d  (PDH/PDL + Asia H/L + pivotes H1/H4)", nL);
 
    int fh = FileOpen("E-MT5-039-setups.csv", FILE_WRITE|FILE_CSV|FILE_ANSI|FILE_COMMON, ',');
    if(fh!=INVALID_HANDLE)
@@ -190,24 +216,27 @@ int OnInit()
       // marcar niveles atravesados (mantiene "en pie" al dia)
       for(int q=0;q<nL;q++)
          if(L[q].tBarrido==0 && L[q].tAlta<tb)
-            if((L[q].isHigh && m1[i].high>L[q].p) || (!L[q].isHigh && m1[i].low<L[q].p))
-               L[q].tBarrido = tb;
+           {
+            // mismo umbral que el sweep: un roce de 0,1 pip no mata el nivel
+            if(L[q].isHigh  && (m1[i].high-L[q].p)/pipSz >= InpMinSweepP) L[q].tBarrido = tb;
+            if(!L[q].isHigh && (L[q].p-m1[i].low )/pipSz >= InpMinSweepP) L[q].tBarrido = tb;
+           }
 
       if(!EnVentana(tb)) continue;
       cVentana++;
 
       //--- 1) SWEEP dentro de la ventana
-      int dir=0; double lvl=0; string kind="";
+      int dir=0; double lvl=0, ext=0; string kind="";
       for(int q=0;q<nL;q++)
         {
          if(L[q].tAlta>=tb) continue;
          if(L[q].tBarrido!=0 && L[q].tBarrido<tb) continue;   // ya estaba barrido de antes
          if(L[q].isHigh && m1[i].high>L[q].p && m1[i].close<=L[q].p
             && (m1[i].high-L[q].p)/pipSz >= InpMinSweepP)
-           { dir=-1; lvl=L[q].p; kind=L[q].kind; break; }
+           { dir=-1; lvl=L[q].p; ext=m1[i].high; kind=L[q].kind; break; }
          if(!L[q].isHigh && m1[i].low<L[q].p && m1[i].close>=L[q].p
             && (L[q].p-m1[i].low)/pipSz >= InpMinSweepP)
-           { dir=1; lvl=L[q].p; kind=L[q].kind; break; }
+           { dir=1; lvl=L[q].p; ext=m1[i].low; kind=L[q].kind; break; }
         }
       if(dir==0) continue;
       cSweep++;
@@ -269,9 +298,16 @@ int OnInit()
       cToque++;
 
       double entrada = zEnt;
-      double stop    = (dir>0)? zLej - InpBufferP*pipSz : zLej + InpBufferP*pipSz;
+      // v1 pone el stop bajo el FVG; v3 lo pone bajo el minimo del sweep
+      // ("aunque son varios pips de stop"). Se toma el MAS LEJANO de los dos:
+      // el borde del FVG de M1 solo mide ~1 pip, menos que el spread, y con
+      // 1R por debajo del costo el marco en R deja de significar nada.
+      double ancla = (dir>0)? MathMin(zLej, ext) : MathMax(zLej, ext);
+      double stop    = (dir>0)? ancla - InpBufferP*pipSz : ancla + InpBufferP*pipSz;
       double riesgo  = MathAbs(entrada-stop);
       if(riesgo <= 0.5*pipSz) continue;
+      // un stop por debajo del costo de ejecucion no es una operacion real
+      if(riesgo < InpCostPips*pipSz) { continue; }
 
       //--- 5) objetivo = proxima liquidez opuesta todavia en pie
       double target=0; bool hayT=false;

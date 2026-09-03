@@ -1,0 +1,3 @@
+bb3c98606a3f366cb4a717efc69ed9c346626d20948ab1827ea36b521e8a4d23  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-09-03T1230Z-E039-prereg-videos/E-MT5-039-preregistration.md
+fe90bc42b756775035cd430e6ba51b7d5c89c5ddc84557d1c7f1c98a02d1efad  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-09-03T1230Z-E039-prereg-videos/RESULTADO.md
+ca2fd52a8ab0f555794f19acd6154e61deb71b2bc0479cd619d2376c6a662527  /Users/nachogm/Desktop/EXTENSION MetaTrader5/spec/experiments/mt5/raw/2026-09-03T1230Z-E039-prereg-videos/E-MT5-039-setups.csv

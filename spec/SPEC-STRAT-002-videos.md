@@ -36,6 +36,28 @@ Ahora, segun 5 de 7 videos:
 Un nivel se considera **barrido** cuando el precio lo penetra por ≥ 1,0 pip y
 la vela cierra de vuelta del lado original.
 
+**ENMIENDA 2026-09-03 (misma fecha, antes de leer ningun resultado valido).**
+La primera version de esta spec REEMPLAZABA los pivotes H1/H4 por PDH/PDL+Asia.
+Fue una sobre-correccion mia. El texto original del trader pedia "maximos y
+minimos de 1h y 4h", y v5 lo confirma en video:
+
+> *"En una hora marcamos esta liquidez, que seria como una liquidez interna"*
+
+Son la **union**, no una alternativa. Los niveles ahora son:
+PDH, PDL, Asia High, Asia Low, **pivotes H1 (3/3) y pivotes H4 (3/3)**.
+
+Por que esta enmienda NO contamina el experimento: el pre-registro de E-MT5-039
+fijo por adelantado que *"si salen menos de 50 setups, la implementacion es
+sospechosa y hay que revisar el codigo ANTES de leer el resultado"*. La primera
+corrida dio n=1. Se aplico esa clausula: se corrigio la implementacion sin mirar
+el resultado. No es ajuste de parametro contra el resultado — es la via que el
+propio pre-registro dejo escrita para este caso.
+
+Segunda correccion de la misma tanda: marcar un nivel como "ya barrido" ahora
+exige la misma penetracion minima que el sweep (1,0 pip). Antes cualquier roce
+de 0,1 pip mataba el nivel, lo que era inconsistente con la propia definicion de
+sweep.
+
 [NO IMPLEMENTADO] Liquidez en linea de tendencia (v1). Es diagonal y
 discrecional; no tengo definicion algoritmica honesta. Queda declarado como
 faltante, no simulado.
@@ -63,8 +85,32 @@ candidatos y el trader no lo aplica.
 ## 5. Stop  ← CAMBIO
 
 Antes: bajo el extremo del sweep.
-Ahora, v1 (*"abajo de este FVG"*): **al borde lejano del FVG sin mitigar**,
-mas 0,3 pip de colchon.
+Ahora: **al mas lejano entre el borde del FVG sin mitigar y el extremo del
+sweep**, mas 0,3 pip de colchon.
+
+**ENMIENDA 2 (2026-09-03).** La primera version usaba solo el borde del FVG
+(v1: *"abajo de este FVG"*). Medido, eso da stops de 0,9 a 3,5 pips, promedio
+~1,5. El costo de ejecucion es 0,838 pips: el stop quedaba del orden del spread,
+o por debajo. Consecuencias mecanicas:
+
+- una operacion con stop de 0,9 pips no es ejecutable — la mata el spread al entrar;
+- con 1R < costo, el marco en R deja de significar algo: aparecen R:R de 26, 42
+  y 53 que no son ganancias reales sino artefactos de dividir por un riesgo diminuto;
+- el break-even a +1R se armaba casi al instante, y 9 de 15 operaciones
+  terminaron en break-even por eso.
+
+v3 dice *"aunque son varios pips de stop"* y *"capaz el stop un poquito mas
+cerca del minimo"*; v1 razona con distancias de 15 y 23 pips. Ninguno opera con
+stops de 1 pip. Tomar el mas lejano de los dos anclajes es lo fiel a ambos videos.
+
+Ademas: se descarta todo setup cuyo riesgo sea **menor que el costo de
+ejecucion**. No es un filtro de rendimiento — es la condicion minima para que la
+operacion exista.
+
+Esta enmienda se hace sobre una corrida que dio **R NETO +26,81**, es decir
+POSITIVA. No se corrige para mejorar un resultado: se corrige porque el resultado
+positivo estaba construido sobre operaciones que no se pueden ejecutar, y dependia
+de 2 de 15 casos (sacando el mejor queda +9,50; sacando los dos, −4).
 
 ## 6. Objetivo  ← CAMBIO
 
